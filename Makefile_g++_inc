@@ -1,0 +1,31 @@
+# COMPILER
+
+CC=g++
+LD=$(CC)
+
+CFLAGS+=-c
+CFLAGS+=-I $(INCDIR)
+CFLAGS+=-Wall
+CFLAGS+=-Werror
+CFLAGS+=-g
+CFLAGS+=-rdynamic
+CFLAGS+=-ggdb
+CFLAGS+=-std=c++11
+CFLAGS+=-fPIC
+
+CFLAGS+="-DCOMPILED_ON=\"`uname -a`\""
+
+QTDIR?=/usr/include
+
+CFLAGS_QT+=-I $(QTDIR)/qtbase/include
+CFLAGS_QT+=-I $(QTDIR)/qtbase/include/QtCore
+CFLAGS_QT+=-I $(QTDIR)/qtbase/include/QtGui
+CFLAGS_QT+=-I $(QTDIR)/qtbase/include/QtWidgets
+
+# LINKER
+
+LDFLAGS_QT=-L$(QTDIR)/qtbase/lib -lQt5Core -lQt5Gui -lQt5Widgets
+MOC=$(QTDIR)/qtbase/bin/moc
+
+# MISC
+

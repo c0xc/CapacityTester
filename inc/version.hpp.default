@@ -1,0 +1,5 @@
+#ifndef DEFINE_GLOBALS
+extern const char *GITVERSION;
+#else
+const char *GITVERSION = "";
+#endif

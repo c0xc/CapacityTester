@@ -1,0 +1,34 @@
+# COMPILER
+
+CC=g++
+LD=$(CC)
+
+CFLAGS+=-c
+CFLAGS+=-I $(INCDIR)
+CFLAGS+=-Wall
+CFLAGS+=-Werror
+CFLAGS+=-g
+CFLAGS+=-std=c++11
+
+#CFLAGS+="-DCOMPILED_ON=\"`...`\""
+
+QT_BASEDIR=%QTDIR%
+CFLAGS_QT+=-I $(QT_BASEDIR)\qtbase\include
+CFLAGS_QT+=-I $(QT_BASEDIR)\qtbase\include\QtCore
+CFLAGS_QT+=-I $(QT_BASEDIR)\qtbase\include\QtGui
+CFLAGS_QT+=-I $(QT_BASEDIR)\qtbase\include\QtWidgets
+
+# LINKER
+
+LDFLAGS_QT="$(QT_BASEDIR)\qtbase\lib\libQt5Core.a" \
+"$(QT_BASEDIR)\qtbase\lib\libQt5Gui.a" \
+"$(QT_BASEDIR)\qtbase\lib\libQt5Widgets.a"
+LDFLAGS_QT+=-Wl,-subsystem,windows
+MOC="$(QT_BASEDIR)\qtbase\bin\moc.exe"
+
+# MISC
+
+CMD_CLEAN=-del "$(OBJDIR)\*.o" "$(OBJDIR)\*.obj" "$(SRCDIR)\*.moc.cpp"
+
+CMD_CLEAN_MOC=-del "$(SRCDIR)\*.moc.cpp"
+

@@ -5,6 +5,7 @@ INCDIR=inc
 OBJDIR=obj
 BINDIR=bin
 SUBDIR=sub
+RESDIR=res
 
 CC_OPT_O=-o 
 LD_OPT_O=$(CC_OPT_O)
@@ -25,7 +26,9 @@ CFLAGS+=$(ADDCFLAGS)
 LDFLAGS+=$(ADDLDFLAGS)
 
 MODULES+=main
+MODULES+=res
 MODULES+=size
+MODULES+=capacitytestercli
 MODULES+=capacitytestergui
 MODULES+=volumetester
 
@@ -57,6 +60,9 @@ $(BINDIR):
 
 $(VERSIONFILE): $(VERSIONFILE_DEFAULT)
 	cp $< $@
+
+$(SRCDIR)/res.cpp: $(RESDIR)/res.qrc
+	$(QTDIR)/qtbase/bin/rcc -o $@ $<
 
 $(OBJDIR)/%.obj: $(SRCDIR)/%.cpp
 	$(CC) $(CFLAGS) $< $(CC_OPT_O)$@

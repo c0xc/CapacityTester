@@ -60,6 +60,9 @@ public:
 
 private:
 
+    bool
+    closing;
+
     QString
     selected_mountpoint;
 
@@ -145,6 +148,9 @@ private:
     worker;
 
 private slots:
+
+    void
+    closeEvent(QCloseEvent *event);
 
     void
     refreshVolumeList();

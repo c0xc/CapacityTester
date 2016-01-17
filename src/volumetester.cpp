@@ -34,23 +34,17 @@
  * There are many counterfeit flash storage devices or memory cards
  * available online.
  * These claim to have a higher capacity than they really have.
- * For example, a thumbdrive sold as "16 GB USB drive"
- * will present itself as a storage device holding 16 GB
+ * For example, a thumbdrive sold as "16 GB USB flash drive"
+ * will present itself as a storage device with a capacity of 16 GB,
  * but in reality, it might just have a 4 GB chip.
- * Writes beyond the 4 GB limit are usually ignored
- * without reporting an error.
+ * Writes beyond the 4 GB limit are sometimes ignored
+ * without reporting an error, depending on the fake.
  * This class will fill the filesystem completely and then verify it
  * to see if the returned data is correct.
  *
- * Before testing every single byte (within the available space),
- * a quick test is performed, which will try to access certain offsets.
- * This will only take a couple of seconds.
- * If the quick test fails, it's already clear that the storage device
- * is bad, although the exact limit will not be known yet.
- *
  * This class works on a mounted filesystem rather than a storage device.
- * This filesystem should span the entire storage device,
- * i.e. it should be the only filesystem on that device.
+ * The filesystem should span the entire storage device,
+ * i.e., it should be the only filesystem on that device.
  *
  * As a courtesy to the user, this tester will clean up after itself
  * and remove all test files afterwards.
@@ -155,19 +149,45 @@ VolumeTester::availableMountpoints()
 VolumeTester::VolumeTester(const QString &mountpoint)
             : block_size_max(16 * MB),
               file_size_max(512 * MB),
+              safety_buffer(1 * MB), //512 KB not enough for some filesystems
               file_prefix("CAPACITYTESTER"),
               bytes_total(0),
               bytes_written(0),
               bytes_remaining(0),
               _canceled(false),
+              success(true),
               error_type(Error::Unknown)
 {
+    //Default safety buffer
+    #if defined(SAFETY_BUFFER)
+    safety_buffer = SAFETY_BUFFER;
+    #endif
+
     //Apply mountpoint if valid
     if (isValid(mountpoint))
     {
         _mountpoint = mountpoint;
     }
 
+}
+
+/*!
+ * Changes the size of the safety buffer zone at the end.
+ * This safety buffer is required for many filesystems.
+ * A too small value may lead to a write error at the end
+ * of the initialization phase.
+ * The default value is 1 MB.
+ *
+ * For example, when testing a FAT32 filesystem,
+ * this could be set to 0.
+ * It's almost never necessary to decrease this value.
+ */
+bool
+VolumeTester::setSafetyBuffer(int new_buffer)
+{
+    if (new_buffer < 0) return false;
+    safety_buffer = new_buffer;
+    return true;
 }
 
 /*!
@@ -393,7 +413,10 @@ VolumeTester::start()
     assert(file_size_max > block_size_max);
 
     //Size of volume
+    //Safety buffer used by default (e.g., 1M)
+    //Some filesystems need this, otherwise write error at 100% (ENOSPC)
     bytes_total = bytesAvailable();
+    bytes_total -= safety_buffer;
     bytes_written = 0;
     bytes_remaining = bytes_total;
     if (bytes_total <= 0)
@@ -424,7 +447,7 @@ VolumeTester::start()
             assert(size > 0);
 
             //File area
-            //*size_max are long (long) (not just int) to prevent overflows
+            //long long (not just int) to prevent overflows
             qint64 pos = i * file_size_max; //NOT times current size!
             assert(pos >= 0); //int overflow may lead to negative pos
             qint64 end = pos + size;
@@ -471,6 +494,7 @@ VolumeTester::start()
                 block_info.rel_offset = pos; //relative offset within file
                 block_info.abs_offset = file_info.offset + pos; //absolute
                 block_info.size = block_size;
+                block_info.rel_end = end;
                 block_info.abs_end = file_info.offset + end;
                 block_info.id = id_bytes;
 
@@ -484,35 +508,36 @@ VolumeTester::start()
         }
     }
 
-    //File objects (local within the scope of this function)
-    //QFile objects created on heap, auto-deleted when (parent) out of scope
+    //File objects (on heap, auto-deleted)
+    //Files deleted after destroyed() immediate deletion may fail (too early)
     QObject files_parent; //restrict QFile objects to this function
-    connect(&files_parent,
-            SIGNAL(destroyed()),
-            SLOT(deleteFiles()));
-    QList<QPointer<QFile>> files;
     for (int i = 0, ii = file_infos.size(); i < ii; i++)
     {
-        FileInfo file_info = file_infos[i];
-
         //Create file
-        QFile *file = new QFile(file_info.path, &files_parent); //with parent
-        files << file;
+        QString path = file_infos[i].path;
+        QFile *file = new QFile(path, &files_parent); //with parent
+        file->setProperty("PATH", path);
+        connect(file,
+                SIGNAL(destroyed(QObject*)),
+                SLOT(removeFile(QObject*)));
+        file_infos[i].file = file;
     }
 
     //Run tests
-    if (initialize(files) && writeFull(files) && verifyFull(files))
+    if (initialize() && writeFull() && verifyFull())
     {
         //Test succeeded
+        success = true;
         emit succeeded();
-        emit finished();
     }
     else
     {
         //Test failed
+        success = false;
         emit failed(error_type);
-        emit finished();
     }
+
+    //Files deleted and finished() after last file object deleted
 
 }
 
@@ -529,10 +554,8 @@ VolumeTester::cancel()
 }
 
 bool
-VolumeTester::initialize(const QList<QPointer<QFile>> &files)
+VolumeTester::initialize()
 {
-    assert(files.size() == file_infos.size());
-
     //Start
     emit initializationStarted(bytes_total);
 
@@ -545,7 +568,17 @@ VolumeTester::initialize(const QList<QPointer<QFile>> &files)
     for (int i = 0, ii = file_infos.size(); i < ii; i++)
     {
         FileInfo file_info = file_infos[i];
-        QFile *file = files[i];
+        QFile *file = file_info.file;
+        assert(file);
+
+        //File must not exist
+        if (file->exists())
+        {
+            //File conflict
+            error_type |= Error::Create;
+            emit createFailed(i, file_info.offset);
+            return false;
+        }
 
         //Create file
         if (!file->open(QIODevice::ReadWrite))
@@ -558,9 +591,6 @@ VolumeTester::initialize(const QList<QPointer<QFile>> &files)
             return false;
         }
 
-        //Start timer
-        timer_initializing.start();
-
         //Write id
         //Usually 1 byte but could be longer
         if (!file->seek(0) ||
@@ -572,34 +602,58 @@ VolumeTester::initialize(const QList<QPointer<QFile>> &files)
             return false;
         }
 
-        //Grow file to calculated size
-        if (!file->resize(file_info.size))
+        //Grow file incrementally
+        for (int j = 0, jj = file_info.blocks.size(); j < jj; j++)
         {
-            //Growing file failed
-            error_type |= Error::Write;
-            error_type |= Error::Resize;
-            emit writeFailed(file_info.offset, file_info.size);
-            return false;
-        }
+            BlockInfo block_info = file_info.blocks[j];
 
-        //Write last byte
-        if (!file->seek(file_info.size - 1) || !file->putChar(byte_fe))
-        {
-            //Writing last byte failed
-            error_type |= Error::Write;
-            emit writeFailed(file_info.offset, file_info.size);
-            return false;
-        }
+            //Start timer
+            timer_initializing.start();
 
-        //Block initialized, get time
-        initialized_sec += timer_initializing.elapsed() / 1000;
-        initialized_mb += file_info.size / MB;
-        double avg_speed =
-            initialized_sec ? initialized_mb / initialized_sec : 0;
-        emit initialized(file_info.end, avg_speed);
+            //Grow file
+            if (!file->resize(block_info.rel_end))
+            {
+                //Growing file failed
+                error_type |= Error::Write;
+                error_type |= Error::Resize;
+                emit writeFailed(block_info.abs_offset, block_info.size);
+                return false;
+            }
+
+            //No fsync() because the initialization should be fast.
+            //This may lead to high (wrong) write speed being reported.
+
+            //Last block
+            bool is_last = j == jj - 1;
+            if (is_last)
+            {
+                //File size
+                assert(file->size() == file_info.size);
+
+                //Write last byte
+                if (!file->seek(file_info.size - 1) ||
+                    !file->putChar(byte_fe))
+                {
+                    //Writing last byte failed
+                    error_type |= Error::Write;
+                    emit writeFailed(block_info.abs_offset, block_info.size);
+                    return false;
+                }
+            }
+
+            //Block initialized, get time
+            initialized_sec += (double)timer_initializing.elapsed() / 1000;
+            initialized_mb += block_info.size / MB;
+            double avg_speed =
+                initialized_sec ? initialized_mb / initialized_sec : 0;
+            emit initialized(block_info.abs_end, avg_speed);
+
+            //Cancel gracefully
+            if (abortRequested()) return false;
+        }
 
         //Verify this file right away to speed things up
-        //Don't wait for last file to be written if second already file lost
+        //Don't wait for last file to be written if second already corrupted
 
         //Verify last byte
         char c;
@@ -625,13 +679,12 @@ VolumeTester::initialize(const QList<QPointer<QFile>> &files)
         //Cancel gracefully
         if (abortRequested()) return false;
     }
-    assert(files.size() == file_infos.size());
 
     //Verify all files (quick test, just first and last few bytes)
     for (int i = 0, ii = file_infos.size(); i < ii; i++)
     {
         FileInfo file_info = file_infos[i];
-        QFile *file = files[i];
+        QFile *file = file_info.file;
 
         //Verify last byte
         char c;
@@ -662,10 +715,8 @@ VolumeTester::initialize(const QList<QPointer<QFile>> &files)
 }
 
 bool
-VolumeTester::writeFull(const QList<QPointer<QFile>> &files)
+VolumeTester::writeFull()
 {
-    assert(files.size() == file_infos.size());
-
     //Start
     emit writeStarted();
 
@@ -676,12 +727,13 @@ VolumeTester::writeFull(const QList<QPointer<QFile>> &files)
     for (int i = 0, ii = file_infos.size(); i < ii; i++)
     {
         FileInfo file_info = file_infos[i];
-        QFile *file = files[i];
+        QFile *file = file_info.file;
+        int fd = file->handle();
 
         //Flush cache
         //Might block for a while if initialized files not on disk yet (cache)
         #ifdef USE_FSYNC
-        fsync(file->handle());
+        fsync(fd);
         #endif
 
         //Write blocks
@@ -707,11 +759,11 @@ VolumeTester::writeFull(const QList<QPointer<QFile>> &files)
 
             //Flush cache
             #ifdef USE_FSYNC
-            fsync(file->handle());
+            fsync(fd);
             #endif
 
             //Block written
-            written_sec += timer_writing.elapsed() / 1000;
+            written_sec += (double)timer_writing.elapsed() / 1000;
             written_mb += block_info.size / MB;
             double avg_speed = written_sec ? written_mb / written_sec : 0;
             emit written(block_info.abs_end, avg_speed);
@@ -725,10 +777,8 @@ VolumeTester::writeFull(const QList<QPointer<QFile>> &files)
 }
 
 bool
-VolumeTester::verifyFull(const QList<QPointer<QFile>> &files)
+VolumeTester::verifyFull()
 {
-    assert(files.size() == file_infos.size());
-
     //Read test pattern
     emit verifyStarted();
     QElapsedTimer timer_verifying;
@@ -737,11 +787,17 @@ VolumeTester::verifyFull(const QList<QPointer<QFile>> &files)
     for (int i = 0, ii = file_infos.size(); i < ii; i++)
     {
         FileInfo file_info = file_infos[i];
-        QFile *file = files[i];
+        QFile *file = file_info.file;
+        int fd = file->handle();
 
         //Flush cache
         #ifdef USE_FSYNC
-        fsync(file->handle());
+        fsync(fd);
+        #endif
+
+        //Tell kernel to discard cache
+        #if _XOPEN_SOURCE >= 600 || _POSIX_C_SOURCE >= 200112L
+        posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
         #endif
 
         //Read pattern in small chunks
@@ -766,7 +822,7 @@ VolumeTester::verifyFull(const QList<QPointer<QFile>> &files)
             }
 
             //Block verified
-            verified_sec += timer_verifying.elapsed() / 1000;
+            verified_sec += (double)timer_verifying.elapsed() / 1000;
             verified_mb += block_info.size / MB;
             double avg_speed = verified_sec ? verified_mb / verified_sec : 0;
             emit verified(block_info.abs_end, avg_speed);
@@ -800,17 +856,36 @@ VolumeTester::generateTestPattern()
 }
 
 void
-VolumeTester::deleteFiles()
+VolumeTester::removeFile(QObject *file)
 {
-    for (int i = file_infos.size(); --i >= 0;)
-    {
-        FileInfo file_info = file_infos[i];
-        QFile file(file_info.path);
-        file.remove();
-        file_infos.removeAt(i);
-    }
-    assert(file_infos.isEmpty());
+    //File path
+    QString path = file->property("PATH").toString();
+    assert(!path.isEmpty());
 
+    //File info index
+    int index = -1;
+    for (int i = 0, ii = file_infos.size(); i < ii; i++)
+    {
+        if (file_infos[i].path == path) index = i;
+    }
+    assert(index != -1);
+
+    //Delete file
+    if (!QFile::remove(path))
+    {
+        //Deleting file failed
+        //Should not happen (maybe slow drive...)
+        emit removeFailed(path);
+    }
+
+    //Remove info
+    file_infos.removeAt(index);
+
+    //Finish after last file
+    if (file_infos.isEmpty())
+    {
+        emit finished(success, error_type);
+    }
 }
 
 QByteArray

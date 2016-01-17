@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <unistd.h>
+#include <fcntl.h>
 
 #if defined(_WIN32)
 #include <io.h> /* _get_osfhandle */
@@ -33,8 +34,8 @@
 #include <errno.h>
 #endif
 
-#include <QDebug>
 #include <QObject>
+#include <QVariant>
 #include <QPair>
 #include <QFile>
 #include <QFileInfo>
@@ -92,7 +93,10 @@ signals:
     succeeded();
 
     void
-    finished();
+    removeFailed(const QString &path);
+
+    void
+    finished(bool success = false, int error_type = Error::Unknown);
 
 public:
 
@@ -112,7 +116,10 @@ public:
     };
 
     static const int
-    MB = 1024 * 1024;
+    KB = 1024;
+
+    static const int
+    MB = 1024 * KB;
 
     static bool
     isValid(const QString &mountpoint);
@@ -121,6 +128,9 @@ public:
     availableMountpoints();
 
     VolumeTester(const QString &mountpoint);
+
+    bool
+    setSafetyBuffer(int new_buffer);
 
     bool
     isValid() const;
@@ -163,19 +173,19 @@ public slots:
 private slots:
 
     bool
-    initialize(const QList<QPointer<QFile>> &files);
+    initialize();
 
     bool
-    writeFull(const QList<QPointer<QFile>> &files);
+    writeFull();
 
     bool
-    verifyFull(const QList<QPointer<QFile>> &files);
+    verifyFull();
 
     void
     generateTestPattern();
 
     void
-    deleteFiles();
+    removeFile(QObject *file);
 
 private:
 
@@ -191,6 +201,9 @@ private:
         size;
 
         qint64
+        rel_end;
+
+        qint64
         abs_end;
 
         QByteArray
@@ -202,6 +215,9 @@ private:
     {
         QString
         path;
+
+        QPointer<QFile>
+        file;
 
         qint64
         offset;
@@ -232,6 +248,9 @@ private:
     qint64
     file_size_max;
 
+    qint64
+    safety_buffer;
+
     QString
     _mountpoint;
 
@@ -252,6 +271,9 @@ private:
 
     bool
     _canceled;
+
+    bool
+    success;
 
     int
     error_type;

@@ -21,7 +21,8 @@
 #include "capacitytestergui.hpp"
 
 CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
-                 : QMainWindow(parent, flags)
+                 : QMainWindow(parent, flags),
+                   closing(false)
 {
     //Layout items
     QVBoxLayout *vbox_main = new QVBoxLayout;
@@ -44,7 +45,7 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     cmb_volume->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     cmb_volume->setToolTip(tr("Mounted volume to be tested"));
     connect(cmb_volume,
-            SIGNAL(activated(int)),
+            SIGNAL(currentIndexChanged(int)),
             SLOT(loadVolume(int)));
     hbox_volume->addWidget(cmb_volume);
     btn_refresh_volumes = new QPushButton(tr("&Refresh"));
@@ -243,6 +244,48 @@ CapacityTesterGui::progressLightPixmap(const QColor &color)
 }
 
 void
+CapacityTesterGui::closeEvent(QCloseEvent *event)
+{
+    //Don't close while test running
+    if (worker)
+    {
+        //Don't close immediately
+        event->ignore();
+
+        //Check if already closing
+        if (closing)
+            return;
+
+        //Ask user what to do
+        if (QMessageBox::question(this,
+            tr("Abort test?"),
+            tr("Do you want to abort the running test?"),
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No) != QMessageBox::Yes)
+        {
+            //Continue, don't close
+            return;
+        }
+
+        //Set closing flag
+        closing = true;
+
+        //Abort test (if still running)
+        if (!worker) return;
+        connect(worker,
+                SIGNAL(destroyed()),
+                SLOT(close()));
+        setEnabled(false);
+        stopVolumeTest();
+
+    }
+    else
+    {
+        event->accept();
+    }
+}
+
+void
 CapacityTesterGui::refreshVolumeList()
 {
     //Remember previously selected item
@@ -337,17 +380,20 @@ CapacityTesterGui::setCapacityFields(VolumeTester &tester)
         arg(capacity.formatted()).
         arg((qint64)capacity));
     Size used = tester.bytesUsed();
-    int used_percentage = ((double)used / capacity) * 100;
+    int used_percentage =
+        capacity ? ((double)used / capacity) * 100 : 0;
     txt_used->setText(tr("%1 / %2 B / %3%").
         arg(used.formatted()).
         arg((qint64)used).
         arg(used_percentage));
     Size available = tester.bytesAvailable();
-    int available_percentage = ((double)available / capacity) * 100;
+    int available_percentage =
+        capacity ? ((double)available / capacity) * 100 : 0;
     txt_available->setText(tr("%1 / %2 B / %3%").
         arg(available.formatted()).
         arg((qint64)available).
         arg(available_percentage));
+
 }
 
 void
@@ -366,7 +412,7 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
         QMessageBox::critical(this,
             tr("Volume invalid"),
             tr("The selected volume is not valid."));
-        cmb_volume->clear(); //unselect
+        cmb_volume->setCurrentIndex(0); //unselect
         QTimer::singleShot(0, this, SLOT(refreshVolumeList())); //update
         return;
     }
@@ -425,7 +471,14 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
             "The volume should be completely empty.").
             arg(root_files.count()));
         msgbox.setDetailedText(root_files.join("\n"));
-        msgbox.exec();
+        msgbox.setStandardButtons(QMessageBox::Ignore | QMessageBox::Cancel);
+        msgbox.setDefaultButton(QMessageBox::Cancel);
+        if (msgbox.exec() == QMessageBox::Cancel)
+        {
+            //Cancel (undo selection)
+            cmb_volume->setCurrentIndex(0); //unselect
+            return;
+        }
     }
 
     //Enable start button (if no problems found)
@@ -457,7 +510,7 @@ CapacityTesterGui::startVolumeTest()
         QMessageBox::critical(this,
             tr("Volume invalid"),
             tr("The selected volume is not valid anymore."));
-        cmb_volume->clear(); //unselect
+        cmb_volume->setCurrentIndex(0); //unselect
         QTimer::singleShot(0, this, SLOT(refreshVolumeList())); //update
         return;
     }
@@ -507,7 +560,9 @@ CapacityTesterGui::startVolumeTest()
     btn_start_volume_test->setEnabled(false);
     btn_stop_volume_test->setEnabled(true);
 
-    //Status field
+    //Reset fields
+    txt_write_speed->clear();
+    txt_read_speed->clear();
     txt_time->clear();
     txt_result->clear();
     txt_result->setStyleSheet(" ");
@@ -591,7 +646,7 @@ CapacityTesterGui::startVolumeTest()
             this,
             SLOT(succeededVolumeTest()));
 
-    //Test completed (either successful or not) handler
+    //Test completed handler (successful or not)
     connect(worker,
             SIGNAL(finished()),
             this,
@@ -633,6 +688,9 @@ CapacityTesterGui::startVolumeTest()
 void
 CapacityTesterGui::stopVolumeTest()
 {
+    //No action if no test running
+    if (!worker) return;
+
     //Test phase
     lbl_pro_testing->setProperty("PHASE", tr("STOPPING"));
 
@@ -654,7 +712,7 @@ CapacityTesterGui::succeededVolumeTest()
 
     //Result - SUCCESS
     txt_result->setPlainText(tr(
-        "TEST COMPLETED SUCCESSFULLY, NO ERRORS FOUND"));
+        "TEST COMPLETED SUCCESSFULLY, NO ERRORS FOUND."));
     txt_result->setStyleSheet("background-color:#DFF0D8; color:#437B43;");
 
     //Stop animation
@@ -831,12 +889,8 @@ void
 CapacityTesterGui::initialized(qint64 bytes, double avg_speed)
 {
     //Initialized MB (progress)
-    qint64 mb = 1024 * 1024;
-    int initialized_mb = bytes / mb;
+    int initialized_mb = bytes / VolumeTester::MB;
     pro_initializing->setValue(initialized_mb);
-
-    //Speed
-    txt_write_speed->setText(tr("%1 MB/s").arg(avg_speed, 0, 'g', 2));
 
 }
 
@@ -864,7 +918,7 @@ void
 CapacityTesterGui::createFailed(int index, qint64 start)
 {
     //Result - ERROR
-    txt_result->setPlainText(tr("ACCESS ERROR"));
+    txt_result->setPlainText(tr("ACCESS ERROR!"));
     txt_result->setStyleSheet("background-color:#F2DEDE; color:#A94442;");
 
 }
@@ -876,7 +930,7 @@ CapacityTesterGui::writeFailed(qint64 start, int size)
     int start_mb = start / VolumeTester::MB;
 
     //Result - ERROR
-    txt_result->setPlainText(tr("WRITE ERROR AFTER %1 MB").arg(start_mb));
+    txt_result->setPlainText(tr("WRITE ERROR AFTER %1 MB!").arg(start_mb));
     txt_result->setStyleSheet("background-color:#F2DEDE; color:#A94442;");
 
 }
@@ -888,7 +942,7 @@ CapacityTesterGui::verifyFailed(qint64 start, int size)
     int start_mb = start / VolumeTester::MB;
 
     //Result - ERROR
-    txt_result->setPlainText(tr("READ ERROR AFTER %1 MB").arg(start_mb));
+    txt_result->setPlainText(tr("READ ERROR AFTER %1 MB!").arg(start_mb));
     txt_result->setStyleSheet("background-color:#F2DEDE; color:#A94442;");
 
 }

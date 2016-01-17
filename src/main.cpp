@@ -26,10 +26,28 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationName(PROGRAM);
     app.setApplicationVersion(GITVERSION);
+    app.setWindowIcon(QPixmap(":/USB_flash_drive.png"));
 
-    CapacityTesterGui gui;
-    gui.show();
+    bool run_cli = false;
+    #ifdef NO_GUI
+    run_cli = true;
+    #endif
 
-    return app.exec();
+    CapacityTesterCli *cli = 0;
+    CapacityTesterGui *gui = 0;
+    if (argc > 1 || run_cli)
+    {
+        cli = new CapacityTesterCli;
+    }
+    else
+    {
+        gui = new CapacityTesterGui;
+        gui->show();
+    }
+
+    int code = app.exec();
+    delete cli;
+    delete gui;
+    return code;
 }
 

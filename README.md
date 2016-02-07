@@ -16,6 +16,10 @@ every few hundred megabytes.
 
 The volume must be completely empty for the test to provide reliable results.
 
+![CapacityTester GUI](screenshots/CapacityTester_GUI_1.png)
+
+![CapacityTester CLI](screenshots/CapacityTester_CLI_1.png)
+
 
 
 Test

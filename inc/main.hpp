@@ -21,9 +21,7 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 
-#include <QDebug>
 #include <QApplication>
-#include <QImage>
 
 #include "version.hpp"
 

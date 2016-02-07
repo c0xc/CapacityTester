@@ -101,6 +101,12 @@ you're probably missing a library or two.
 Check the dependencies of $QTDIR/qtbase/plugins/platforms/libqxcb.so
 and install the missing libraries or add them manually.
 
+Command line mode (no gui):
+
+    $ export LD_LIBRARY_PATH=~/Builds/Qt/5.5.1-GCC4.7.2-DEBIAN7/qtbase/lib
+    $ bin/CapacityTester -platform offscreen
+    $ bin/CapacityTester -platform offscreen -list
+
 
 
 Author

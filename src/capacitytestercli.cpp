@@ -38,6 +38,8 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
     //Command line argument parser
     QCommandLineParser parser;
     parser.addHelpOption();
+    parser.setSingleDashWordOptionMode(
+        QCommandLineParser::ParseAsLongOptions);
 
     //Declare basic arguments
     parser.addOption(QCommandLineOption(QStringList() << "l" << "list",
@@ -100,8 +102,6 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
     }
     else
     {
-        out << "Unrecognized call" << endl;
-        out << endl;
         parser.showHelp();
     }
 

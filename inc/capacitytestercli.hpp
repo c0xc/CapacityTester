@@ -24,7 +24,7 @@
 #include <cassert>
 #include <iostream>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QTimer>
 #include <QTextStream>
@@ -47,7 +47,7 @@ public:
 
 private:
 
-    QApplication
+    QCoreApplication
     &app;
 
     QTextStream

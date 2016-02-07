@@ -25,6 +25,7 @@
 
 #include <QDebug>
 #include <QApplication>
+#include <QPixmap>
 #include <QDesktopWidget>
 #include <QMainWindow>
 #include <QVBoxLayout>

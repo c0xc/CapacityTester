@@ -26,28 +26,36 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationName(PROGRAM);
     app.setApplicationVersion(GITVERSION);
-    app.setWindowIcon(QPixmap(":/USB_flash_drive.png"));
 
     bool run_cli = false;
-    #ifdef NO_GUI
+    if (qApp->platformName() == "offscreen") run_cli = true;
+    #ifndef NO_GUI
+    app.setWindowIcon(QPixmap(":/USB_flash_drive.png"));
+    #else
     run_cli = true;
     #endif
 
     CapacityTesterCli *cli = 0;
+    #ifndef NO_GUI
     CapacityTesterGui *gui = 0;
+    #endif
     if (argc > 1 || run_cli)
     {
         cli = new CapacityTesterCli;
     }
     else
     {
+        #ifndef NO_GUI
         gui = new CapacityTesterGui;
         gui->show();
+        #endif
     }
 
     int code = app.exec();
     delete cli;
+    #ifndef NO_GUI
     delete gui;
+    #endif
     return code;
 }
 

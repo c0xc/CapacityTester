@@ -1,11 +1,11 @@
 PROGRAM=CapacityTester
 
-SRCDIR=src
-INCDIR=inc
-OBJDIR=obj
-BINDIR=bin
-SUBDIR=sub
-RESDIR=res
+SRCDIR=../src
+INCDIR=../inc
+OBJDIR=../obj
+BINDIR=../bin
+SUBDIR=../sub
+RESDIR=../res
 
 CC_OPT_O=-o 
 LD_OPT_O=$(CC_OPT_O)

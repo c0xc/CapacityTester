@@ -138,7 +138,7 @@ Command line mode (no gui):
 Author
 ------
 
-Philip Seeger (philip@philip-seeger.de)
+Philip Seeger (philip@c0xc.net)
 
 
 

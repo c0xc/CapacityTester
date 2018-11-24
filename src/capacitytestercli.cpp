@@ -431,6 +431,7 @@ CapacityTesterCli::succeededVolumeTest()
 void
 CapacityTesterCli::failedVolumeTest(int error_type)
 {
+    Q_UNUSED(error_type);
 }
 
 void
@@ -496,6 +497,8 @@ CapacityTesterCli::initializationStarted(qint64 total)
 void
 CapacityTesterCli::initialized(qint64 bytes, double avg_speed)
 {
+    Q_UNUSED(avg_speed);
+
     //Initialized MB (progress)
     int initialized_mb = bytes / VolumeTester::MB;
     int p = ((double)initialized_mb / total_mb) * 100;

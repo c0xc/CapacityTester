@@ -1,5 +1,5 @@
 #ifndef DEFINE_GLOBALS
-extern const char *GITVERSION;
+extern const char *APP_VERSION;
 #else
-const char *GITVERSION = "";
+const char *APP_VERSION = "";
 #endif

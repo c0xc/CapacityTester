@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationName(PROGRAM);
-    app.setApplicationVersion(GITVERSION);
+    app.setApplicationVersion(APP_VERSION);
 
     bool run_cli = false;
     if (qApp->platformName() == "offscreen") run_cli = true;

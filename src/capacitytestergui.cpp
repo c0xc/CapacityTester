@@ -888,6 +888,8 @@ CapacityTesterGui::initializationStarted(qint64 total)
 void
 CapacityTesterGui::initialized(qint64 bytes, double avg_speed)
 {
+    Q_UNUSED(avg_speed);
+
     //Initialized MB (progress)
     int initialized_mb = bytes / VolumeTester::MB;
     pro_initializing->setValue(initialized_mb);
@@ -917,6 +919,9 @@ CapacityTesterGui::verifyStarted()
 void
 CapacityTesterGui::createFailed(int index, qint64 start)
 {
+    Q_UNUSED(index);
+    Q_UNUSED(start);
+
     //Result - ERROR
     txt_result->setPlainText(tr("ACCESS ERROR!"));
     txt_result->setStyleSheet("background-color:#F2DEDE; color:#A94442;");
@@ -926,6 +931,8 @@ CapacityTesterGui::createFailed(int index, qint64 start)
 void
 CapacityTesterGui::writeFailed(qint64 start, int size)
 {
+    Q_UNUSED(size);
+
     //MB
     int start_mb = start / VolumeTester::MB;
 
@@ -938,6 +945,8 @@ CapacityTesterGui::writeFailed(qint64 start, int size)
 void
 CapacityTesterGui::verifyFailed(qint64 start, int size)
 {
+    Q_UNUSED(size);
+
     //MB
     int start_mb = start / VolumeTester::MB;
 

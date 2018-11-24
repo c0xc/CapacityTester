@@ -1,19 +1,37 @@
 CapacityTester
 ==============
 
+Have you bought a 128 GB USB flash drive (pen drive, usb stick) for $10/€10,
+with "free" shipping from Asia?
+If you ask something, you get a response in broken English from a Chinese guy
+who's calling himself "Jennifer"...
+Thinking about taxes and shipping fees, you're beginning to wonder how cheap
+this particular drive is compared to one in a local shop?
+Let's face it: You've probably bought a **fake flash drive**, i.e.,
+one that actually has much less capacity than it claims to have.
+
 This tool can test a USB drive or memory card to find out if it's a fake.
-For example, a fake might be sold as "64 GB USB thumbdrive"
+For example, a fake might be sold as "64 GB USB thumb drive"
 but it would only have a real capacity of 4 GB, everything beyond this limit
-will be lost. Write requests beyond that limit might be ignored without error,
-so a user would not be notified about the data loss.
+will be lost. At that point, the fake flash drive is often rendered useless.
 
 This tool performs a simple test to determine if the full capacity
-is usable or not. All it does is fill the volume with test data
+is usable or not. All it does is fill the volume with test data (files)
 and verify if the data on the volume is correct.
 
-The volume must be completely empty for the test to provide reliable results.
+The volume must be completely empty (no files on it)
+for the test to provide reliable results.
+
+Note that the test runs on top of an existing filesystem,
+which is sufficient to check a fake flash drive.
+You could also use it to test an old hard drive
+(delete all files or format it first), but that's not what it's supposed
+to be used for. For an old hdd, you might want to use *badblocks*
+or some other tool to test the drive itself.
 
 ![CapacityTester GUI](screenshots/CapacityTester_GUI_1.png)
+
+![CapacityTester GUI](screenshots/CapacityTester_GUI_2.png)
 
 ![CapacityTester CLI](screenshots/CapacityTester_CLI_1.png)
 
@@ -61,7 +79,7 @@ Many complex filesystems do not allow the full capacity to be used
 as metadata and fragmentation can reduce the available capacity
 once files are written.
 For that reason, there is a buffer, which should be around 1 MB.
-Some filesystems such as FAT32 do not need a buffer (SAFETY_BUFFER = 0).
+Some filesystems such as FAT32 do not need that buffer (SAFETY_BUFFER = 0).
 
 
 

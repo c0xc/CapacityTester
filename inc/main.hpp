@@ -22,6 +22,8 @@
 #define MAIN_HPP
 
 #include <QApplication>
+#include <QTranslator>
+#include <QProcessEnvironment>
 
 #include "version.hpp"
 

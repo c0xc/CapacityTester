@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/i18n">
+    <file>capacitytester_german.qm</file>
+</qresource>
+</RCC>

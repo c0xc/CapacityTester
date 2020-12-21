@@ -1,7 +1,9 @@
 VERSION
 
-obj/
-bin/
+/obj/
+/bin/
 
-platforms/
+/platforms/
+
+/languages/*.qm
 

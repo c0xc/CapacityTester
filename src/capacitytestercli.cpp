@@ -454,16 +454,16 @@ CapacityTesterCli::completedVolumeTest(bool success, int error_type)
             tr("The volume might be bad.") :
             tr("An error has occurred.");
         if (error_type & VolumeTester::Error::Create)
-            comment += tr("\nError creating test file.");
+            comment += "\n" + tr("Error creating test file.");
         if (error_type & VolumeTester::Error::Permissions)
-            comment += tr("\nPermission denied.");
+            comment += "\n" + tr("Permission denied.");
         if (error_type & VolumeTester::Error::Resize)
-            comment += tr("\nResizing test file failed.");
+            comment += "\n" + tr("Resizing test file failed.");
         if (error_type & VolumeTester::Error::Write)
-            comment += tr("\nWrite failed.");
+            comment += "\n" + tr("Write failed.");
         if (error_type & VolumeTester::Error::Verify)
-            comment += tr("\nVerification failed.");
-        out << tr("Test failed.\n") << comment << endl;
+            comment += "\n" + tr("Verification failed.");
+        out << tr("Test failed.") << "\n" << comment << endl;
     }
 
     //Time

@@ -376,20 +376,20 @@ void
 CapacityTesterGui::setCapacityFields(VolumeTester &tester)
 {
     Size capacity = tester.bytesTotal();
-    txt_capacity->setText(tr("%1 / %2 B").
+    txt_capacity->setText(QString("%1 / %2 B").
         arg(capacity.formatted()).
         arg((qint64)capacity));
     Size used = tester.bytesUsed();
     int used_percentage =
         capacity ? ((double)used / capacity) * 100 : 0;
-    txt_used->setText(tr("%1 / %2 B / %3%").
+    txt_used->setText(QString("%1 / %2 B / %3%").
         arg(used.formatted()).
         arg((qint64)used).
         arg(used_percentage));
     Size available = tester.bytesAvailable();
     int available_percentage =
         capacity ? ((double)available / capacity) * 100 : 0;
-    txt_available->setText(tr("%1 / %2 B / %3%").
+    txt_available->setText(QString("%1 / %2 B / %3%").
         arg(available.formatted()).
         arg((qint64)available).
         arg(available_percentage));
@@ -762,18 +762,18 @@ CapacityTesterGui::failedVolumeTest(int error_type)
         tr("The volume might be bad.") :
         tr("An error has occurred.");
     if (error_type & VolumeTester::Error::Create)
-        comment += tr(" Error creating test file.");
+        comment += " " + tr("Error creating test file.");
     if (error_type & VolumeTester::Error::Permissions)
-        comment += tr(" Permission denied.");
+        comment += " " + tr("Permission denied.");
     if (error_type & VolumeTester::Error::Resize)
-        comment += tr(" Resizing test file failed.");
+        comment += " " + tr("Resizing test file failed.");
     if (error_type & VolumeTester::Error::Write)
-        comment += tr(" Write failed.");
+        comment += " " + tr("Write failed.");
     if (error_type & VolumeTester::Error::Verify)
-        comment += tr(" Verification failed.");
+        comment += " " + tr("Verification failed.");
     QMessageBox::critical(this,
         tr("Test failed"),
-        tr("Test failed. %1").arg(comment));
+        tr("Test failed.") + QString("%1").arg(comment));
     txt_result->appendPlainText(comment);
 
 }
@@ -964,7 +964,7 @@ CapacityTesterGui::written(qint64 written, double avg_speed)
     pro_writing->setValue(written_mb);
 
     //Speed
-    txt_write_speed->setText(tr("%1 MB/s").arg(avg_speed, 0, 'g', 2));
+    txt_write_speed->setText(QString("%1 MB/s").arg(avg_speed, 0, 'g', 2));
 
 }
 
@@ -976,7 +976,7 @@ CapacityTesterGui::verified(qint64 read, double avg_speed)
     pro_verifying->setValue(read_mb);
 
     //Speed
-    txt_read_speed->setText(tr("%1 MB/s").arg(avg_speed, 0, 'g', 2));
+    txt_read_speed->setText(QString("%1 MB/s").arg(avg_speed, 0, 'g', 2));
 
 }
 

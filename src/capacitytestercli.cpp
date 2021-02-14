@@ -249,10 +249,10 @@ CapacityTesterCli::showVolumeInfo(const QString &mountpoint)
     QStringList conflict_files = tester.conflictFiles();
     if (!conflict_files.isEmpty())
     {
+        int n = conflict_files.count();
         out << tr(
-            "%1 old test file(s) have been found.\n"
-            "Cannot test with these files present, please delete them!").
-            arg(conflict_files.count())
+            "%n old test file(s) have been found.\n"
+            "Cannot test with these files present, please delete them!", "", n)
             << endl;
         foreach (QString file, conflict_files)
         {
@@ -265,10 +265,10 @@ CapacityTesterCli::showVolumeInfo(const QString &mountpoint)
     QStringList root_files = tester.rootFiles();
     if (!root_files.isEmpty())
     {
+        int n = root_files.count();
         out << tr(
-            "%1 file(s) have been found.\n"
-            "The volume should be completely empty.").
-            arg(root_files.count())
+            "%n file(s) have been found.\n"
+            "The volume should be completely empty.", "", n)
             << endl;
         foreach (QString file, root_files)
         {
@@ -304,11 +304,11 @@ CapacityTesterCli::startVolumeTest(const QString &mountpoint)
         QStringList root_files = tester.rootFiles();
         if (!root_files.isEmpty())
         {
+            int n = root_files.count();
             out << tr(
-                "The volume is not empty: %1 file(s) have been found.\n"
+                "The volume is not empty: %n file(s) have been found.\n"
                 "You should delete all those files first.\n"
-                "Are you really sure you want to continue?").
-                arg(root_files.count())
+                "Are you really sure you want to continue?", "", n)
                 << endl;
             if (!confirm()) return close(2);
         }

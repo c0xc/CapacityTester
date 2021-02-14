@@ -48,18 +48,44 @@
         <source>Available:</source>
         <translation>Disponible:</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../src/capacitytestercli.cpp" line="253"/>
+        <source>%n old test file(s) have been found.
+Cannot test with these files present, please delete them!</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/capacitytestercli.cpp" line="269"/>
+        <source>%n file(s) have been found.
+The volume should be completely empty.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/capacitytestercli.cpp" line="308"/>
+        <source>The volume is not empty: %n file(s) have been found.
+You should delete all those files first.
+Are you really sure you want to continue?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="252"/>
         <source>%1 old test file(s) have been found.
 Cannot test with these files present, please delete them!</source>
-        <translation>%1 archivo(s) antiguos encontrados.
+        <translation type="vanished">%1 archivo(s) antiguos encontrados.
 No se puede realizar la verificación con estos archivos presentes, ¡Borrelos por favor!</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="268"/>
         <source>%1 file(s) have been found.
 The volume should be completely empty.</source>
-        <translation>%1 archivo(s) han sido encontrados.
+        <translation type="vanished">%1 archivo(s) han sido encontrados.
 El dispositivo debe estar completamente vacío.</translation>
     </message>
     <message>
@@ -68,11 +94,10 @@ El dispositivo debe estar completamente vacío.</translation>
         <translation>El dispositivo seleccionado está lleno.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="307"/>
         <source>The volume is not empty: %1 file(s) have been found.
 You should delete all those files first.
 Are you really sure you want to continue?</source>
-        <translation>El dispositivo no está vacío: %1 archivo(s) han sido encontrados.
+        <translation type="vanished">El dispositivo no está vacío: %1 archivo(s) han sido encontrados.
 ¿Está completamente seguro que desea continuar?</translation>
     </message>
     <message>
@@ -215,7 +240,7 @@ Are you really sure you want to continue?</source>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="413"/>
-        <location filename="../src/capacitytestergui.cpp" line="511"/>
+        <location filename="../src/capacitytestergui.cpp" line="513"/>
         <source>Volume invalid</source>
         <translation>Dispositivo inválido</translation>
     </message>
@@ -230,148 +255,169 @@ Are you really sure you want to continue?</source>
         <translation>Se han encontrado archivos de verificación antiguos</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="449"/>
         <source>%1 old test file(s) have been found! Cannot test with these files present, please delete them! The volume should be completely empty.</source>
-        <translation>%1 ¡Archivo(s) de veriicación se ha encontrado! No se puede verificar con estos archivos presentes, ¡Bórrelos por favor! El dispositivo debe estar completamente vacío.</translation>
+        <translation type="vanished">%1 ¡Archivo(s) de veriicación se ha encontrado! No se puede verificar con estos archivos presentes, ¡Bórrelos por favor! El dispositivo debe estar completamente vacío.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="468"/>
-        <location filename="../src/capacitytestergui.cpp" line="538"/>
+        <location filename="../src/capacitytestergui.cpp" line="469"/>
+        <location filename="../src/capacitytestergui.cpp" line="540"/>
         <source>Volume not empty</source>
         <translation>El dispositivo no está vacío</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="469"/>
         <source>%1 file(s) have been found. The volume should be completely empty.</source>
-        <translation>%1 Archivo(s) se han encontrado. El dispositivo debe estar completamente vacío.</translation>
+        <translation type="vanished">%1 Archivo(s) se han encontrado. El dispositivo debe estar completamente vacío.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="512"/>
+        <location filename="../src/capacitytestergui.cpp" line="514"/>
         <source>The selected volume is not valid anymore.</source>
         <translation>El dispositivo seleccionado ya no es válido.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="526"/>
+        <location filename="../src/capacitytestergui.cpp" line="528"/>
         <source>Volume full</source>
         <translation>Dispositivo lleno</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="527"/>
+        <location filename="../src/capacitytestergui.cpp" line="529"/>
         <source>The selected volume is full.</source>
         <translation>El dispositivo seleccionado está lleno.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="539"/>
         <source>The volume is not empty: %1 file(s) have been found. You should cancel, delete all those files and try again. Are you really sure you want to continue?</source>
-        <translation>El dispositivo no está vacío: se encontraron %1 archivo(s). Deberías abortar ahora y borrar estos archivos antes de intentarlo de nuevo. ¿Está seguro de que quiere continuar ahora?</translation>
+        <translation type="vanished">El dispositivo no está vacío: se encontraron %1 archivo(s). Deberías abortar ahora y borrar estos archivos antes de intentarlo de nuevo. ¿Está seguro de que quiere continuar ahora?</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/capacitytestergui.cpp" line="450"/>
+        <source>%n old test file(s) have been found! Cannot test with these files present, please delete them! The volume should be completely empty.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/capacitytestergui.cpp" line="471"/>
+        <source>%n file(s) have been found. The volume should be completely empty.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/capacitytestergui.cpp" line="542"/>
+        <source>The volume is not empty: %n file(s) have been found. You should cancel, delete all those files and try again. Are you really sure you want to continue?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="678"/>
+        <location filename="../src/capacitytestergui.cpp" line="681"/>
         <source>STARTING</source>
         <translation>INICIANDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="695"/>
+        <location filename="../src/capacitytestergui.cpp" line="698"/>
         <source>STOPPING</source>
         <translation>PARANDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="711"/>
+        <location filename="../src/capacitytestergui.cpp" line="714"/>
         <source>TEST SUCCEEDED</source>
         <translation>VERIFICACIÓN EXITOSA</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="714"/>
+        <location filename="../src/capacitytestergui.cpp" line="717"/>
         <source>TEST COMPLETED SUCCESSFULLY, NO ERRORS FOUND.</source>
         <translation>VERIFICACIÓN COMPLETADA CON ÉXITO, NO SE ENCONTRARON ERRORES.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="730"/>
+        <location filename="../src/capacitytestergui.cpp" line="733"/>
         <source>Test succeeded</source>
         <translation>Verificación exitosa</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="731"/>
+        <location filename="../src/capacitytestergui.cpp" line="734"/>
         <source>Test completed successfully, no errors found.</source>
         <translation>Verificación completada con exito, no se encontraron errores.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="741"/>
+        <location filename="../src/capacitytestergui.cpp" line="744"/>
         <source>TEST FAILED</source>
         <translation>LA VERIFICACIÓN FALLO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="762"/>
+        <location filename="../src/capacitytestergui.cpp" line="765"/>
         <source>The volume might be bad.</source>
         <translation>El dispositivo puede ser defectuoso.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="763"/>
+        <location filename="../src/capacitytestergui.cpp" line="766"/>
         <source>An error has occurred.</source>
         <translation>Ha ocurrido un error.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="765"/>
+        <location filename="../src/capacitytestergui.cpp" line="768"/>
         <source>Error creating test file.</source>
         <translation>Error al crear el archivo de verificación.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="767"/>
+        <location filename="../src/capacitytestergui.cpp" line="770"/>
         <source>Permission denied.</source>
         <translation>Permiso denegado.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="769"/>
+        <location filename="../src/capacitytestergui.cpp" line="772"/>
         <source>Resizing test file failed.</source>
         <translation>Fallo el redimensionado del archivo de verificación.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="771"/>
+        <location filename="../src/capacitytestergui.cpp" line="774"/>
         <source>Write failed.</source>
         <translation>Fallo la operación de escritura.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="773"/>
+        <location filename="../src/capacitytestergui.cpp" line="776"/>
         <source>Verification failed.</source>
         <translation>Fallo la verificación.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="775"/>
+        <location filename="../src/capacitytestergui.cpp" line="778"/>
         <source>Test failed</source>
         <translation>Fallo la verificación</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="776"/>
+        <location filename="../src/capacitytestergui.cpp" line="779"/>
         <source>Test failed.</source>
         <translation>Fallo la verificación.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="884"/>
+        <location filename="../src/capacitytestergui.cpp" line="887"/>
         <source>INITIALIZING</source>
         <translation>INICIANDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="903"/>
+        <location filename="../src/capacitytestergui.cpp" line="906"/>
         <source>WRITING</source>
         <translation>ESCRIBIENDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="913"/>
+        <location filename="../src/capacitytestergui.cpp" line="916"/>
         <source>VERIFYING</source>
         <translation>VERIFICANDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="926"/>
+        <location filename="../src/capacitytestergui.cpp" line="929"/>
         <source>ACCESS ERROR!</source>
         <translation>¡ERROR DE ACCESO!</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="940"/>
+        <location filename="../src/capacitytestergui.cpp" line="943"/>
         <source>WRITE ERROR AFTER %1 MB!</source>
         <translation>¡ERROR DE ESCRITURA DESPUES DE %1 MB!</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="954"/>
+        <location filename="../src/capacitytestergui.cpp" line="957"/>
         <source>READ ERROR AFTER %1 MB!</source>
         <translation>¡ERROR DE LECTURA DESPUES DE %1 MB!</translation>
     </message>

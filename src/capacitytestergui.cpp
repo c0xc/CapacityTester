@@ -446,11 +446,12 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
         QMessageBox msgbox(this);
         msgbox.setIcon(QMessageBox::Critical);
         msgbox.setWindowTitle(tr("Old test files found"));
+        int n = conflict_files.count();
         msgbox.setText(tr(
-            "%1 old test file(s) have been found! "
+            "%n old test file(s) have been found! "
             "Cannot test with these files present, please delete them! "
-            "The volume should be completely empty.").
-            arg(conflict_files.count()));
+            "The volume should be completely empty.", "", n)
+        );
         msgbox.setDetailedText(conflict_files.join("\n"));
         msgbox.exec();
 
@@ -466,10 +467,11 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
         QMessageBox msgbox(this);
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.setWindowTitle(tr("Volume not empty"));
+        int n = root_files.count();
         msgbox.setText(tr(
-            "%1 file(s) have been found. "
-            "The volume should be completely empty.").
-            arg(root_files.count()));
+            "%n file(s) have been found. "
+            "The volume should be completely empty.", "", n)
+        );
         msgbox.setDetailedText(root_files.join("\n"));
         msgbox.setStandardButtons(QMessageBox::Ignore | QMessageBox::Cancel);
         msgbox.setDefaultButton(QMessageBox::Cancel);
@@ -536,11 +538,12 @@ CapacityTesterGui::startVolumeTest()
             QMessageBox msgbox(this);
             msgbox.setIcon(QMessageBox::Warning);
             msgbox.setWindowTitle(tr("Volume not empty"));
+            int n = root_files.count();
             msgbox.setText(tr(
-                "The volume is not empty: %1 file(s) have been found. "
+                "The volume is not empty: %n file(s) have been found. "
                 "You should cancel, delete all those files and try again. "
-                "Are you really sure you want to continue?").
-                arg(root_files.count()));
+                "Are you really sure you want to continue?", "", n)
+            );
             msgbox.setStandardButtons(
                 QMessageBox::Ignore | QMessageBox::Cancel);
             msgbox.setDefaultButton(QMessageBox::Cancel);

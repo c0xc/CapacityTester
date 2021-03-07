@@ -52,18 +52,22 @@
         <location filename="../src/capacitytestercli.cpp" line="253"/>
         <source>%n old test file(s) have been found.
 Cannot test with these files present, please delete them!</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 archivo antiguos encontrado.
+No se puede realizar la verificación con este archivo presente, ¡Borrelo por favor!</numerusform>
+            <numerusform>%n archivos antiguos encontrados.
+No se puede realizar la verificación con estos archivos presentes, ¡Borrelos por favor!</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestercli.cpp" line="269"/>
         <source>%n file(s) have been found.
 The volume should be completely empty.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 archivo ha sido encontrado.
+El dispositivo debe estar completamente vacío.</numerusform>
+            <numerusform>%n archivos han sido encontrados.
+El dispositivo debe estar completamente vacío.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -71,9 +75,9 @@ The volume should be completely empty.</source>
         <source>The volume is not empty: %n file(s) have been found.
 You should delete all those files first.
 Are you really sure you want to continue?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>El dispositivo no está vacío: se encontraron %1 archivo. Deberías abortar ahora y borrar este archivo antes de intentarlo de nuevo. ¿Está seguro de que quiere continuar ahora?</numerusform>
+            <numerusform>El dispositivo no está vacío: se encontraron %n archivos. Deberías abortar ahora y borrar estos archivos antes de intentarlo de nuevo. ¿Está seguro de que quiere continuar ahora?</numerusform>
         </translation>
     </message>
     <message>
@@ -290,25 +294,27 @@ Are you really sure you want to continue?</source>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="450"/>
         <source>%n old test file(s) have been found! Cannot test with these files present, please delete them! The volume should be completely empty.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 ¡Archivo de veriicación se ha encontrado! No se puede verificar con este archivos presente, ¡Bórrelo por favor! El dispositivo debe estar completamente vacío.</numerusform>
+            <numerusform>%n ¡Archivos de veriicación se ha encontrado! No se puede verificar con estos archivos presentes, ¡Bórrelos por favor! El dispositivo debe estar completamente vacío.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="471"/>
         <source>%n file(s) have been found. The volume should be completely empty.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 archivo ha sido encontrado.
+El dispositivo debe estar completamente vacío.</numerusform>
+            <numerusform>%n archivos ha sido encontrado.
+El dispositivo debe estar completamente vacío.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="542"/>
         <source>The volume is not empty: %n file(s) have been found. You should cancel, delete all those files and try again. Are you really sure you want to continue?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>El dispositivo no está vacío: se encontraron %1 archivo. Deberías abortar ahora y borrar este archivo antes de intentarlo de nuevo. ¿Está seguro de que quiere continuar ahora?</numerusform>
+            <numerusform>El dispositivo no está vacío: se encontraron %n archivos. Deberías abortar ahora y borrar estos archivos antes de intentarlo de nuevo. ¿Está seguro de que quiere continuar ahora?</numerusform>
         </translation>
     </message>
     <message>

@@ -147,6 +147,9 @@ public:
     qint64
     bytesAvailable() const;
 
+    int
+    usedPercentagePoints() const;
+
     QString
     name() const;
 

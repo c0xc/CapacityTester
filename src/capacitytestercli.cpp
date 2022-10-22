@@ -42,6 +42,7 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
         QCommandLineParser::ParseAsLongOptions);
 
     //Declare basic arguments
+    //IDEA alternatively, list partitions (libparted) if running as root
     parser.addOption(QCommandLineOption(QStringList() << "l" << "list",
         tr("Lists available volumes.")));
     parser.addOption(QCommandLineOption(QStringList() << "i" << "info",
@@ -174,9 +175,25 @@ CapacityTesterCli::confirm()
 void
 CapacityTesterCli::showVolumeList()
 {
-    //Mounted filesystems
     QStringList mountpoints;
-    foreach (QString mountpoint, VolumeTester::availableMountpoints())
+    bool fetched_list = false;
+    //Mounted USB devices
+    UDiskManager manager;
+    if (manager.isValid())
+    {
+        foreach (QString device, manager.usbPartitions())
+        {
+            QString mountpoint = manager.mountpoint(device);
+            if (!mountpoint.isEmpty())
+                mountpoints << mountpoint;
+        }
+        fetched_list = true;
+    }
+
+    //All mounted filesystems (fallback)
+    if (!fetched_list)
+        mountpoints = VolumeTester::availableMountpoints();
+    foreach (QString mountpoint, mountpoints)
     {
         //Gather information
         VolumeTester tester(mountpoint);

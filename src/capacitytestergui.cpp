@@ -35,27 +35,23 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     QFont monospace_font =
         QFontDatabase::systemFont(QFontDatabase::FixedFont);
 
-    //Volume selection
+    //Volume text box, selection button
     QHBoxLayout *hbox_volume = new QHBoxLayout;
     vbox_main->addLayout(hbox_volume);
     QLabel *lbl_volume = new QLabel(tr("Volume"));
     hbox_volume->addWidget(lbl_volume);
-    cmb_volume = new QComboBox;
-    cmb_volume->setFont(monospace_font);
-    cmb_volume->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    cmb_volume->setToolTip(tr("Mounted volume to be tested"));
-    connect(cmb_volume,
-            SIGNAL(currentIndexChanged(int)),
-            SLOT(loadVolume(int)));
-    hbox_volume->addWidget(cmb_volume);
-    btn_refresh_volumes = new QPushButton(tr("&Refresh"));
-    hbox_volume->addWidget(btn_refresh_volumes);
-    connect(btn_refresh_volumes,
+    txt_volume = new QLineEdit;
+    txt_volume->setReadOnly(true);
+    txt_volume->setFont(monospace_font);
+    txt_volume->setPlaceholderText(tr("Volume"));
+    txt_volume->setToolTip(tr("Mounted volume to be tested"));
+    txt_volume->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    hbox_volume->addWidget(txt_volume);
+    btn_select_volume = new QPushButton(tr("Select &drive..."));
+    hbox_volume->addWidget(btn_select_volume);
+    connect(btn_select_volume,
             SIGNAL(clicked()),
-            SLOT(refreshVolumeList()));
-
-    //Load list of volumes
-    QTimer::singleShot(0, this, SLOT(refreshVolumeList()));
+            SLOT(showDriveWindow()));
 
     //Horizontal line
     hline = new QFrame;
@@ -213,6 +209,9 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
             QApplication::desktop()->availableGeometry())
     );
 
+    //Set focus on select button
+    QTimer::singleShot(0, btn_select_volume, SLOT(setFocus()));
+
 }
 
 QPixmap
@@ -286,44 +285,12 @@ CapacityTesterGui::closeEvent(QCloseEvent *event)
 }
 
 void
-CapacityTesterGui::refreshVolumeList()
+CapacityTesterGui::showDriveWindow()
 {
-    //Remember previously selected item
-    QString selected_mountpoint = cmb_volume->currentData().toString();
-    int selected_index = -1;
-
-    //Clear
-    cmb_volume->clear();
-    cmb_volume->addItem("");
-
-    //The user is provided with a list of mounted filesystems.
-    //So finding the right drive should be easy.
-    //Letting the user select any random directory on the system
-    //would not be user-friendly at all.
-
-    //Fill list with mounted filesystems
-    foreach (QString mountpoint, VolumeTester::availableMountpoints())
-    {
-        //Gather information
-        VolumeTester tester(mountpoint);
-        if (!tester.isValid()) continue;
-        QString label = tester.label();
-
-        //Check if selected in list
-        if (mountpoint == selected_mountpoint)
-            selected_index = cmb_volume->count();
-
-        //Add to list
-        cmb_volume->addItem(label, QVariant(mountpoint));
-
-    }
-
-    //Select previously selected item
-    if (selected_index != -1)
-    {
-        cmb_volume->setCurrentIndex(selected_index);
-        loadVolume(selected_index);
-    }
+    SelectionWindow *window = new SelectionWindow(this);
+    window->setModal(true);
+    window->show();
+    connect(window, SIGNAL(volumeSelected(const QString&)), SLOT(loadVolume(const QString&)));
 
 }
 
@@ -361,6 +328,7 @@ CapacityTesterGui::unloadVolume()
 
     //Forget mountpoint
     selected_mountpoint.clear();
+    txt_volume->clear();
 
     //Reset test buttons
     btn_start_volume_test->setEnabled(false);
@@ -404,6 +372,7 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
     if (mountpoint.isEmpty()) return;
 
     //Check if mountpoint is still a mountpoint
+    //Set mountpoint if valid
     VolumeTester tester(mountpoint);
     if (!tester.isValid())
     {
@@ -412,10 +381,9 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
         QMessageBox::critical(this,
             tr("Volume invalid"),
             tr("The selected volume is not valid."));
-        cmb_volume->setCurrentIndex(0); //unselect
-        QTimer::singleShot(0, this, SLOT(refreshVolumeList())); //update
         return;
     }
+    txt_volume->setText(mountpoint);
 
     //Remember selected mountpoint
     selected_mountpoint = mountpoint;
@@ -454,6 +422,25 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
         );
         msgbox.setDetailedText(conflict_files.join("\n"));
         msgbox.exec();
+        return;
+    }
+
+    //Check filesystem usage (should be empty)
+    if (tester.usedPercentagePoints() > 10)
+    {
+        //Warn user, filesystem should be empty
+        QMessageBox msgbox(this);
+        msgbox.setIcon(QMessageBox::Warning);
+        msgbox.setWindowTitle(tr("Volume not empty"));
+        msgbox.setText(tr(
+            "This volume is %1% full. "
+            "The volume should be completely empty.").arg(tester.usedPercentagePoints())
+        );
+        msgbox.setStandardButtons(QMessageBox::Abort);
+        if (msgbox.exec() != QMessageBox::Ignore)
+        {
+            return;
+        }
 
         //Don't allow user to start test
         ok_to_test = false;
@@ -474,11 +461,9 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
         );
         msgbox.setDetailedText(root_files.join("\n"));
         msgbox.setStandardButtons(QMessageBox::Ignore | QMessageBox::Cancel);
-        msgbox.setDefaultButton(QMessageBox::Cancel);
-        if (msgbox.exec() == QMessageBox::Cancel)
+        msgbox.setDefaultButton(QMessageBox::Ignore);
+        if (msgbox.exec() != QMessageBox::Ignore)
         {
-            //Cancel (undo selection)
-            cmb_volume->setCurrentIndex(0); //unselect
             return;
         }
     }
@@ -489,13 +474,6 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
         btn_start_volume_test->setEnabled(true);
     }
 
-}
-
-void
-CapacityTesterGui::loadVolume(int index)
-{
-    QString mountpoint = cmb_volume->itemData(index).toString();
-    loadVolume(mountpoint);
 }
 
 void
@@ -512,8 +490,7 @@ CapacityTesterGui::startVolumeTest()
         QMessageBox::critical(this,
             tr("Volume invalid"),
             tr("The selected volume is not valid anymore."));
-        cmb_volume->setCurrentIndex(0); //unselect
-        QTimer::singleShot(0, this, SLOT(refreshVolumeList())); //update
+        QTimer::singleShot(0, this, SLOT(unloadVolume()));
         return;
     }
 
@@ -545,10 +522,10 @@ CapacityTesterGui::startVolumeTest()
                 "Are you really sure you want to continue?", "", n)
             );
             msgbox.setStandardButtons(
-                QMessageBox::Ignore | QMessageBox::Cancel);
+                QMessageBox::Yes | QMessageBox::Cancel);
             msgbox.setDefaultButton(QMessageBox::Cancel);
             msgbox.setDetailedText(root_files.join("\n"));
-            if (msgbox.exec() != QMessageBox::Ignore) return;
+            if (msgbox.exec() != QMessageBox::Yes) return;
         }
     }
 
@@ -556,8 +533,7 @@ CapacityTesterGui::startVolumeTest()
     //Test starts here
 
     //Disable volume selection
-    cmb_volume->setEnabled(false);
-    btn_refresh_volumes->setEnabled(false);
+    btn_select_volume->setEnabled(false);
 
     //Start/stop buttons
     btn_start_volume_test->setEnabled(false);
@@ -792,8 +768,7 @@ CapacityTesterGui::completedVolumeTest()
     btn_stop_volume_test->setEnabled(false);
 
     //Enable volume selection
-    cmb_volume->setEnabled(true);
-    btn_refresh_volumes->setEnabled(true);
+    btn_select_volume->setEnabled(true);
 
     //Stop timer
     tmr_total_test_time.invalidate();

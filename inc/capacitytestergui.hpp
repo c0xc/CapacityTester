@@ -48,6 +48,7 @@
 
 #include "size.hpp"
 #include "volumetester.hpp"
+#include "selectionwindow.hpp"
 
 class CapacityTesterGui : public QMainWindow
 {
@@ -67,11 +68,11 @@ private:
     QString
     selected_mountpoint;
 
-    QComboBox
-    *cmb_volume;
+    QLineEdit
+    *txt_volume;
 
     QPushButton
-    *btn_refresh_volumes;
+    *btn_select_volume;
 
     QPushButton
     *btn_start_volume_test;
@@ -154,7 +155,7 @@ private slots:
     closeEvent(QCloseEvent *event);
 
     void
-    refreshVolumeList();
+    showDriveWindow();
 
     void
     unloadVolume();
@@ -164,9 +165,6 @@ private slots:
 
     void
     loadVolume(const QString &mountpoint);
-
-    void
-    loadVolume(int index);
 
     void
     startVolumeTest();

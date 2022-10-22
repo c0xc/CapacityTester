@@ -5,11 +5,14 @@ INCLUDEPATH = inc/
 HEADERS = inc/*
 SOURCES = src/*
 QT += widgets
+QT += dbus
 
 DEFINES += PROGRAM=\\\"CapacityTester\\\"
 
 CONFIG += lrelease embed_translations
 RESOURCES += res/lang.qrc
+
+LIBS += -lparted
 
 TRANSLATIONS = \
 languages/capacitytester_en.ts \

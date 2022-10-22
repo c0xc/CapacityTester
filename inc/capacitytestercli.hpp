@@ -32,6 +32,8 @@
 #include <QSignalMapper>
 #include <QThread>
 
+#include "udiskmanager.hpp"
+
 #include "size.hpp"
 #include "volumetester.hpp"
 

@@ -268,6 +268,18 @@ const
 }
 
 /*!
+ * Returns filesystem usage in percentage points, like 10(%).
+ */
+int
+VolumeTester::usedPercentagePoints()
+const
+{
+    long long used_k = bytesUsed() / 1024;
+    long long total_k = bytesTotal() / 1024;
+    return std::div(used_k * 100, total_k).quot;
+}
+
+/*!
  * Returns the name of the filesystem, if defined.
  * Returns an empty string otherwise.
  */
@@ -300,7 +312,7 @@ const
         label = mountpoint();
         QString name = this->name();
         if (!name.isEmpty())
-            label = label + ": " + name;
+            label = label + " " + name;
     }
 
     return label;

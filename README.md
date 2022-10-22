@@ -35,6 +35,13 @@ or some other tool to test the drive itself.
 
 ![CapacityTester CLI](screenshots/CapacityTester_CLI_1.png)
 
+The drive selection window lists all USB storage devices.
+This is a Linux feature. If unavailable, all mounted filesystems are listed.
+
+![USB selection](screenshots/CapacityTester_USB_selection.png)
+
+Tip: You can run this program from a Linux live system like the Fedora installer disc.
+
 
 
 Test

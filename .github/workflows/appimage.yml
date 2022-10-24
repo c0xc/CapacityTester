@@ -16,7 +16,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qt5-default qtdeclarative5-dev qttools5-dev-tools squashfs-tools
+          sudo apt-get install -y qt5-default qtdeclarative5-dev qttools5-dev-tools squashfs-tools squashfs-tools-ng 
       - name: configure
         run: qmake CONFIG+=release PREFIX=/usr
       - name: build

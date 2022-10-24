@@ -23,6 +23,8 @@ jobs:
         run: INSTALL_ROOT=./AppDir make install
       - name: desktop
         run: cp -vi capacitytester.desktop USB_flash_drive.png AppDir/
+      - name: desktop
+        run: mkdir -p AppDir/usr/share/icons/; cp -vi USB_flash_drive.png AppDir/usr/share/icons/
       - name: Build AppImage
         uses: AppImageCrafters/build-appimage-action@master
         env:

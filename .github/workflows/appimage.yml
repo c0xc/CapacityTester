@@ -16,13 +16,13 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qt5-default qtdeclarative5-dev cmake
+          sudo apt-get install -y qt5-default qtdeclarative5-dev lrelease-qt5 
       - name: configure
         run: qmake CONFIG+=release PREFIX=/usr
       - name: build
         run: INSTALL_ROOT=./AppDir make install
       - name: desktop
-        run: /usr/bin/cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
+        run: cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
       - name: Build AppImage
         uses: AppImageCrafters/build-appimage-action@master
         env:

@@ -32,6 +32,7 @@ jobs:
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
           UPDATE_INFO: gh-releases-zsync|c0xc|CapacityTester|latest|*x86_64.AppImage.zsync
+          PATH: /usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/philip/.local/bin:/home/philip/bin:/var/lib/snapd/snap/bin:/home/philip/.local/bin:/home/philip/bin
         with:
           recipe: .AppImageBuilder.yml
       

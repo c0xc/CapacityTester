@@ -1,0 +1,32 @@
+name: C/C++ AppImage
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-appimage:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt5-default qtdeclarative5-dev cmake
+      - name: configure
+        run: qmake CONFIG+=release PREFIX=/usr
+      - name: build
+        run: INSTALL_ROOT=./AppDir make install
+      - name: desktop
+        run: cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
+      - name: Build AppImage
+        uses: AppImageCrafters/build-appimage-action@master
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        with:
+          recipe: .AppImageBuilder.yml
+      

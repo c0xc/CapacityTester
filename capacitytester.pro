@@ -12,8 +12,6 @@ DEFINES += PROGRAM=\\\"CapacityTester\\\"
 CONFIG += lrelease embed_translations
 RESOURCES += res/lang.qrc
 
-LIBS += -lparted
-
 TRANSLATIONS = \
 languages/capacitytester_en.ts \
 languages/capacitytester_de.ts \

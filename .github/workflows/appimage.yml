@@ -21,6 +21,8 @@ jobs:
         run: qmake CONFIG+=release PREFIX=/usr
       - name: build
         run: INSTALL_ROOT=./AppDir make install
+      - name: dbg
+        run: find /usr -name mksquashfs
       - name: desktop
         run: cp -vi capacitytester.desktop USB_flash_drive.png AppDir/
       - name: desktop

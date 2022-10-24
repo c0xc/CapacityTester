@@ -22,7 +22,7 @@ jobs:
       - name: build
         run: INSTALL_ROOT=./AppDir make install
       - name: desktop
-        run: cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
+        run: /usr/bin/cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
       - name: Build AppImage
         uses: AppImageCrafters/build-appimage-action@master
         env:

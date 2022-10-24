@@ -1,6 +1,11 @@
 ---
 name: C/C++ AppImage
 
+
+on:
+  - push
+  - pull_request
+
 jobs:
   build-appimage:
 

@@ -27,6 +27,7 @@ jobs:
         uses: AppImageCrafters/build-appimage-action@master
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
+          UPDATE_INFO: gh-releases-zsync|c0xc|CapacityTester|latest|*x86_64.AppImage.zsync
         with:
           recipe: .AppImageBuilder.yml
       

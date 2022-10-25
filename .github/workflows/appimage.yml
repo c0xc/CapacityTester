@@ -22,7 +22,7 @@ jobs:
       - name: build
         run: INSTALL_ROOT=./AppDir make install
       - name: dbg
-        run: which mksquashfs && echo ok; cp -v /usr/sbin/mksquashfs /usr/local/bin/
+        run: which mksquashfs && echo ok; ln -s  /usr/bin/mksquashfs /usr/local/bin/
       - name: desktop
         run: cp -vi capacitytester.desktop USB_flash_drive.png AppDir/
       - name: desktop

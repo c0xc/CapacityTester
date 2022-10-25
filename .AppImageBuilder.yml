@@ -8,6 +8,7 @@ AppDir:
     version: latest
     exec: usr/bin/capacitytester
     exec_args: $@
+  
   apt:
     arch: amd64
     sources:

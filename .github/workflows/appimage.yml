@@ -17,6 +17,6 @@ jobs:
         uses: c0xc/qt-build-appimage-test@master
         env:
           APPIMAGE_EXTRACT_AND_RUN: 1
-        with:
-          recipe: .AppImageBuilder.yml
+        #with:
+        #  recipe: .AppImageBuilder.yml
       

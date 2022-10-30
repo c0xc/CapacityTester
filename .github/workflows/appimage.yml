@@ -11,8 +11,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: desktop
-        run: cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
+      #- name: desktop
+      #  run: cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
       - name: Run test container
         uses: c0xc/qt-build-appimage-test@master
         env:

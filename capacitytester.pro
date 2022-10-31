@@ -20,3 +20,5 @@ languages/capacitytester_de.ts \
 languages/capacitytester_ru.ts \
 languages/capacitytester_es.ts
 
+target.path = /opt/capacitytester
+INSTALLS += target

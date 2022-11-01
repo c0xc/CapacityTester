@@ -1,5 +1,5 @@
 ---
-name: C/C++ AppImage
+name: Build AppImage executable
 
 on:
   - push
@@ -11,12 +11,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      #- name: desktop
-      #  run: cp -vi capacitytester.desktop res/USB_flash_drive.png AppDir/
-      - name: Run test container
+      - name: Run build container
         uses: c0xc/qt-build-appimage-test@master
-        env:
-          APPIMAGE_EXTRACT_AND_RUN: 1
-        #with:
-        #  recipe: .AppImageBuilder.yml
-      
+        with:
+          recipe: .build_pipe_vars
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: executable
+          path: bin/* *.AppImage
+          #retention-days: 5      

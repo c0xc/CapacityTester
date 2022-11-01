@@ -52,6 +52,7 @@
  * to automatically create classes and unmarshal D-Bus responses.
  */
 
+const char *UDiskManager::UDISKS2_SERVICE = "org.freedesktop.UDisks2";
 UDiskManager::UDiskManager(QObject *parent)
             : QObject(parent)
 {

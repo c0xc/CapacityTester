@@ -17,6 +17,8 @@ jobs:
           recipe: .build_pipe_vars
           build-args: |
             APT_INSTALL=libparted-dev
+            OS_NAME=ubuntu
+            OS_RELEASE=bionic
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:

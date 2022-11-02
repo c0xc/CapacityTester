@@ -12,9 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run build container
-        uses: c0xc/qt-build-appimage-test@master
+        uses: c0xc/qt-build-appimage-test/debia@master
         with:
           recipe: .build_pipe_vars
+          build-args: |
+            APT_INSTALL=libparted-dev
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:

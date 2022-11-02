@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run build container
-        uses: c0xc/qt-build-appimage-test/debia@master
+        uses: c0xc/qt-build-appimage-test@master
         with:
           recipe: .build_pipe_vars
           build-args: |

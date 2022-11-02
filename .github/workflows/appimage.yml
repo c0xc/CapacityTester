@@ -12,7 +12,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run build container
-        uses: c0xc/qt-build-appimage-test/debian8@master
+        uses: c0xc/qt-build-appimage-test/debian-8@master
+        with:
+          recipe: .build_pipe_vars
+      - name: Run build container
+        uses: c0xc/qt-build-appimage-test/ubuntu-18-04@master
+        with:
+          recipe: .build_pipe_vars
+      - name: Run build container
+        uses: c0xc/qt-build-appimage-test/fedora-30@master
         with:
           recipe: .build_pipe_vars
       - name: 'Upload Artifact'

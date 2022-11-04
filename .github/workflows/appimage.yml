@@ -20,5 +20,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: executable
-          path: bin/* *.AppImage
+          path: |
+            bin/*
+            *.AppImage
           #retention-days: 5      

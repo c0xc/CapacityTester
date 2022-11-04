@@ -1,4 +1,4 @@
-desktop_file=*.desktop
+desktop_file=capacitytester.desktop
 icon_file=res/USB_flash_drive.png
 font_file=res/Roboto-Regular.ttf
 

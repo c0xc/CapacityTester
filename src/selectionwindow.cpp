@@ -210,6 +210,10 @@ SelectionWindow::refresh()
         list->item(0)->setSelected(true);
         showSelection(0);
     }
+    else
+    {
+        QTimer::singleShot(0, list, SLOT(setFocus()));
+    }
 }
 
 void

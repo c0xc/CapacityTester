@@ -1,0 +1,5 @@
+desktop_file=res/capacitytester.desktop
+icon_file=res/CapacityTester.png
+font_file=res/Roboto-Regular.ttf
+
+INSTALL_DEBIAN=libparted-dev

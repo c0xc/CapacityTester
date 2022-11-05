@@ -90,6 +90,25 @@ Some filesystems such as FAT32 do not need that buffer (SAFETY_BUFFER = 0).
 
 
 
+Download
+--------
+
+There are pre-compiled executable files available for Linux
+which can be downloaded from the "[Releases](https://github.com/c0xc/CapacityTester/releases)" page.
+
+From the latest release there, under "assets", you'll find them.
+
+If the executable file does not run because you don't have some libraries
+installed, pick the AppImage file which is supposed to be portable.
+The AppImage file should run on most modern Linux systems
+out of the box.
+
+A pre-compiled binary for Windows is also available,
+but it's an older version of this program which did not have
+the USB drive selection window yet because that's a Linux feature.
+
+
+
 Build
 -----
 

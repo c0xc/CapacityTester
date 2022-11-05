@@ -15,12 +15,11 @@ jobs:
         uses: c0xc/qt-build-appimage-test@debian-8
         with:
           recipe: .build_pipe_vars
-          #build-args: |
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:
           name: executable
           path: |
-            bin/*
-            *.AppImage
-          #retention-days: 5      
+            build.tar
+            #bin/*
+            #*.AppImage

@@ -2,4 +2,6 @@ desktop_file=res/capacitytester.desktop
 icon_file=res/CapacityTester.png
 font_file=res/Roboto-Regular.ttf
 
+add_library=libQt5XcbQpa.so
+
 INSTALL_DEBIAN=libparted-dev

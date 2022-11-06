@@ -18,10 +18,10 @@ jobs:
           os_name: fedora
           env: |
             os_name=Fedora
-          build-args: |
-            OS_NAME=${{ env.OS_NAME }}
-            OS_RELEASE=${{ env.OS_RELEASE }}
-            os_name=FEDORA
+          #build-args: |
+          #  OS_NAME=${{ env.OS_NAME }}
+          #  OS_RELEASE=${{ env.OS_RELEASE }}
+          #  os_name=FEDORA
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:

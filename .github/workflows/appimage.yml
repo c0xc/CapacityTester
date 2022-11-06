@@ -16,8 +16,8 @@ jobs:
         with:
           recipe: .build_pipe_vars
           os_name: fedora
-          env: |
-            os_name=Fedora
+          #env: |
+          #  os_name=Fedora
           #build-args: |
           #  OS_NAME=${{ env.OS_NAME }}
           #  OS_RELEASE=${{ env.OS_RELEASE }}

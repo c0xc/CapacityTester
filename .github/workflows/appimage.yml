@@ -17,8 +17,9 @@ jobs:
           recipe: .build_pipe_vars
           os_name: fedora
           build-args: |
-            "OS_NAME=fedora"
-            "OS_RELEASE=30"
+            OS_NAME=${{ env.OS_NAME }}
+            OS_RELEASE=${{ env.OS_RELEASE }}
+            os_name=FEDORA
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:

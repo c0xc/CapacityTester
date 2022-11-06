@@ -15,6 +15,7 @@ jobs:
         uses: c0xc/qt-build-appimage-test@master
         with:
           recipe: .build_pipe_vars
+          os_name: fedora
           build-args: |
             OS_NAME=fedora
             OS_RELEASE=30

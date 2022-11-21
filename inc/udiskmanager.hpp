@@ -182,7 +182,7 @@ public slots:
 
 private:
 
-    static const char *UDISKS2_SERVICE;
+    static constexpr const char *UDISKS2_SERVICE = "org.freedesktop.UDisks2";
 
     struct SpecInterface
     {

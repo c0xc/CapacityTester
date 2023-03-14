@@ -942,7 +942,7 @@ CapacityTesterGui::written(qint64 written, double avg_speed)
     pro_writing->setValue(written_mb);
 
     //Speed
-    txt_write_speed->setText(QString("%1 MB/s").arg(avg_speed, 0, 'g', 2));
+    txt_write_speed->setText(QString("%1 MB/s").arg(avg_speed, 0, 'f', 1));
 
 }
 
@@ -954,7 +954,7 @@ CapacityTesterGui::verified(qint64 read, double avg_speed)
     pro_verifying->setValue(read_mb);
 
     //Speed
-    txt_read_speed->setText(QString("%1 MB/s").arg(avg_speed, 0, 'g', 2));
+    txt_read_speed->setText(QString("%1 MB/s").arg(avg_speed, 0, 'f', 1));
 
 }
 

@@ -1,4 +1,4 @@
-TARGET = CapacityTester
+TARGET = capacity-tester
 DESTDIR = bin/
 OBJECTS_DIR = obj/
 INCLUDEPATH = inc/

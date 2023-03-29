@@ -300,7 +300,7 @@ Sind Sie wirklich sicher, dass Sie dennoch fortfahren möchten?</translation>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="50"/>
         <source>Select &amp;drive...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gewähltes &amp;Laufwerk...</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="418"/>
@@ -313,7 +313,7 @@ Sind Sie wirklich sicher, dass Sie dennoch fortfahren möchten?</translation>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="435"/>
         <source>This volume is %1% full. The volume should be completely empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Dateisystem ist zu %1% voll. Das Dateisystem sollte komplett leer sein.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="458"/>
@@ -447,170 +447,170 @@ Sind Sie wirklich sicher, dass Sie dennoch fortfahren möchten?</translation>
     <message>
         <location filename="../src/selectionwindow.cpp" line="31"/>
         <source>Select the USB drive to be tested.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu testendes USB-Laufwerk auswählen.</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="32"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisieren</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="45"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Schließen</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="73"/>
         <source>The USB device selection is not available on this platform. Instead, all available mountpoints are shown here. Please find your USB drive in the list below and confirm your selection (it must be mounted).</source>
-        <translation type="unfinished"></translation>
+        <translation>Die USB-Laufwerksauswahl ist auf dieser Plattform nicht verfügbar. Stattdessen werden alle Einhängepunkte aller Laufwerke hier aufgelistet. Bitte markieren Sie Ihr bereits eingehängtes USB-Laufwerk in der Liste und bestätigen Sie die Auswahl (ggf. zuvor im Dateimanager mounten).</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="84"/>
         <location filename="../src/selectionwindow.cpp" line="88"/>
         <source>Drives</source>
-        <translation type="unfinished"></translation>
+        <translation>Laufwerke</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="92"/>
         <source>All mountpoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Einhängepunkte</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="93"/>
         <source>All mountpoints devices are listed, including system mountpoints.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Einhängepunkten werden aufgelistet, auch zum System zugehörige.</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="96"/>
         <source>All filesystems</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Dateisysteme</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="97"/>
         <source>All detected storage devices are listed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle erkannten Speichermedien werden aufgelistet.</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="101"/>
         <source>USB filesystems</source>
-        <translation type="unfinished"></translation>
+        <translation>USB-Dateisysteme</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="102"/>
         <source>Only USB storage devices are listed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur USB-Speichermedien werden aufgelistet.</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="154"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="162"/>
         <source>Mountpoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Einhängepunkt</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="168"/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezeichnung</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="174"/>
         <source>Capacity</source>
-        <translation type="unfinished">Kapazität</translation>
+        <translation>Kapazität</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="184"/>
         <source>Contents of selected drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Inhalte des gewählten Laufwerkes</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="192"/>
         <source>Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Einhängen</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="196"/>
         <source>Unmount</source>
-        <translation type="unfinished"></translation>
+        <translation>Aushängen</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="200"/>
         <source>Select and Continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswählen und Fortfahren</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="268"/>
         <source>Invalid selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Auswahl</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="269"/>
         <source>No mountpoint selected. The drive you want to select must be mounted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es ist kein Einhängepunkt ausgewählt. Sie müssen das gewünschte Laufwerk einhängen.</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="311"/>
         <source>Cannot show directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis kann nicht angezeigt werden</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="312"/>
         <source>The subdirectory %1 is outside of the selected mountpoint %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Unterverzeichnis %1 liegt außerhalb des gewählten Einhängepunktes %2.</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="371"/>
         <source>Mount device?</source>
-        <translation type="unfinished"></translation>
+        <translation>Laufwerk einhängen?</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="372"/>
         <source>Do you want to mount the selected device %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Möchten Sie das gewählte Laufwerk %1 einhängen?</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="381"/>
         <location filename="../src/selectionwindow.cpp" line="387"/>
         <source>Mount device</source>
-        <translation type="unfinished"></translation>
+        <translation>Laufwerk einhängen</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="382"/>
         <source>The selected device has been mounted here: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Das gewählte Laufwerk wurde hier eingehängt: %1</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="388"/>
         <source>The selected device could not be mounted. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Das gewählte Laufwerk konnte nicht eingehängt werden: %1</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="407"/>
         <source>Unmount device?</source>
-        <translation type="unfinished"></translation>
+        <translation>Laufwerk aushängen?</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="408"/>
         <source>Do you want to unmount the selected device, currently mounted at %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Möchten Sie das gewählte Laufwerk aushängen, aktuell eingehängt unter %1?</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="417"/>
         <location filename="../src/selectionwindow.cpp" line="422"/>
         <source>Unmount device</source>
-        <translation type="unfinished"></translation>
+        <translation>Laufwerk aushängen</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="418"/>
         <source>The selected device has been unmounted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das gewählte Laufwerk wurde ausgehängt.</translation>
     </message>
     <message>
         <location filename="../src/selectionwindow.cpp" line="423"/>
         <source>The selected device could not be unmounted. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Das gewählte Laufwerk konnte nicht ausgehängt werden. %1</translation>
     </message>
 </context>
 </TS>

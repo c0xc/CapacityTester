@@ -4,5 +4,6 @@
     <file>capacitytester_german.qm</file>
     <file>capacitytester_russian.qm</file>
     <file>capacitytester_spanish.qm</file>
+    <file>capacitytester_pt_br.qm</file>
 </qresource>
 </RCC>

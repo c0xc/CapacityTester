@@ -20,7 +20,7 @@ languages/capacitytester_de.ts \
 languages/capacitytester_ru.ts \
 languages/capacitytester_es.ts
 
-target.path = /opt/capacitytester
+target.path = /usr/bin
 INSTALLS += target
 
 #!versionAtLeast(QT_VERSION, 5.15.0) {

@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run build container
-        uses: c0xc/github-build-qt-appimage-action@debian-8
+        uses: c0xc/github-build-qt-appimage-action@fedora-33
         with:
           recipe: .build_pipe_vars
       - name: 'Upload Artifact'

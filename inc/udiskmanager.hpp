@@ -68,6 +68,12 @@ public:
     QString
     mountpoint(const QString &device);
 
+    /**
+     * Returns the device name which is mounted at mountpoint.
+     */
+    QString
+    mountedDevice(const QString &mountpoint);
+
     bool
     isSystemDevice(const QString &device);
 
@@ -96,6 +102,8 @@ public:
      */
     QStringList
     blockDevices(bool dbus_path = false);
+    QStringList
+    getBlockDevices();
 
     /**
      * Returns a list of names of block devices that are partitions.

@@ -150,6 +150,7 @@ VolumeTester::VolumeTester(const QString &mountpoint)
             : block_size_max(16 * MB),
               file_size_max(512 * MB),
               safety_buffer(1 * MB), //512 KB not enough for some filesystems
+              req_remount(false),
               file_prefix("CAPACITYTESTER"),
               bytes_total(0),
               bytes_written(0),
@@ -188,6 +189,12 @@ VolumeTester::setSafetyBuffer(int new_buffer)
     if (new_buffer < 0) return false;
     safety_buffer = new_buffer;
     return true;
+}
+
+void
+VolumeTester::setReqRemount(bool enabled)
+{
+    req_remount = enabled;
 }
 
 /*!
@@ -444,11 +451,11 @@ VolumeTester::start()
     assert(pattern.size() == block_size_max);
 
     //Calculate file and block sizes
+    QDir dir(mountpoint());
     {
         int file_count = bytes_total / file_size_max;
         int last_file_size = bytes_total % file_size_max;
         if (last_file_size) file_count++;
-        QDir dir(mountpoint());
         file_infos.clear();
         for (int i = 0; i < file_count; i++)
         {
@@ -474,7 +481,7 @@ VolumeTester::start()
 
             //File information
             FileInfo file_info;
-            file_info.path = path;
+            file_info.filename = name;
             file_info.offset = pos;
             file_info.size = size;
             file_info.end = end;
@@ -522,13 +529,14 @@ VolumeTester::start()
 
     //File objects (on heap, auto-deleted)
     //Files deleted after destroyed() immediate deletion may fail (too early)
-    QObject files_parent; //restrict QFile objects to this function
+    files_parent = new QObject(this); //scope till finished
     for (int i = 0, ii = file_infos.size(); i < ii; i++)
     {
         //Create file
-        QString path = file_infos[i].path;
-        QFile *file = new QFile(path, &files_parent); //with parent
-        file->setProperty("PATH", path);
+        QString name = file_infos[i].filename;
+        QString path = dir.absoluteFilePath(name);
+        QFile *file = new QFile(path, files_parent); //with parent
+        file->setProperty("NAME", name);
         connect(file,
                 SIGNAL(destroyed(QObject*)),
                 SLOT(removeFile(QObject*)));
@@ -536,17 +544,21 @@ VolumeTester::start()
     }
 
     //Run tests
-    if (initialize() && writeFull() && verifyFull())
-    {
-        //Test succeeded
-        success = true;
-        emit succeeded();
-    }
-    else
+    bool ok = initialize() && writeFull();
+    if (!ok)
     {
         //Test failed
         success = false;
         emit failed(error_type);
+    }
+    //Remount
+    if (req_remount)
+    {
+        emit remountRequested(_mountpoint);
+    }
+    else
+    {
+        runVerifyStep();
     }
 
     //Files deleted and finished() after last file object deleted
@@ -563,6 +575,59 @@ VolumeTester::cancel()
 {
     error_type |= Error::Aborted;
     _canceled = true;
+}
+
+void
+VolumeTester::handleRemounted(const QString &new_mountpoint)
+{
+    //Request completed: volume remounted at new_mountpoint
+    if (new_mountpoint.isEmpty())
+    {
+        //Remount failed!
+        emit verifyFailed(0, 0);
+        return;
+    }
+
+    //UDiskManager/DBus call fails in this thread:
+    //UDiskManager diskmanager;
+    //diskmanager.umount(device)...
+    //QObject: Cannot create children for a parent that is in a different thread.
+    //(Parent is UDiskManager(), parent's thread is QThread(), current thread is QThread()
+
+    //Fix file paths
+    if (!QFileInfo(new_mountpoint).isDir())
+        return;
+    _mountpoint = new_mountpoint;
+    for (int i = 0, ii = file_infos.size(); i < ii; i++)
+    {
+        FileInfo file_info = file_infos[i];
+        QFile *file = file_info.file;
+        QFileInfo fi(QDir(new_mountpoint), file_info.filename);
+        file->setFileName(fi.filePath());
+    }
+
+    //Continue test, which is waiting for remount
+    runVerifyStep();
+}
+
+void
+VolumeTester::runVerifyStep()
+{
+    bool ok = verifyFull();
+    if (ok)
+    {
+        //Test succeeded
+        success = true;
+        emit succeeded();
+    }
+    else
+    {
+        //Test failed
+        success = false;
+        emit failed(error_type);
+    }
+
+    files_parent->deleteLater();
 }
 
 bool
@@ -783,6 +848,13 @@ VolumeTester::writeFull()
             //Cancel gracefully
             if (abortRequested()) return false;
         }
+
+        //Tell kernel to discard cache
+        #if _XOPEN_SOURCE >= 600 || _POSIX_C_SOURCE >= 200112L
+        posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+        #endif
+
+        file->close();
     }
 
     return true;
@@ -800,17 +872,6 @@ VolumeTester::verifyFull()
     {
         FileInfo file_info = file_infos[i];
         QFile *file = file_info.file;
-        int fd = file->handle();
-
-        //Flush cache
-        #ifdef USE_FSYNC
-        fsync(fd);
-        #endif
-
-        //Tell kernel to discard cache
-        #if _XOPEN_SOURCE >= 600 || _POSIX_C_SOURCE >= 200112L
-        posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
-        #endif
 
         //Read pattern in small chunks
         for (int j = 0, jj = file_info.blocks.size(); j < jj; j++)
@@ -822,6 +883,17 @@ VolumeTester::verifyFull()
 
             //Start timer
             timer_verifying.start();
+
+            //Re-open file
+            if (!file->isOpen())
+            {
+                if (!file->open(QIODevice::ReadOnly))
+                {
+                    error_type |= Error::Verify;
+                    emit verifyFailed(block_info.abs_offset, block_info.size);
+                    return false;
+                }
+            }
 
             //Read block
             if (!file->seek(block_info.rel_offset) ||
@@ -868,26 +940,31 @@ VolumeTester::generateTestPattern()
 }
 
 void
-VolumeTester::removeFile(QObject *file)
+VolumeTester::removeFile(QObject *file_obj)
 {
-    //File path
-    QString path = file->property("PATH").toString();
-    assert(!path.isEmpty());
+    //File is QFile and may be removed now
+    QFile *file = qobject_cast<QFile*>(file_obj);
+    //assert(file);
 
-    //File info index
+    //Find index of file info object
+    QString name = file_obj->property("NAME").toString();
+    assert(!name.isEmpty());
     int index = -1;
     for (int i = 0, ii = file_infos.size(); i < ii; i++)
     {
-        if (file_infos[i].path == path) index = i;
+        if (file_infos[i].filename == name) index = i;
     }
     assert(index != -1);
 
     //Delete file
-    if (!QFile::remove(path))
+    bool removed = false;
+    if (file) removed = file->remove();
+    else removed = QFile::remove(QDir(_mountpoint).absoluteFilePath(name));
+    if (!removed)
     {
         //Deleting file failed
         //Should not happen (maybe slow drive...)
-        emit removeFailed(path);
+        emit removeFailed(name);
     }
 
     //Remove info

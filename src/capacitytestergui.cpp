@@ -22,7 +22,8 @@
 
 CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
                  : QMainWindow(parent, flags),
-                   closing(false)
+                   closing(false),
+                   req_remount(false)
 {
     //Layout items
     QVBoxLayout *vbox_main = new QVBoxLayout;
@@ -189,6 +190,14 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     connect(btn_quit,
             SIGNAL(clicked()),
             SLOT(close()));
+    btn_advanced = new QPushButton(tr("Advanced...")); //Advanced functions...
+    QMenu *mnu_advanced = new QMenu;
+    btn_advanced->setMenu(mnu_advanced);
+    act_toggle_remount = mnu_advanced->addAction(tr("Unmount and remount during test"));
+    act_toggle_remount->setCheckable(true);
+    connect(act_toggle_remount,
+            SIGNAL(toggled(bool)),
+            SLOT(toggleReqRemount(bool)));
 
     //Initiate/unload view
     QTimer::singleShot(0, this, SLOT(unloadVolume()));
@@ -198,6 +207,7 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     vbox_main->addLayout(hbox_buttons);
     hbox_buttons->addWidget(btn_start_volume_test);
     hbox_buttons->addWidget(btn_stop_volume_test);
+    hbox_buttons->addWidget(btn_advanced);
     hbox_buttons->addWidget(btn_quit);
 
     //Window position
@@ -292,6 +302,30 @@ CapacityTesterGui::showDriveWindow()
     window->show();
     connect(window, SIGNAL(volumeSelected(const QString&)), SLOT(loadVolume(const QString&)));
 
+}
+
+void
+CapacityTesterGui::toggleReqRemount(bool checked)
+{
+    if (!checked)
+    {
+        req_remount = false;
+    }
+    else
+    {
+        QMessageBox::information(this, tr("Information"),
+            tr("You have requested the volume to be remounted during the test."
+            " Normally, this should not be necessary."
+            " You might be asked for a password."
+        ));
+            //"Normally, this should not be necessary, because "
+            //"the program makes an attempt to discard the cache. "
+            //"After unmounting and mounting again, you can be sure "
+            //"that all test data is read from the device, not from the cache. "
+            //"Note that you may be asked for an administrative password "
+            //"to allow the drive to be unmounted and mounted."
+        req_remount = true;
+    }
 }
 
 void
@@ -548,6 +582,7 @@ CapacityTesterGui::startVolumeTest()
 
     //Worker
     worker = new VolumeTester(mountpoint);
+    if (req_remount) worker->setReqRemount(true);
 
     //Thread for worker
     QThread *thread = new QThread;
@@ -648,6 +683,17 @@ CapacityTesterGui::startVolumeTest()
             SIGNAL(finished()),
             thread,
             SLOT(deleteLater()));
+
+    //Handle remount request in this (GUI) thread
+    connect(worker,
+            SIGNAL(remountRequested(const QString&)),
+            this,
+            SLOT(executeRemount(const QString&)));
+    //connect(this,
+    //        SIGNAL(remountExecuted(const QString&)),
+    //        worker,
+    //        SLOT(handleRemounted(const QString&))); //slot is not called...
+    //see executeRemount() which directly calls worker to continue
 
     //Start test in background
     thread->start();
@@ -752,7 +798,7 @@ CapacityTesterGui::failedVolumeTest(int error_type)
         comment += " " + tr("Verification failed.");
     QMessageBox::critical(this,
         tr("Test failed"),
-        tr("Test failed.") + QString("%1").arg(comment));
+        tr("Test failed. ") + QString("%1").arg(comment));
     txt_result->appendPlainText(comment);
 
 }
@@ -956,5 +1002,35 @@ CapacityTesterGui::verified(qint64 read, double avg_speed)
     //Speed
     txt_read_speed->setText(QString("%1 MB/s").arg(avg_speed, 0, 'f', 1));
 
+}
+
+void
+CapacityTesterGui::executeRemount(const QString &mountpoint)
+{
+    #ifndef NO_UDISK
+    //Unmount, mount
+    UDiskManager diskmanager;
+    QString old_mountpoint = mountpoint;
+    QString device = diskmanager.mountedDevice(mountpoint);
+    //Unmount
+    if (!diskmanager.umount(device))
+    {
+        emit remountExecuted("");
+        return;
+    }
+    //Mount
+    QString new_mountpoint;
+    if (!diskmanager.mount(device, &new_mountpoint))
+    {
+        emit remountExecuted("");
+        return;
+    }
+    //Confirm remount, continue
+    //emit remountExecuted(new_mountpoint); does not arrive
+    worker->handleRemounted(new_mountpoint);
+
+    #else
+    return;
+    #endif
 }
 

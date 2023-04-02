@@ -45,16 +45,24 @@
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
 #include <QMutexLocker>
+#include <QMenu>
 
 #include "size.hpp"
 #include "volumetester.hpp"
 #include "selectionwindow.hpp"
+
+#ifndef NO_UDISK
+#include "udiskmanager.hpp"
+#endif
 
 class CapacityTesterGui : public QMainWindow
 {
     Q_OBJECT
 
 signals:
+
+    void
+    remountExecuted(const QString &new_mountpoint);
 
 public:
 
@@ -68,11 +76,26 @@ private:
     QString
     selected_mountpoint;
 
+    bool
+    req_remount;
+
     QLineEdit
     *txt_volume;
 
     QPushButton
     *btn_select_volume;
+
+    QPushButton
+    *btn_advanced;
+
+    QAction
+    *act_toggle_remount;
+
+    //QAction
+    //*act_show_format_window;
+
+    //QAction
+    //*act_select_drive_for_destructive_test;
 
     QPushButton
     *btn_start_volume_test;
@@ -158,6 +181,9 @@ private slots:
     showDriveWindow();
 
     void
+    toggleReqRemount(bool checked);
+
+    void
     unloadVolume();
 
     void
@@ -210,6 +236,9 @@ private slots:
 
     void
     verified(qint64 read, double avg_speed);
+
+    void
+    executeRemount(const QString &mountpoint);
 
 };
 

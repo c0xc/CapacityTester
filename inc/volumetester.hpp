@@ -84,6 +84,9 @@ signals:
     writeFailed(qint64 start, int size);
 
     void
+    remountRequested(const QString &mountpoint);
+
+    void
     verifyFailed(qint64 start, int size);
 
     void
@@ -132,6 +135,9 @@ public:
     bool
     setSafetyBuffer(int new_buffer);
 
+    void
+    setReqRemount(bool enabled);
+
     bool
     isValid() const;
 
@@ -173,7 +179,13 @@ public slots:
     void
     cancel();
 
+    void
+    handleRemounted(const QString &new_mountpoint);
+
 private slots:
+
+    void
+    runVerifyStep();
 
     bool
     initialize();
@@ -217,7 +229,7 @@ private:
     struct FileInfo
     {
         QString
-        path;
+        filename;
 
         QPointer<QFile>
         file;
@@ -254,6 +266,9 @@ private:
     qint64
     safety_buffer;
 
+    bool
+    req_remount;
+
     QString
     _mountpoint;
 
@@ -280,6 +295,9 @@ private:
 
     int
     error_type;
+
+    QPointer<QObject>
+    files_parent;
 
     QList<FileInfo>
     file_infos;

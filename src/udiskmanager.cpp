@@ -97,6 +97,33 @@ UDiskManager::mountpoint(const QString &device)
     return "";
 }
 
+QString
+UDiskManager::mountedDevice(const QString &mountpoint)
+{
+    //Determine which device is mounted at mountpoint
+    //by iterating over all devices and checking their mountpoints
+    //Another option might be the GetManagedObjects method
+    //but it returns a complex data structure with nested maps
+
+    QString matching_device;
+
+    foreach (QString some_dev, getBlockDevices())
+    {
+        QList<QDir> mp_dirs = mountpoints(some_dev);
+        bool dev_matches = false;
+        foreach (const QDir &dir, mp_dirs)
+        {
+            if (dir.path() == mountpoint)
+                dev_matches = true;
+        }
+        if (!dev_matches) continue;
+        //Found matching device
+        matching_device = some_dev;
+    }
+
+    return matching_device;
+}
+
 bool
 UDiskManager::isSystemDevice(const QString &device)
 {
@@ -206,6 +233,25 @@ UDiskManager::blockDevices(bool dbus_path)
     }
 
     return devices;
+}
+
+QStringList
+UDiskManager::getBlockDevices()
+{
+    QStringList dev_list;
+
+    QString method_path = "/org/freedesktop/UDisks2/Manager";
+    QString method_if = "org.freedesktop.UDisks2.Manager";
+    QDBusInterface &iface = dbusInterface(method_path, method_if);
+    QDBusReply<QList<QDBusObjectPath>> reply = iface.call("GetBlockDevices", QVariantMap());
+    //TODO qdbus_cast<QList<QDBusObjectPath>>(reply.value())
+    foreach (const QDBusObjectPath &o, reply.value())
+    {
+        QString dev = o.path();
+        dev_list << dev;
+    }
+
+    return dev_list;
 }
 
 QStringList

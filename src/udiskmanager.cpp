@@ -63,6 +63,14 @@ UDiskManager::isValid() const
     return QDBusConnection::systemBus().isConnected();
 }
 
+bool
+UDiskManager::isBlankDevice(const QString &device)
+{
+    QVariantMap data = deviceData(device);
+    qint64 size = data.value("Size").toLongLong();
+    return size == 0;
+}
+
 QList<QDir>
 UDiskManager::mountpoints(const QString &device)
 {
@@ -122,6 +130,30 @@ UDiskManager::mountedDevice(const QString &mountpoint)
     }
 
     return matching_device;
+}
+
+QStringList
+UDiskManager::mountedPartitionsOf(const QString &device)
+{
+    QStringList mounted_devs;
+
+    QStringList all_parts;
+    all_parts << device; //TODO
+    foreach (QString dev, partitionDevices(device))
+        all_parts << dev;
+    foreach (QString part, all_parts)
+    {
+        if (!mountpoints(part).isEmpty())
+            mounted_devs << part;
+    }
+
+    return mounted_devs;
+}
+
+bool
+UDiskManager::isAnyPartitionMountedOf(const QString &device)
+{
+    return !mountedPartitionsOf(device).isEmpty();
 }
 
 bool
@@ -298,6 +330,27 @@ UDiskManager::partitions(bool dbus_path, bool fs_only)
 }
 
 QStringList
+UDiskManager::partitionDevices(const QString &device, bool dbus_path)
+{
+    QStringList sub_devices; //list of partitions in device
+
+    //The property called Partitions contains an array of dbus path objects
+    //For example: /org/freedesktop/UDisks2/block_devices/sda1
+    QString partitiontable_if = "org.freedesktop.UDisks2.PartitionTable"; //interface for partitiontable section
+    QDBusInterface &iface = dbusInterface(devicePath(device), partitiontable_if);
+    QVariant v_partitions = iface.property("Partitions");
+    QList<QDBusObjectPath> obj_list = qvariant_cast<QList<QDBusObjectPath>>(v_partitions);
+    foreach (const QDBusObjectPath &o, obj_list)
+    {
+        QString dev = o.path();
+        if (!dbus_path) dev = dev.section('/', -1);
+        sub_devices << dev;
+    }
+
+    return sub_devices;
+}
+
+QStringList
 UDiskManager::usbPartitions()
 {
     QStringList devices;
@@ -321,8 +374,9 @@ UDiskManager::underlyingBlockDevice(const QString &device)
 
     //Table property points to underlying storage device
     QVariant var = getVariant(devicePath(device), partition_if, "Table");
+    //check if device is a partition: var.canConvert<QDBusObjectPath>();
+    if (!var.canConvert<QDBusObjectPath>()) return "";
     QDBusObjectPath parent_obj;
-    //to check if device is a partition: var.canConvert<QDBusObjectPath>();
     parent_obj = var.value<QDBusObjectPath>();
     parent_device = parent_obj.path();
 
@@ -359,6 +413,18 @@ UDiskManager::drives()
     }
 
     return drives;
+}
+
+QStringList
+UDiskManager::supportedFilesystems()
+{
+    QString manager_path = "/org/freedesktop/UDisks2/Manager";
+    QString manager_if = "org.freedesktop.UDisks2.Manager";
+    QDBusInterface &iface = dbusInterface(manager_path, manager_if);
+    QVariant v_filesystems = iface.property("SupportedFilesystems");
+    QStringList filesystems = qvariant_cast<QStringList>(v_filesystems);
+
+    return filesystems;
 }
 
 bool
@@ -412,6 +478,44 @@ UDiskManager::umount(const QString &device, QString *message_ref)
     }
 
     return false;
+}
+
+void
+UDiskManager::makeDiskLabel(const QString &device, const QString &type)
+{
+    QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
+    QString path = devicePath(device);
+
+    // If the option erase is used then the underlying device will be erased. Valid values include “zero” to write zeroes over the entire device before formatting, “ata-secure-erase” to perform a secure erase or “ata-secure-erase-enhanced” to perform an enhanced secure erase. 
+
+    QDBusInterface &iface = dbusInterface(path, block_if);
+    QVariantMap options_dict;
+    QVariant options(options_dict);
+    QDBusMessage msg = iface.call("Format", type, options);
+
+}
+
+bool
+UDiskManager::createPartition(const QString &device, const QString &type, QString *message_ref)
+{
+    QString partitiontable_if = "org.freedesktop.UDisks2.PartitionTable";
+    QString path = devicePath(device);
+
+    // http://storaged.org/doc/udisks2-api/latest/gdbus-org.freedesktop.UDisks2.PartitionTable.html#gdbus-method-org-freedesktop-UDisks2-PartitionTable.CreatePartitionAndFormat
+    //offset 0 will be rounded up to 1M
+
+    QDBusInterface &iface = dbusInterface(path, partitiontable_if);
+    QVariantMap options_dict;
+    QVariant opt(options_dict);
+    QDBusMessage msg = iface.call("CreatePartitionAndFormat", (quint64)0, (quint64)0, "", "", opt, type, opt);
+
+    if (msg.type() == QDBusMessage::ErrorMessage)
+    {
+        if (message_ref) *message_ref = msg.errorMessage();
+        return false;
+    }
+
+    return true;
 }
 
 QString

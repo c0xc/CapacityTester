@@ -54,6 +54,13 @@ public:
     isValid() const;
 
     /**
+     * Returns true if this is a blank device with a size of zero,
+     * for example an empty card reader.
+     */
+    bool
+    isBlankDevice(const QString &device);
+
+    /**
      * Returns a list of all mountpoints of the specified device.
      * if the device (partition) is not mounted, the list will be empty.
      */
@@ -73,6 +80,12 @@ public:
      */
     QString
     mountedDevice(const QString &mountpoint);
+
+    QStringList
+    mountedPartitionsOf(const QString &device);
+
+    bool
+    isAnyPartitionMountedOf(const QString &device);
 
     bool
     isSystemDevice(const QString &device);
@@ -102,6 +115,7 @@ public:
      */
     QStringList
     blockDevices(bool dbus_path = false);
+
     QStringList
     getBlockDevices();
 
@@ -128,6 +142,14 @@ public:
      */
     QStringList
     partitions(bool dbus_path = false, bool fs_only = false);
+
+    /**
+     * Returns the list of partitions from the partition table of device.
+     * With dbus_path = true, the internal dbus identifiers will be returned
+     * instead of sda1. Otherwise it might be [sda1, sda2] (for device = sda).
+     */
+    QStringList
+    partitionDevices(const QString &device, bool dbus_path = false);
 
     QStringList
     usbPartitions();
@@ -158,6 +180,9 @@ public:
     QStringList
     drives();
 
+    QStringList
+    supportedFilesystems();
+
     //void
     //watch...
     //watchDrives...
@@ -187,6 +212,20 @@ public slots:
      */
     bool
     umount(const QString &device, QString *message_ref = 0);
+
+    /**
+     * Reset disk label with new partition table.
+     * This will wipe the device!
+     * Do not call this without asking the user first.
+     */
+    void
+    makeDiskLabel(const QString &device, const QString &type = "dos");
+
+    /**
+     * Create new partition on device.
+     */
+    bool
+    createPartition(const QString &device, const QString &type, QString *message_ref = 0);
 
 private:
 

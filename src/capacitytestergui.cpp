@@ -198,6 +198,16 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     connect(act_toggle_remount,
             SIGNAL(toggled(bool)),
             SLOT(toggleReqRemount(bool)));
+    act_show_format_window = mnu_advanced->addAction(tr("Format drive"));
+    connect(act_show_format_window,
+            SIGNAL(triggered()),
+            SLOT(showFormatDialog()));
+    //Disable format feature on unsupported platforms
+    bool udisk_support = false;
+#ifndef NO_UDISK
+    udisk_support = UDiskManager().isValid();
+#endif
+    if (!udisk_support) act_show_format_window->setEnabled(false);
 
     //Initiate/unload view
     QTimer::singleShot(0, this, SLOT(unloadVolume()));
@@ -302,6 +312,42 @@ CapacityTesterGui::showDriveWindow()
     window->show();
     connect(window, SIGNAL(volumeSelected(const QString&)), SLOT(loadVolume(const QString&)));
 
+}
+
+void
+CapacityTesterGui::showFormatDialog(const QString &target)
+{
+    //Show format dialog for target which usually is a (block) device
+    //It could also be a mountpoint in which case the device will be determined
+    UDiskFormatDialog *format_dialog = new UDiskFormatDialog(target, this);
+    format_dialog->setAttribute(Qt::WA_DeleteOnClose);
+    format_dialog->open();
+}
+
+void
+CapacityTesterGui::showFormatDialog()
+{
+    //If mountpoint selected, use it as target and clear selection
+    //because after formatting it will not be a valid mountpoint anymore
+    if (!selected_mountpoint.isEmpty())
+    {
+        QString mp = selected_mountpoint;
+        unloadVolume();
+        showFormatDialog(mp);
+        return;
+    }
+
+    //Show device selection dialog
+    UDiskSelectionDialog *selection_dialog = new UDiskSelectionDialog(this);
+    selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(selection_dialog, SIGNAL(deviceSelected(const QString&)), this, SLOT(showFormatDialog(const QString&)));
+    //connect(selection_dialog, &UDiskSelectionDialog::deviceSelected, this, [this]
+    //(const QString &dev)
+    //{
+    //    UDiskFormatDialog *format_dialog = new UDiskFormatDialog(this);
+    //    showFormatDialog(dev, this);
+    //});
+    selection_dialog->open();
 }
 
 void
@@ -1007,7 +1053,7 @@ CapacityTesterGui::verified(qint64 read, double avg_speed)
 void
 CapacityTesterGui::executeRemount(const QString &mountpoint)
 {
-    #ifndef NO_UDISK
+#ifndef NO_UDISK
     //Unmount, mount
     UDiskManager diskmanager;
     QString old_mountpoint = mountpoint;
@@ -1029,8 +1075,8 @@ CapacityTesterGui::executeRemount(const QString &mountpoint)
     //emit remountExecuted(new_mountpoint); does not arrive
     worker->handleRemounted(new_mountpoint);
 
-    #else
+#else
     return;
-    #endif
+#endif
 }
 

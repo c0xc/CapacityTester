@@ -50,6 +50,7 @@
 #include "size.hpp"
 #include "volumetester.hpp"
 #include "selectionwindow.hpp"
+#include "udiskformatdialog.hpp"
 
 #ifndef NO_UDISK
 #include "udiskmanager.hpp"
@@ -91,8 +92,8 @@ private:
     QAction
     *act_toggle_remount;
 
-    //QAction
-    //*act_show_format_window;
+    QAction
+    *act_show_format_window;
 
     //QAction
     //*act_select_drive_for_destructive_test;
@@ -179,6 +180,12 @@ private slots:
 
     void
     showDriveWindow();
+
+    void
+    showFormatDialog(const QString &target);
+
+    void
+    showFormatDialog();
 
     void
     toggleReqRemount(bool checked);

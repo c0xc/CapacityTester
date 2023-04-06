@@ -268,7 +268,7 @@ UDiskManager::blockDevices(bool dbus_path)
 }
 
 QStringList
-UDiskManager::getBlockDevices()
+UDiskManager::getBlockDevices(bool dbus_path)
 {
     QStringList dev_list;
 
@@ -280,6 +280,7 @@ UDiskManager::getBlockDevices()
     foreach (const QDBusObjectPath &o, reply.value())
     {
         QString dev = o.path();
+        if (!dbus_path) dev = dev.section('/', -1);
         dev_list << dev;
     }
 
@@ -366,7 +367,7 @@ UDiskManager::usbPartitions()
 }
 
 QString
-UDiskManager::underlyingBlockDevice(const QString &device)
+UDiskManager::underlyingBlockDevice(const QString &device, bool dbus_path)
 {
     QString partition_if = "org.freedesktop.UDisks2.Partition"; //interface for partition section
 
@@ -379,6 +380,8 @@ UDiskManager::underlyingBlockDevice(const QString &device)
     QDBusObjectPath parent_obj;
     parent_obj = var.value<QDBusObjectPath>();
     parent_device = parent_obj.path();
+    //Remove DBus path leaving only the device name //TODO use types / objects
+    if (!dbus_path) parent_device = parent_device.section('/', -1);
 
     return parent_device;
 }

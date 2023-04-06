@@ -117,7 +117,7 @@ public:
     blockDevices(bool dbus_path = false);
 
     QStringList
-    getBlockDevices();
+    getBlockDevices(bool dbus_path = false);
 
     /**
      * Returns a list of names of block devices that are partitions.
@@ -159,7 +159,7 @@ public:
      * This will be device name (without /dev/), like "sda".
      */
     QString
-    underlyingBlockDevice(const QString &device);
+    underlyingBlockDevice(const QString &device, bool dbus_path = false);
 
     /**
      * Returns the drive that contains the specified block device.

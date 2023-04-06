@@ -238,12 +238,9 @@ UDiskSelectionDialog::UDiskSelectionDialog(QWidget *parent)
     form->addRow(tr("Size"), m_txt_dev_size);
 
     //Control buttons
-    QDialogButtonBox *button_box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(button_box, SIGNAL(accepted()), this, SLOT(confirmSelection()));
-    //m_btn_umount = new QPushButton(tr("Unmount"));
-    //m_btn_umount->setDisabled(true);
-    //button_box->addButton(m_btn_umount, QDialogButtonBox::ActionRole);
-    vbox->addWidget(button_box);
+    m_button_box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(m_button_box, SIGNAL(accepted()), this, SLOT(confirmSelection()));
+    vbox->addWidget(m_button_box);
 
     //QTimer::singleShot(0, this, SLOT(reloadList()));
     reloadList();
@@ -253,6 +250,7 @@ void
 UDiskSelectionDialog::reloadList()
 {
     m_selection_list->clear();
+    m_button_box->button(QDialogButtonBox::Ok)->setDisabled(true);
 
     foreach (QString dev, udisk.blockDevices())
     {
@@ -284,6 +282,7 @@ UDiskSelectionDialog::itemSelected(QListWidgetItem *current, QListWidgetItem *pr
         arg(capacity.formatted()). //TODO fix 2048408248320B shown as 1TB
         arg((qint64)capacity));
 
+    m_button_box->button(QDialogButtonBox::Ok)->setDisabled(false);
 
 }
 

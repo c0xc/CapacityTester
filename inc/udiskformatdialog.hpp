@@ -132,8 +132,8 @@ private:
     QLineEdit
     *m_txt_dev_size;
 
-    //QPushButton
-    //*m_btn_umount;
+    QDialogButtonBox
+    *m_button_box;
 
     UDiskManager
     udisk;

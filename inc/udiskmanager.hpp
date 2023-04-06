@@ -217,6 +217,11 @@ public slots:
      * Reset disk label with new partition table.
      * This will wipe the device!
      * Do not call this without asking the user first.
+     *
+     * DANGER DANGER DANGER
+     * IF YOU CALL THIS FUNCTION WITH THE WRONG DEVICE NAME,
+     * YOU WILL NEED RECOVERY TOOLS (OR A BACKUP PLAN WITH SNAPSHOTS).
+     * YOU HAVE BEEN WARNED.
      */
     void
     makeDiskLabel(const QString &device, const QString &type = "dos");

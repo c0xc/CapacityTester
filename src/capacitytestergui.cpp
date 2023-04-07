@@ -588,6 +588,7 @@ CapacityTesterGui::startVolumeTest()
     }
 
     //Ask again if volume not empty
+    //TODO ignore default ****: lost+found, System Volume Information
     {
         QStringList root_files = tester.rootFiles();
         if (!root_files.isEmpty())
@@ -603,7 +604,7 @@ CapacityTesterGui::startVolumeTest()
             );
             msgbox.setStandardButtons(
                 QMessageBox::Yes | QMessageBox::Cancel);
-            msgbox.setDefaultButton(QMessageBox::Cancel);
+            msgbox.setDefaultButton(QMessageBox::Yes);
             msgbox.setDetailedText(root_files.join("\n"));
             if (msgbox.exec() != QMessageBox::Yes) return;
         }
@@ -612,8 +613,9 @@ CapacityTesterGui::startVolumeTest()
     //Sanity checks above
     //Test starts here
 
-    //Disable volume selection
+    //Disable volume selection and other stuff
     btn_select_volume->setEnabled(false);
+    btn_advanced->setEnabled(false);
 
     //Start/stop buttons
     btn_start_volume_test->setEnabled(false);
@@ -859,8 +861,9 @@ CapacityTesterGui::completedVolumeTest()
     btn_start_volume_test->setEnabled(true);
     btn_stop_volume_test->setEnabled(false);
 
-    //Enable volume selection
+    //Enable volume selection and other stuff
     btn_select_volume->setEnabled(true);
+    btn_advanced->setEnabled(true);
 
     //Stop timer
     tmr_total_test_time.invalidate();

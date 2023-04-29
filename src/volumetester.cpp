@@ -20,37 +20,6 @@
 
 #include "volumetester.hpp"
 
-/*! \class VolumeTester
- *
- * \brief The VolumeTester class provides an interface for
- * testing a mounted filesystem.
- *
- * A VolumeTester can test the capacity of a mounted filesystem
- * by writing files to it and verifying those files.
- * The filesystem should be completely empty.
- * A filesystem that's already half full cannot be tested properly.
- *
- * The goal is to detect a fake USB thumbdrive (or memory card).
- * There are many counterfeit flash storage devices or memory cards
- * available online.
- * These claim to have a higher capacity than they really have.
- * For example, a thumbdrive sold as "16 GB USB flash drive"
- * will present itself as a storage device with a capacity of 16 GB,
- * but in reality, it might just have a 4 GB chip.
- * Writes beyond the 4 GB limit are sometimes ignored
- * without reporting an error, depending on the fake.
- * This class will fill the filesystem completely and then verify it
- * to see if the returned data is correct.
- *
- * This class works on a mounted filesystem rather than a storage device.
- * The filesystem should span the entire storage device,
- * i.e., it should be the only filesystem on that device.
- *
- * As a courtesy to the user, this tester will clean up after itself
- * and remove all test files afterwards.
- *
- */
-
 #if defined(_WIN32) && !defined(NO_FSYNC)
 int
 fsync(int fd)
@@ -483,6 +452,7 @@ VolumeTester::start()
             FileInfo file_info;
             file_info.filename = name;
             file_info.offset = pos;
+            file_info.offset_mb = pos / MB;
             file_info.size = size;
             file_info.end = end;
             file_info.id = id_bytes;
@@ -512,9 +482,11 @@ VolumeTester::start()
                 BlockInfo block_info;
                 block_info.rel_offset = pos; //relative offset within file
                 block_info.abs_offset = file_info.offset + pos; //absolute
+                block_info.abs_offset_mb = block_info.abs_offset / MB;
                 block_info.size = block_size;
                 block_info.rel_end = end;
                 block_info.abs_end = file_info.offset + end;
+                block_info.abs_end_mb = block_info.abs_end / MB;
                 block_info.id = id_bytes;
 
                 //Add to list
@@ -584,7 +556,7 @@ VolumeTester::handleRemounted(const QString &new_mountpoint)
     if (new_mountpoint.isEmpty())
     {
         //Remount failed!
-        emit verifyFailed(0, 0);
+        emit verifyFailed(0);
         return;
     }
 
@@ -634,7 +606,8 @@ bool
 VolumeTester::initialize()
 {
     //Start
-    emit initializationStarted(bytes_total);
+    qint64 total_mb = bytes_total / MB;
+    emit initializationStarted(total_mb);
 
     //Create test files to fill available space
     //Last test file usually smaller (to fill space)
@@ -675,7 +648,7 @@ VolumeTester::initialize()
         {
             //Writing id failed
             error_type |= Error::Write;
-            emit writeFailed(file_info.offset, file_info.size);
+            emit writeFailed(file_info.offset_mb);
             return false;
         }
 
@@ -693,7 +666,7 @@ VolumeTester::initialize()
                 //Growing file failed
                 error_type |= Error::Write;
                 error_type |= Error::Resize;
-                emit writeFailed(block_info.abs_offset, block_info.size);
+                emit writeFailed(block_info.abs_offset_mb);
                 return false;
             }
 
@@ -713,7 +686,7 @@ VolumeTester::initialize()
                 {
                     //Writing last byte failed
                     error_type |= Error::Write;
-                    emit writeFailed(block_info.abs_offset, block_info.size);
+                    emit writeFailed(block_info.abs_offset_mb);
                     return false;
                 }
             }
@@ -723,7 +696,7 @@ VolumeTester::initialize()
             initialized_mb += block_info.size / MB;
             double avg_speed =
                 initialized_sec ? initialized_mb / initialized_sec : 0;
-            emit initialized(block_info.abs_end, avg_speed);
+            emit initialized(block_info.abs_end_mb, avg_speed);
 
             //Cancel gracefully
             if (abortRequested()) return false;
@@ -739,7 +712,7 @@ VolumeTester::initialize()
         {
             //Verifying last byte failed
             error_type |= Error::Verify;
-            emit verifyFailed(file_info.offset, file_info.size);
+            emit verifyFailed(file_info.offset_mb); //TODO possible bug, position at 0
             return false;
         }
 
@@ -749,7 +722,7 @@ VolumeTester::initialize()
         {
             //Verifying id failed
             error_type |= Error::Verify;
-            emit verifyFailed(file_info.offset, file_info.size);
+            emit verifyFailed(file_info.offset_mb); //TODO possible bug, position at 0
             return false;
         }
 
@@ -770,7 +743,7 @@ VolumeTester::initialize()
         {
             //Verifying last byte failed
             error_type |= Error::Verify;
-            emit verifyFailed(file_info.offset, file_info.size);
+            emit verifyFailed(file_info.offset_mb); //TODO possible bug, position at 0
             return false;
         }
 
@@ -780,7 +753,7 @@ VolumeTester::initialize()
         {
             //Verifying id failed
             error_type |= Error::Verify;
-            emit verifyFailed(file_info.offset, file_info.size);
+            emit verifyFailed(file_info.offset_mb); //TODO possible bug, position at 0
             return false;
         }
 
@@ -830,7 +803,7 @@ VolumeTester::writeFull()
             {
                 //Writing chunk failed
                 error_type |= Error::Write;
-                emit writeFailed(block_info.abs_offset, block_info.size);
+                emit writeFailed(block_info.abs_offset_mb);
                 return false;
             }
 
@@ -843,7 +816,7 @@ VolumeTester::writeFull()
             written_sec += (double)timer_writing.elapsed() / 1000;
             written_mb += block_info.size / MB;
             double avg_speed = written_sec ? written_mb / written_sec : 0;
-            emit written(block_info.abs_end, avg_speed);
+            emit written(block_info.abs_end_mb, avg_speed);
 
             //Cancel gracefully
             if (abortRequested()) return false;
@@ -890,7 +863,7 @@ VolumeTester::verifyFull()
                 if (!file->open(QIODevice::ReadOnly))
                 {
                     error_type |= Error::Verify;
-                    emit verifyFailed(block_info.abs_offset, block_info.size);
+                    emit verifyFailed(block_info.abs_offset_mb); //TODO possible bug, position at 0
                     return false;
                 }
             }
@@ -901,7 +874,7 @@ VolumeTester::verifyFull()
             {
                 //Verifying chunk failed
                 error_type |= Error::Verify;
-                emit verifyFailed(block_info.abs_offset, block_info.size);
+                emit verifyFailed(block_info.abs_offset_mb); //TODO possible bug, position at 0
                 return false;
             }
 
@@ -909,7 +882,7 @@ VolumeTester::verifyFull()
             verified_sec += (double)timer_verifying.elapsed() / 1000;
             verified_mb += block_info.size / MB;
             double avg_speed = verified_sec ? verified_mb / verified_sec : 0;
-            emit verified(block_info.abs_end, avg_speed);
+            emit verified(block_info.abs_end_mb, avg_speed);
 
             //Cancel gracefully
             if (abortRequested()) return false;

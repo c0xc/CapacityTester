@@ -49,6 +49,8 @@
 
 #include "size.hpp"
 #include "volumetester.hpp"
+#include "destructivedisktester.hpp"
+#include "destructivedisktesterwrapper.hpp"
 #include "selectionwindow.hpp"
 #include "udiskformatdialog.hpp"
 
@@ -65,9 +67,12 @@ signals:
     void
     remountExecuted(const QString &new_mountpoint);
 
+    void
+    reqStop();
+
 public:
 
-    CapacityTesterGui(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    CapacityTesterGui(QWidget *parent = 0);
 
 private:
 
@@ -95,8 +100,8 @@ private:
     QAction
     *act_show_format_window;
 
-    //QAction
-    //*act_select_drive_for_destructive_test;
+    QAction
+    *act_destructive_test;
 
     QPushButton
     *btn_start_volume_test;
@@ -171,7 +176,10 @@ private:
     progressLightPixmap(const QColor &color);
 
     QPointer<VolumeTester>
-    worker;
+    volume_worker;
+
+    QPointer<DestructiveDiskTester>
+    dd_worker;
 
 private slots:
 
@@ -191,6 +199,18 @@ private slots:
     toggleReqRemount(bool checked);
 
     void
+    startDiskTest(const QString &device);
+
+    void
+    startDiskTest();
+
+    void
+    startedDiskTest(qint64 total);
+
+    void
+    completedDiskTest(bool success);
+
+    void
     unloadVolume();
 
     void
@@ -203,7 +223,7 @@ private slots:
     startVolumeTest();
 
     void
-    stopVolumeTest();
+    stopTest();
 
     void
     succeededVolumeTest();
@@ -221,7 +241,7 @@ private slots:
     initializationStarted(qint64 total);
 
     void
-    initialized(qint64 bytes, double avg_speed);
+    initialized(qint64 size, double avg_speed);
 
     void
     writeStarted();
@@ -233,10 +253,10 @@ private slots:
     createFailed(int index, qint64 start);
 
     void
-    writeFailed(qint64 start, int size);
+    writeFailed(qint64 start);
 
     void
-    verifyFailed(qint64 start, int size);
+    verifyFailed(qint64 start);
 
     void
     written(qint64 written, double avg_speed);

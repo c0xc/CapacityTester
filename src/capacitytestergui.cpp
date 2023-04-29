@@ -20,8 +20,8 @@
 
 #include "capacitytestergui.hpp"
 
-CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
-                 : QMainWindow(parent, flags),
+CapacityTesterGui::CapacityTesterGui(QWidget *parent)
+                 : QMainWindow(parent),
                    closing(false),
                    req_remount(false)
 {
@@ -32,7 +32,7 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     main_widget->setLayout(vbox_main);
     setCentralWidget(main_widget);
 
-    //Font
+    //Font, icon
     QFont monospace_font =
         QFontDatabase::systemFont(QFontDatabase::FixedFont);
 
@@ -185,7 +185,7 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     btn_stop_volume_test = new QPushButton(tr("&Stop Test"));
     connect(btn_stop_volume_test,
             SIGNAL(clicked()),
-            SLOT(stopVolumeTest()));
+            SLOT(stopTest()));
     btn_quit = new QPushButton(tr("&Quit"));
     connect(btn_quit,
             SIGNAL(clicked()),
@@ -202,6 +202,10 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent, Qt::WindowFlags flags)
     connect(act_show_format_window,
             SIGNAL(triggered()),
             SLOT(showFormatDialog()));
+    act_destructive_test = mnu_advanced->addAction(tr("Fast test (destructive)"));
+    connect(act_destructive_test,
+            SIGNAL(triggered()),
+            SLOT(startDiskTest()));
     //Disable format feature on unsupported platforms
     bool udisk_support = false;
 #ifndef NO_UDISK
@@ -266,7 +270,7 @@ void
 CapacityTesterGui::closeEvent(QCloseEvent *event)
 {
     //Don't close while test running
-    if (worker)
+    if (volume_worker || dd_worker)
     {
         //Don't close immediately
         event->ignore();
@@ -289,13 +293,17 @@ CapacityTesterGui::closeEvent(QCloseEvent *event)
         //Set closing flag
         closing = true;
 
-        //Abort test (if still running)
-        if (!worker) return;
-        connect(worker,
-                SIGNAL(destroyed()),
-                SLOT(close()));
+        //Abort test (if still running) and close GUI after test
+        if (volume_worker)
+        {
+            connect(volume_worker, SIGNAL(destroyed()), SLOT(close()));
+        }
+        else if (dd_worker)
+        {
+            connect(dd_worker, SIGNAL(destroyed()), SLOT(close()));
+        }
         setEnabled(false);
-        stopVolumeTest();
+        stopTest();
 
     }
     else
@@ -341,12 +349,6 @@ CapacityTesterGui::showFormatDialog()
     UDiskSelectionDialog *selection_dialog = new UDiskSelectionDialog(this);
     selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(selection_dialog, SIGNAL(deviceSelected(const QString&)), this, SLOT(showFormatDialog(const QString&)));
-    //connect(selection_dialog, &UDiskSelectionDialog::deviceSelected, this, [this]
-    //(const QString &dev)
-    //{
-    //    UDiskFormatDialog *format_dialog = new UDiskFormatDialog(this);
-    //    showFormatDialog(dev, this);
-    //});
     selection_dialog->open();
 }
 
@@ -364,14 +366,244 @@ CapacityTesterGui::toggleReqRemount(bool checked)
             " Normally, this should not be necessary."
             " You might be asked for a password."
         ));
-            //"Normally, this should not be necessary, because "
-            //"the program makes an attempt to discard the cache. "
-            //"After unmounting and mounting again, you can be sure "
-            //"that all test data is read from the device, not from the cache. "
-            //"Note that you may be asked for an administrative password "
-            //"to allow the drive to be unmounted and mounted."
         req_remount = true;
     }
+}
+
+void
+CapacityTesterGui::startDiskTest(const QString &device)
+{
+    if (device.isEmpty()) return;
+
+    //DESTRUCTIVE DISK TEST - unmounted disk will be overwritten
+
+    if (QMessageBox::question(this, tr("Destructive disk test"),
+        tr("Do you want to run a destructive test on the selected device?\n%1\nPlease note that this test routine will overwrite the device, destroying all data on it. After running this test, you will have to format it before you're able to use it again.\nIf you have any valuable files on this device, cancel NOW (press ESC).").arg(device),
+        QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
+        return;
+
+    //Check if selected device is valid and not in use (quick check)
+    //note that this is not 100% reliable
+    DestructiveDiskTester checker(device);
+    if (checker.isMounted())
+    {
+        QMessageBox::critical(this, tr("Cannot start test"),
+            tr("This device is in use: %1. Please unmount it. The destructive disk test requires that the device is not in use because it will overwrite it, destroying all data on it.").arg(device));
+        return;
+    }
+
+    //Sanity checks above
+    //---
+    //Test starts here
+
+    //Disable volume selection and other stuff
+    btn_select_volume->setEnabled(false);
+    btn_advanced->setEnabled(false);
+
+    //Start/stop buttons
+    btn_start_volume_test->setEnabled(false);
+    btn_stop_volume_test->setEnabled(true);
+
+    //Reset fields
+    txt_write_speed->clear();
+    txt_read_speed->clear();
+    txt_time->clear();
+    txt_result->clear();
+    txt_result->setStyleSheet(" ");
+
+    //Initialize worker
+    dd_worker = new DestructiveDiskTester(device);
+
+    //Thread for worker
+    QThread *thread = new QThread;
+    dd_worker->moveToThread(thread);
+
+    //Use sudo wrapper if not running as root
+    if (!DestructiveDiskTester::amIRoot())
+    {
+        QMessageBox::warning(this, tr("Destructive disk test"),
+            tr("This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password."));
+        dd_worker = new DestructiveDiskTesterWrapper(device);
+        dd_worker->moveToThread(thread); //NOTE optional
+    }
+
+    //Start worker when thread starts
+    connect(thread,
+            SIGNAL(started()),
+            dd_worker,
+            SLOT(start()));
+
+    //Initialization started
+    connect(dd_worker,
+            SIGNAL(started(qint64)),
+            this,
+            SLOT(startedDiskTest(qint64)));
+
+    //Written
+    connect(dd_worker,
+            SIGNAL(written(qint64, double)),
+            this,
+            SLOT(written(qint64, double)));
+    connect(dd_worker,
+            SIGNAL(writeFailed(qint64)),
+            this,
+            SLOT(writeFailed(qint64)));
+
+    //Verified
+    connect(dd_worker,
+            SIGNAL(verified(qint64, double)),
+            this,
+            SLOT(verified(qint64, double)));
+    connect(dd_worker,
+            SIGNAL(verifyFailed(qint64)),
+            this,
+            SLOT(verifyFailed(qint64)));
+
+    //Test completed handler (successful or not)
+    connect(dd_worker,
+            SIGNAL(finished(bool)),
+            this,
+            SLOT(completedDiskTest(bool)));
+
+    //Stop thread when worker done (stops event loop -> thread->finished())
+    connect(dd_worker,
+            SIGNAL(finished()),
+            thread,
+            SLOT(quit()));
+
+    //Delete worker when done
+    //This signal can be connected to QObject::deleteLater(), to free objects in that thread.
+    //https://doc.qt.io/qt-5/qthread.html#finished
+    connect(thread,
+            SIGNAL(finished()),
+            dd_worker,
+            SLOT(deleteLater())); //delete worker after loop
+
+    //Delete thread when thread done (event loop stopped)
+    connect(dd_worker,
+            SIGNAL(destroyed()),
+            thread,
+            SLOT(deleteLater())); //delete thread after worker
+
+    //Stop worker on request
+    connect(this,
+            SIGNAL(reqStop()),
+            dd_worker,
+            SLOT(cancel()));
+
+    //Delete on quit (GUI) //TODO ?
+    connect(this,
+            SIGNAL(destroyed()),
+            dd_worker,
+            SLOT(deleteLater())); //delete worker on quit
+
+    //Enable progress label
+    tmr_pro_testing->setProperty("BLINK_STATE", 0);
+    lbl_pro_testing->setProperty("PHASE", tr("STARTING"));
+    lbl_pro_left_light->setPixmap(progressLightPixmap("yellow"));
+    lbl_pro_right_light->setPixmap(progressLightPixmap("yellow"));
+    tmr_pro_testing->start();
+
+    //Enable fields
+    txt_capacity->setEnabled(true);
+    pro_initializing->setEnabled(true);
+    pro_writing->setEnabled(true);
+    pro_verifying->setEnabled(true);
+    txt_time->setEnabled(true);
+    txt_result->setEnabled(true);
+
+    //Start test in background
+    thread->start();
+
+    //Start timer
+    tmr_total_test_time.start();
+
+}
+
+void
+CapacityTesterGui::startDiskTest()
+{
+    //Show device selection dialog
+    UDiskSelectionDialog *selection_dialog = new UDiskSelectionDialog(this);
+    selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(selection_dialog, &UDiskSelectionDialog::deviceSelected, this, [this]
+    (const QString &dev, const QString &dev_path)
+    {
+        startDiskTest(dev_path);
+    });
+    selection_dialog->open();
+}
+
+void
+CapacityTesterGui::startedDiskTest(qint64 total)
+{
+    initializationStarted(total);
+    lbl_pro_testing->setProperty("PHASE", tr("TESTING"));
+
+    //Size capacity = total ...; //Size can't init MB yet
+    txt_capacity->setText(QString("%1 GB (%2 MB)").
+        arg(total / 1024).
+        arg(total));
+
+}
+
+void
+CapacityTesterGui::completedDiskTest(bool success)
+{
+
+    //Phase
+    tmr_pro_testing->stop();
+    lbl_pro_testing->clear();
+    //Stop animation
+    ani_pro_left->stop();
+    eff_pro_left->setOpacity(1);
+    lbl_pro_left_light->setVisible(true);
+    ani_pro_right->stop();
+    eff_pro_right->setOpacity(1);
+    lbl_pro_right_light->setVisible(true);
+
+    if (success)
+    {
+        //SUCCESS
+        lbl_pro_testing->setText(tr("TEST SUCCEEDED"));
+        txt_result->setPlainText(tr(
+            "TEST COMPLETED SUCCESSFULLY, NO ERRORS FOUND."));
+        txt_result->setStyleSheet("background-color:#DFF0D8; color:#437B43;");
+
+        lbl_pro_left_light->setPixmap(progressLightPixmap("green"));
+        lbl_pro_right_light->setPixmap(progressLightPixmap("green"));
+
+    }
+    else
+    {
+        //ERROR
+        lbl_pro_testing->setText(tr("TEST FAILED"));
+
+        lbl_pro_left_light->setPixmap(progressLightPixmap("red"));
+        lbl_pro_right_light->setPixmap(progressLightPixmap("red"));
+
+        //The position has already been written to txt_result by the slot
+        //writeFailed / verifyFailed
+        //TODO use/get gotError signal for unexpected errors
+        QString comment = "";
+        QMessageBox::critical(this,
+            tr("Test failed"),
+            tr("Test failed. ") + QString("%1").arg(comment));
+        //txt_result->appendPlainText(comment);
+
+    }
+
+    //Start/stop buttons
+    btn_start_volume_test->setEnabled(true);
+    btn_stop_volume_test->setEnabled(false);
+
+    //Enable volume selection and other stuff
+    btn_select_volume->setEnabled(true);
+    btn_advanced->setEnabled(true);
+
+    //Stop timer
+    tmr_total_test_time.invalidate();
+
 }
 
 void
@@ -629,101 +861,101 @@ CapacityTesterGui::startVolumeTest()
     txt_result->setStyleSheet(" ");
 
     //Worker
-    worker = new VolumeTester(mountpoint);
-    if (req_remount) worker->setReqRemount(true);
+    volume_worker = new VolumeTester(mountpoint);
+    if (req_remount) volume_worker->setReqRemount(true);
 
     //Thread for worker
     QThread *thread = new QThread;
-    worker->moveToThread(thread);
+    volume_worker->moveToThread(thread);
 
     //Start worker when thread starts
     connect(thread,
             SIGNAL(started()),
-            worker,
+            volume_worker,
             SLOT(start()));
 
     //Initialization started
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(initializationStarted(qint64)),
             this,
             SLOT(initializationStarted(qint64)));
 
     //Block initialized
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(initialized(qint64, double)),
             this,
             SLOT(initialized(qint64, double)));
 
     //Written
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(written(qint64, double)),
             this,
             SLOT(written(qint64, double)));
 
     //Verified
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(verified(qint64, double)),
             this,
             SLOT(verified(qint64, double)));
 
     //Write started
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(writeStarted()),
             this,
             SLOT(writeStarted()));
 
     //Verify started
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(verifyStarted()),
             this,
             SLOT(verifyStarted()));
 
     //Create failed
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(createFailed(int, qint64)),
             this,
             SLOT(createFailed(int, qint64)));
 
     //Write failed
-    connect(worker,
-            SIGNAL(writeFailed(qint64, int)),
+    connect(volume_worker,
+            SIGNAL(writeFailed(qint64)),
             this,
-            SLOT(writeFailed(qint64, int)));
+            SLOT(writeFailed(qint64)));
 
     //Verify failed
-    connect(worker,
-            SIGNAL(verifyFailed(qint64, int)),
+    connect(volume_worker,
+            SIGNAL(verifyFailed(qint64)),
             this,
-            SLOT(verifyFailed(qint64, int)));
+            SLOT(verifyFailed(qint64)));
 
     //Test failed handler (after write/verify failed, with delay)
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(failed(int)),
             this,
             SLOT(failedVolumeTest(int)));
 
     //Test succeeded handler
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(succeeded()),
             this,
             SLOT(succeededVolumeTest()));
 
     //Test completed handler (successful or not)
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(finished()),
             this,
             SLOT(completedVolumeTest()));
 
     //Stop thread when worker done (stops event loop -> thread->finished())
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(finished()),
             thread,
             SLOT(quit()));
 
     //Delete worker when done
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(finished()),
-            worker,
+            volume_worker,
             SLOT(deleteLater()));
 
     //Delete thread when thread done (event loop stopped)
@@ -733,15 +965,21 @@ CapacityTesterGui::startVolumeTest()
             SLOT(deleteLater()));
 
     //Handle remount request in this (GUI) thread
-    connect(worker,
+    connect(volume_worker,
             SIGNAL(remountRequested(const QString&)),
             this,
             SLOT(executeRemount(const QString&)));
     //connect(this,
     //        SIGNAL(remountExecuted(const QString&)),
-    //        worker,
+    //        volume_worker,
     //        SLOT(handleRemounted(const QString&))); //slot is not called...
     //see executeRemount() which directly calls worker to continue
+
+    //Stop worker on request
+    connect(this,
+            SIGNAL(reqStop()),
+            volume_worker,
+            SLOT(cancel()));
 
     //Start test in background
     thread->start();
@@ -759,19 +997,24 @@ CapacityTesterGui::startVolumeTest()
 }
 
 void
-CapacityTesterGui::stopVolumeTest()
+CapacityTesterGui::stopTest()
 {
     //No action if no test running
-    if (!worker) return;
+    if (!volume_worker && !dd_worker) return;
 
-    //Test phase
+    //Update progress label
     lbl_pro_testing->setProperty("PHASE", tr("STOPPING"));
 
     //Disable button
     btn_stop_volume_test->setEnabled(false);
 
-    //Set stop flag
-    worker->cancel();
+    //Request worker to stop
+    emit reqStop();
+    //this essentially does:
+    //if (volume_worker)
+    //    volume_worker->cancel();
+    //else if (dd_worker)
+    //    dd_worker->cancel();
 
 }
 
@@ -942,8 +1185,7 @@ CapacityTesterGui::initializationStarted(qint64 total)
     total_test_size = total;
 
     //Progress max
-    qint64 mb = 1024 * 1024;
-    int total_mb = total / mb; //bytes would overflow int
+    int total_mb = total; //all units in MB, bytes would overflow int
     pro_initializing->setMaximum(total_mb);
     pro_writing->setMaximum(total_mb);
     pro_verifying->setMaximum(total_mb);
@@ -959,12 +1201,12 @@ CapacityTesterGui::initializationStarted(qint64 total)
 }
 
 void
-CapacityTesterGui::initialized(qint64 bytes, double avg_speed)
+CapacityTesterGui::initialized(qint64 size, double avg_speed)
 {
     Q_UNUSED(avg_speed);
 
     //Initialized MB (progress)
-    int initialized_mb = bytes / VolumeTester::MB;
+    int initialized_mb = size;
     pro_initializing->setValue(initialized_mb);
 
 }
@@ -1002,12 +1244,10 @@ CapacityTesterGui::createFailed(int index, qint64 start)
 }
 
 void
-CapacityTesterGui::writeFailed(qint64 start, int size)
+CapacityTesterGui::writeFailed(qint64 start)
 {
-    Q_UNUSED(size);
-
     //MB
-    int start_mb = start / VolumeTester::MB;
+    int start_mb = start;
 
     //Result - ERROR
     txt_result->setPlainText(tr("WRITE ERROR AFTER %1 MB!").arg(start_mb));
@@ -1016,12 +1256,10 @@ CapacityTesterGui::writeFailed(qint64 start, int size)
 }
 
 void
-CapacityTesterGui::verifyFailed(qint64 start, int size)
+CapacityTesterGui::verifyFailed(qint64 start)
 {
-    Q_UNUSED(size);
-
     //MB
-    int start_mb = start / VolumeTester::MB;
+    int start_mb = start;
 
     //Result - ERROR
     txt_result->setPlainText(tr("READ ERROR AFTER %1 MB!").arg(start_mb));
@@ -1033,7 +1271,7 @@ void
 CapacityTesterGui::written(qint64 written, double avg_speed)
 {
     //MB
-    int written_mb = written / VolumeTester::MB;
+    int written_mb = written;
     pro_writing->setValue(written_mb);
 
     //Speed
@@ -1045,7 +1283,7 @@ void
 CapacityTesterGui::verified(qint64 read, double avg_speed)
 {
     //MB
-    int read_mb = read / VolumeTester::MB;
+    int read_mb = read;
     pro_verifying->setValue(read_mb);
 
     //Speed
@@ -1076,7 +1314,7 @@ CapacityTesterGui::executeRemount(const QString &mountpoint)
     }
     //Confirm remount, continue
     //emit remountExecuted(new_mountpoint); does not arrive
-    worker->handleRemounted(new_mountpoint);
+    volume_worker->handleRemounted(new_mountpoint);
 
 #else
     return;

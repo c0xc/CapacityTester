@@ -34,6 +34,7 @@
 #include <errno.h>
 #endif
 
+#include <QDebug>
 #include <QObject>
 #include <QVariant>
 #include <QPair>
@@ -53,6 +54,37 @@ int
 fsync(int fd);
 #endif
 
+/*! \class VolumeTester
+ *
+ * \brief The VolumeTester class provides an interface for
+ * testing a mounted filesystem.
+ *
+ * A VolumeTester can test the capacity of a mounted filesystem
+ * by writing files to it and verifying those files.
+ * The filesystem should be completely empty.
+ * A filesystem that's already half full cannot be tested properly.
+ *
+ * The goal is to detect a fake USB thumbdrive (or memory card).
+ * There are many counterfeit flash storage devices or memory cards
+ * available online.
+ * These claim to have a higher capacity than they really have.
+ * For example, a thumbdrive sold as "16 GB USB flash drive"
+ * will present itself as a storage device with a capacity of 16 GB,
+ * but in reality, it might just have a 4 GB chip.
+ * Writes beyond the 4 GB limit are sometimes ignored
+ * without reporting an error, depending on the fake.
+ * This class will fill the filesystem completely and then verify it
+ * to see if the returned data is correct.
+ *
+ * This class works on a mounted filesystem rather than a storage device.
+ * The filesystem should span the entire storage device,
+ * i.e., it should be the only filesystem on that device.
+ *
+ * As a courtesy to the user, this tester will clean up after itself
+ * and remove all test files afterwards.
+ *
+ */
+
 class VolumeTester : public QObject
 {
     Q_OBJECT
@@ -69,7 +101,7 @@ signals:
     verifyStarted();
 
     void
-    initialized(qint64 bytes, double avg_speed);
+    initialized(qint64 size, double avg_speed);
 
     void
     written(qint64 bytes, double avg_speed);
@@ -81,13 +113,13 @@ signals:
     createFailed(int index, qint64 start);
 
     void
-    writeFailed(qint64 start, int size);
+    writeFailed(qint64 start);
 
     void
     remountRequested(const QString &mountpoint);
 
     void
-    verifyFailed(qint64 start, int size);
+    verifyFailed(qint64 start);
 
     void
     failed(int error_type = Error::Unknown);
@@ -212,6 +244,9 @@ private:
         qint64
         abs_offset;
 
+        qint64
+        abs_offset_mb;
+
         int
         size;
 
@@ -220,6 +255,9 @@ private:
 
         qint64
         abs_end;
+
+        qint64
+        abs_end_mb;
 
         QByteArray
         id;
@@ -236,6 +274,9 @@ private:
 
         qint64
         offset;
+
+        qint64
+        offset_mb;
 
         int
         size;

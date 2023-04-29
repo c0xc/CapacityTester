@@ -23,10 +23,32 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    app.setApplicationName(PROGRAM);
-    app.setApplicationVersion(APP_VERSION);
+    QCoreApplication *app = 0;
+
+    //Determine whether to initialize GUI (default) or CLI
+    //In GUI mode, QCoreApplication is not enough:
+    //QWidget: Cannot create a QWidget without QApplication
+    //In CLI mode, QApplication is too much:
+    //qt.qpa.xcb: could not connect to display
+    bool run_cli = false;
+    if (argc > 1) run_cli = true;
+    //if (qApp->platformName() == "offscreen") run_cli = true;
+    #ifdef NO_GUI
+    run_cli = true;
+    #endif
+
+    //Initialize Qt
+    if (run_cli)
+    {
+        app = new QCoreApplication(argc, argv);
+    }
+    else
+    {
+        app = new QApplication(argc, argv);
+    }
     QString program = QString(PROGRAM).toLower();
+    app->setApplicationName(PROGRAM);
+    app->setApplicationVersion(APP_VERSION);
 
     //Initialize QTranslator, load default translation
     //To change the language manually, either set the environment variable
@@ -44,33 +66,26 @@ int main(int argc, char *argv[])
     else if (translator_locale.load(program + "_" + QLocale::languageToString(QLocale().language()).toLower(), ":/i18n"))
         QCoreApplication::installTranslator(&translator_locale);
 
-    //Decide whether to run in cli mode (headless) or not
-    bool run_cli = false;
-    if (qApp->platformName() == "offscreen") run_cli = true;
-    #ifndef NO_GUI
-    app.setWindowIcon(QPixmap(":/USB_flash_drive.png"));
-    #else
-    run_cli = true;
-    #endif
-
     //Load application instance
     CapacityTesterCli *cli = 0;
     #ifndef NO_GUI
     CapacityTesterGui *gui = 0;
     #endif
-    if (argc > 1 || run_cli)
+    if (run_cli)
     {
         cli = new CapacityTesterCli;
     }
     else
     {
         #ifndef NO_GUI
+        qApp->setWindowIcon(QPixmap(":/USB_flash_drive.png"));
         gui = new CapacityTesterGui;
         gui->show();
         #endif
     }
 
-    int code = app.exec();
+    //Run event loop (in CLI mode, explicit close may be required when done)
+    int code = app->exec();
     delete cli;
     #ifndef NO_GUI
     delete gui;

@@ -31,11 +31,13 @@
 #include <QCommandLineParser>
 #include <QSignalMapper>
 #include <QThread>
+#include <QSocketNotifier>
 
 #include "udiskmanager.hpp"
 
 #include "size.hpp"
 #include "volumetester.hpp"
+#include "destructivedisktester.hpp"
 
 class CapacityTesterCli : public QObject
 {
@@ -58,8 +60,10 @@ private:
     QTextStream
     err;
 
-    QTextStream
-    in;
+    //QTextStream
+    //in;
+    QFile
+    *in_file;
 
     bool
     is_yes;
@@ -82,6 +86,9 @@ private:
     QString
     str_verify_speed;
 
+    QPointer<QSocketNotifier>
+    stdin_notifier;
+
 private slots:
 
     void
@@ -92,6 +99,15 @@ private slots:
 
     void
     close();
+
+    void
+    watchStdinSignal();
+
+    void
+    readStdinSignal();
+
+    void
+    checkStdinSignal();
 
     bool
     confirm();
@@ -121,7 +137,7 @@ private slots:
     initializationStarted(qint64 total);
 
     void
-    initialized(qint64 bytes, double avg_speed);
+    initialized(qint64 size, double avg_speed);
 
     void
     writeStarted();
@@ -134,6 +150,27 @@ private slots:
 
     void
     verified(qint64 read, double avg_speed);
+
+    void
+    startDiskTest(const QString &device);
+
+    void
+    startedDiskTest(qint64 total);
+
+    void
+    diskWritten(qint64 size, double avg);
+
+    void
+    diskWriteFailed(qint64 size);
+
+    void
+    diskVerified(qint64 size, double avg);
+
+    void
+    diskVerifyFailed(qint64 size);
+
+    void
+    completedDiskTest(bool success);
 
 };
 

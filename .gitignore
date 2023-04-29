@@ -1,4 +1,5 @@
 VERSION
+*.swp
 
 /obj/
 /bin/

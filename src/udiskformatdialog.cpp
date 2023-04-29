@@ -263,8 +263,14 @@ UDiskSelectionDialog::reloadList()
         bool is_usb = udisk.isUsbDevice(dev);
         if (!is_usb) continue;
 
-        //Add device
-        m_selection_list->addItem(dev);
+        //Add device item to list
+        //dev = "sda", dev_path = "/dev/sda"
+        QString dev_path = udisk.deviceFilePath(dev); //object/struct?
+        //m_selection_list->addItem(dev);
+        QListWidgetItem *item = new QListWidgetItem(dev, m_selection_list);
+        item->setData(Qt::UserRole, dev_path);
+        m_selection_list->addItem(item);
+
     }
 
 }
@@ -290,7 +296,8 @@ void
 UDiskSelectionDialog::confirmSelection(QListWidgetItem *item)
 {
     QString dev = item->text();
-    emit deviceSelected(dev);
+    QString dev_path = item->data(Qt::UserRole).toString();
+    emit deviceSelected(dev, dev_path);
     done(QDialog::Accepted);
 }
 

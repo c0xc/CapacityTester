@@ -101,7 +101,7 @@ class UDiskSelectionDialog : public QDialog
 signals:
 
     void
-    deviceSelected(const QString &dev);
+    deviceSelected(const QString &dev, const QString &dev_path = "");
 
 public:
 

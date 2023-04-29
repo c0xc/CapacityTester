@@ -54,6 +54,13 @@ public:
     isValid() const;
 
     /**
+     * Returns the full file path to the device file.
+     * For example, sda => /dev/sda.
+     */
+    QString
+    deviceFilePath(const QString &device);
+
+    /**
      * Returns true if this is a blank device with a size of zero,
      * for example an empty card reader.
      */
@@ -247,7 +254,7 @@ private:
     m_dbus_ifc_conns;
 
     QString
-    devicePath(const QString &name);
+    deviceDbusPath(const QString &name);
 
     QDBusInterface&
     dbusInterface(const QString &path, const QString &interface);

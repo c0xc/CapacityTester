@@ -63,6 +63,16 @@ UDiskManager::isValid() const
     return QDBusConnection::systemBus().isConnected();
 }
 
+QString
+UDiskManager::deviceFilePath(const QString &device)
+{
+    QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
+
+    QVariant var = getVariant(deviceDbusPath(device), block_if, "Device");
+
+    return var.toByteArray();
+}
+
 bool
 UDiskManager::isBlankDevice(const QString &device)
 {
@@ -83,7 +93,7 @@ UDiskManager::mountpoints(const QString &device)
 
     QList<QDir> mountpoints;
 
-    QString path = devicePath(device);
+    QString path = deviceDbusPath(device);
     foreach (QByteArray ba, getByteArrayList(path, filesystem_if, "MountPoints"))
     {
         QString mountpoint(ba);
@@ -161,7 +171,7 @@ UDiskManager::isSystemDevice(const QString &device)
 {
     QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
 
-    QVariant var = getVariant(devicePath(device), block_if, "HintSystem");
+    QVariant var = getVariant(deviceDbusPath(device), block_if, "HintSystem");
 
     return var.toBool();
 }
@@ -171,7 +181,7 @@ UDiskManager::isHiddenDevice(const QString &device)
 {
     QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
 
-    QVariant var = getVariant(devicePath(device), block_if, "HintHidden");
+    QVariant var = getVariant(deviceDbusPath(device), block_if, "HintHidden");
 
     return var.toBool();
 }
@@ -207,7 +217,7 @@ UDiskManager::idLabel(const QString &device)
 {
     QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
 
-    QVariant var = getVariant(devicePath(device), block_if, "IdLabel");
+    QVariant var = getVariant(deviceDbusPath(device), block_if, "IdLabel");
 
     return var.toString();
 }
@@ -218,7 +228,7 @@ UDiskManager::deviceData(const QString &device)
     QVariantMap dev_dict;
 
     //Get list of all available properties
-    QString dbus_path = devicePath(device);
+    QString dbus_path = deviceDbusPath(device);
     dev_dict["dbus_path"] = dbus_path;
     QVariantMap data = introspect(dbus_path);
 
@@ -300,7 +310,7 @@ UDiskManager::partitions(bool dbus_path, bool fs_only)
 
     foreach (QString device, blockDevices(dbus_path))
     {
-        QString path = devicePath(device);
+        QString path = deviceDbusPath(device);
 
         //Skip if device contains partitions (== is partitioned == has partition table)
         //With this check, we skip drives like "sda".
@@ -338,7 +348,7 @@ UDiskManager::partitionDevices(const QString &device, bool dbus_path)
     //The property called Partitions contains an array of dbus path objects
     //For example: /org/freedesktop/UDisks2/block_devices/sda1
     QString partitiontable_if = "org.freedesktop.UDisks2.PartitionTable"; //interface for partitiontable section
-    QDBusInterface &iface = dbusInterface(devicePath(device), partitiontable_if);
+    QDBusInterface &iface = dbusInterface(deviceDbusPath(device), partitiontable_if);
     QVariant v_partitions = iface.property("Partitions");
     QList<QDBusObjectPath> obj_list = qvariant_cast<QList<QDBusObjectPath>>(v_partitions);
     foreach (const QDBusObjectPath &o, obj_list)
@@ -374,7 +384,7 @@ UDiskManager::underlyingBlockDevice(const QString &device, bool dbus_path)
     QString parent_device;
 
     //Table property points to underlying storage device
-    QVariant var = getVariant(devicePath(device), partition_if, "Table");
+    QVariant var = getVariant(deviceDbusPath(device), partition_if, "Table");
     //check if device is a partition: var.canConvert<QDBusObjectPath>();
     if (!var.canConvert<QDBusObjectPath>()) return "";
     QDBusObjectPath parent_obj;
@@ -392,7 +402,7 @@ UDiskManager::drive(const QString &device)
     QString prop_if = "org.freedesktop.DBus.Properties"; //D-Bus interface for properties
     QString block_if = "org.freedesktop.UDisks2.Block";
 
-    QVariant var = getVariant(devicePath(device), block_if, "Drive");
+    QVariant var = getVariant(deviceDbusPath(device), block_if, "Drive");
 
     QString drive_path;
     if (var.canConvert<QDBusObjectPath>())
@@ -434,7 +444,7 @@ bool
 UDiskManager::mount(const QString &device, QString *message_ref)
 {
     QString filesystem_if = "org.freedesktop.UDisks2.Filesystem"; //interface for filesystem section
-    QString path = devicePath(device);
+    QString path = deviceDbusPath(device);
 
     //Call mount method
     QDBusInterface &iface = dbusInterface(path, filesystem_if);
@@ -460,7 +470,7 @@ bool
 UDiskManager::umount(const QString &device, QString *message_ref)
 {
     QString filesystem_if = "org.freedesktop.UDisks2.Filesystem"; //interface for filesystem section
-    QString path = devicePath(device);
+    QString path = deviceDbusPath(device);
 
     //Call umount method
     //If successful, type will be ReplyMessage.
@@ -487,7 +497,7 @@ void
 UDiskManager::makeDiskLabel(const QString &device, const QString &type)
 {
     QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
-    QString path = devicePath(device);
+    QString path = deviceDbusPath(device);
 
     // If the option erase is used then the underlying device will be erased. Valid values include “zero” to write zeroes over the entire device before formatting, “ata-secure-erase” to perform a secure erase or “ata-secure-erase-enhanced” to perform an enhanced secure erase. 
 
@@ -502,7 +512,7 @@ bool
 UDiskManager::createPartition(const QString &device, const QString &type, QString *message_ref)
 {
     QString partitiontable_if = "org.freedesktop.UDisks2.PartitionTable";
-    QString path = devicePath(device);
+    QString path = deviceDbusPath(device);
 
     // http://storaged.org/doc/udisks2-api/latest/gdbus-org.freedesktop.UDisks2.PartitionTable.html#gdbus-method-org-freedesktop-UDisks2-PartitionTable.CreatePartitionAndFormat
     //offset 0 will be rounded up to 1M
@@ -522,8 +532,14 @@ UDiskManager::createPartition(const QString &device, const QString &type, QStrin
 }
 
 QString
-UDiskManager::devicePath(const QString &name)
+UDiskManager::deviceDbusPath(const QString &name)
 {
+    //Dbus does not use the real path to the device file
+    //For example, the device "sda" (which would be at /dev/sda):
+    // /org/freedesktop/UDisks2/block_devices/sda
+
+    //Turn "sda" into dbus path
+    //NOTE that a full path is not resolved and fixed! TODO
     QString path = name;
     if (!path.contains("/"))
         path = "/org/freedesktop/UDisks2/block_devices/" + path;
@@ -706,7 +722,7 @@ QStringList
 UDiskManager::methodNames(const QString &path)
 {
     QStringList methods;
-    methods = introspect(devicePath(path)).value("method").toStringList();
+    methods = introspect(deviceDbusPath(path)).value("method").toStringList();
     return methods;
 }
 
@@ -714,7 +730,7 @@ QStringList
 UDiskManager::propertyNames(const QString &path)
 {
     QStringList properties;
-    properties = introspect(devicePath(path)).value("property").toStringList();
+    properties = introspect(deviceDbusPath(path)).value("property").toStringList();
     return properties;
 }
 

@@ -156,7 +156,7 @@ Build
 To start using CapacityTester now, it's recommended to
 use the pre-built binary file available for download on the [releases](https://github.com/c0xc/CapacityTester/releases) page.
 
-To build from source, use `qmake && make` (see [notes](https://github.com/c0xc/CapacityTester/blob/master/BUILD_NOTES.md)).
+To build from source, use `qmake && make` (see [notes](BUILD_NOTES.md)).
 
 
 

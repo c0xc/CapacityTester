@@ -4,7 +4,7 @@ CapacityTester
 - Test your new USB flash drive from China to find out if its full capacity can be used or if it's fake!
 - The *volume test* fills the filesystem, verifying that all of it can be used.
 - The *disk test* overwrites the drive itself and is much faster (some GB/TB large USB drives can be checked in less than 10 minutes); but it's experimental.
-- To learn more, keep reading. To start using CapacityTester now, download the latest [release](https://github.com/c0xc/CapacityTester/releases).
+- To learn more, keep reading. To start using CapacityTester now, download the latest [release](https://github.com/c0xc/CapacityTester/releases/tag/v0.5).
 
 **New feature: Destructive Disk Test - test your flash drive within minutes; Linux only** ([feedback](https://github.com/c0xc/CapacityTester/issues/12) appreciated)
 

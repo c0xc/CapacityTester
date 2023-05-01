@@ -120,6 +120,7 @@ VolumeTester::VolumeTester(const QString &mountpoint)
               file_size_max(512 * MB),
               safety_buffer(1 * MB), //512 KB not enough for some filesystems
               req_remount(false),
+              no_precheck(false),
               file_prefix("CAPACITYTESTER"),
               bytes_total(0),
               bytes_written(0),
@@ -164,6 +165,12 @@ void
 VolumeTester::setReqRemount(bool enabled)
 {
     req_remount = enabled;
+}
+
+void
+VolumeTester::disableInitPrecheck(bool disable)
+{
+    no_precheck = disable;
 }
 
 /*!
@@ -611,6 +618,12 @@ VolumeTester::initialize()
 
     //Create test files to fill available space
     //Last test file usually smaller (to fill space)
+    //That's actually the job of this init phase - to create the files
+    //Additionally, a pre-check is also performed by default
+    //to check the files (superficial check on each file after creation)
+    //to be able to detect a fake/bad drive before it's 100% full.
+    //We deliberately do not flush during the init phase,
+    //so if an error is detected, the actual error may have been earlier.
     uchar byte_fe = 254;
     QElapsedTimer timer_initializing;
     double initialized_mb = 0;
@@ -704,6 +717,7 @@ VolumeTester::initialize()
 
         //Verify this file right away to speed things up
         //Don't wait for last file to be written if second already corrupted
+        if (no_precheck) continue;
 
         //Verify last byte
         char c;

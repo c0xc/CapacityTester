@@ -170,6 +170,9 @@ public:
     void
     setReqRemount(bool enabled);
 
+    void
+    disableInitPrecheck(bool disable);
+
     bool
     isValid() const;
 
@@ -309,6 +312,9 @@ private:
 
     bool
     req_remount;
+
+    bool
+    no_precheck;
 
     QString
     _mountpoint;

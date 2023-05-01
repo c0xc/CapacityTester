@@ -23,7 +23,8 @@
 CapacityTesterGui::CapacityTesterGui(QWidget *parent)
                  : QMainWindow(parent),
                    closing(false),
-                   req_remount(false)
+                   req_remount(false),
+                   disable_precheck(false)
 {
     //Layout items
     QVBoxLayout *vbox_main = new QVBoxLayout;
@@ -193,16 +194,23 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
     btn_advanced = new QPushButton(tr("Advanced...")); //Advanced functions...
     QMenu *mnu_advanced = new QMenu;
     btn_advanced->setMenu(mnu_advanced);
+    act_disable_precheck = mnu_advanced->addAction(tr("Run pre-check during initialization"));
+    act_disable_precheck->setCheckable(true);
+    act_disable_precheck->setChecked(true);
+    connect(act_disable_precheck,
+            SIGNAL(toggled(bool)),
+            SLOT(toggleInitPrecheck(bool)));
     act_toggle_remount = mnu_advanced->addAction(tr("Unmount and remount during test"));
     act_toggle_remount->setCheckable(true);
     connect(act_toggle_remount,
             SIGNAL(toggled(bool)),
             SLOT(toggleReqRemount(bool)));
+    mnu_advanced->addSeparator();
     act_show_format_window = mnu_advanced->addAction(tr("Format drive"));
     connect(act_show_format_window,
             SIGNAL(triggered()),
             SLOT(showFormatDialog()));
-    act_destructive_test = mnu_advanced->addAction(tr("Fast test (destructive)"));
+    act_destructive_test = mnu_advanced->addAction(tr("Destructive disk test"));
     connect(act_destructive_test,
             SIGNAL(triggered()),
             SLOT(startDiskTest()));
@@ -368,6 +376,12 @@ CapacityTesterGui::toggleReqRemount(bool checked)
         ));
         req_remount = true;
     }
+}
+
+void
+CapacityTesterGui::toggleInitPrecheck(bool checked)
+{
+    disable_precheck = !checked;
 }
 
 void
@@ -863,6 +877,7 @@ CapacityTesterGui::startVolumeTest()
     //Worker
     volume_worker = new VolumeTester(mountpoint);
     if (req_remount) volume_worker->setReqRemount(true);
+    if (disable_precheck) volume_worker->disableInitPrecheck(true);
 
     //Thread for worker
     QThread *thread = new QThread;
@@ -976,10 +991,14 @@ CapacityTesterGui::startVolumeTest()
     //see executeRemount() which directly calls worker to continue
 
     //Stop worker on request
+    //set stop flag immediately (DirectConnection acts in this thread!)
+    //otherwise (AutoConnection) not canceled for a long time as thread blocks
     connect(this,
             SIGNAL(reqStop()),
             volume_worker,
-            SLOT(cancel()));
+            SLOT(cancel()), Qt::DirectConnection);
+    //when canceled, test failed is shown with all buttons disabled
+    //until all the files are cleaned up and the worker is gone
 
     //Start test in background
     thread->start();

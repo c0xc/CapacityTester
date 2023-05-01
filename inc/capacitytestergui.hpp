@@ -85,6 +85,9 @@ private:
     bool
     req_remount;
 
+    bool
+    disable_precheck;
+
     QLineEdit
     *txt_volume;
 
@@ -96,6 +99,9 @@ private:
 
     QAction
     *act_toggle_remount;
+
+    QAction
+    *act_disable_precheck;
 
     QAction
     *act_show_format_window;
@@ -197,6 +203,9 @@ private slots:
 
     void
     toggleReqRemount(bool checked);
+
+    void
+    toggleInitPrecheck(bool checked);
 
     void
     startDiskTest(const QString &device);

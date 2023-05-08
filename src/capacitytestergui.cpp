@@ -40,15 +40,21 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
     //Volume text box, selection button
     QHBoxLayout *hbox_volume = new QHBoxLayout;
     vbox_main->addLayout(hbox_volume);
+    //: Volume refers to a (mounted) filesystem throughout this application,
+    //: so the word volume may be translated as filesystem.
     QLabel *lbl_volume = new QLabel(tr("Volume"));
     hbox_volume->addWidget(lbl_volume);
     txt_volume = new QLineEdit;
     txt_volume->setReadOnly(true);
     txt_volume->setFont(monospace_font);
+    //: Volume, filesystem.
     txt_volume->setPlaceholderText(tr("Volume"));
     txt_volume->setToolTip(tr("Mounted volume to be tested"));
     txt_volume->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     hbox_volume->addWidget(txt_volume);
+    //: Button action: Select volume/filesystem on a USB flash drive,
+    //: the dialog lists drives but the user needs to select a volume,
+    //: a mounted filesystem, so the word filesystem can be used here as well.
     btn_select_volume = new QPushButton(tr("Select &drive..."));
     hbox_volume->addWidget(btn_select_volume);
     connect(btn_select_volume,
@@ -75,12 +81,14 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
     txt_used = new QLineEdit;
     txt_used->setReadOnly(true);
     txt_used->setFont(monospace_font);
+    //: Label: Used storage (of capacity).
     volume_form->addRow(tr("Used"), txt_used);
 
     //Available space
     txt_available = new QLineEdit;
     txt_available->setReadOnly(true);
     txt_available->setFont(monospace_font);
+    //: Label: Unused storage (of capacity).
     volume_form->addRow(tr("Available"), txt_available);
 
     //Horizontal line
@@ -133,10 +141,13 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
 
     //Progress
     pro_initializing = new QProgressBar;
+    //: Label for status of this phase - the init phase of the test.
     volume_form->addRow(tr("Initializing"), pro_initializing);
     pro_writing = new QProgressBar;
+    //: Label for status of this test phase.
     volume_form->addRow(tr("Writing"), pro_writing);
     pro_verifying = new QProgressBar;
+    //: Label for status of this test phase.
     volume_form->addRow(tr("Verifying"), pro_verifying);
 
     //Write speed
@@ -179,7 +190,7 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
     hline = 0;
 
     //Buttons
-    btn_start_volume_test = new QPushButton(tr("Start &Test"));
+    btn_start_volume_test = new QPushButton(tr("Start &Test")); //start VOLUME test
     connect(btn_start_volume_test,
             SIGNAL(clicked()),
             SLOT(startVolumeTest()));
@@ -191,25 +202,37 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
     connect(btn_quit,
             SIGNAL(clicked()),
             SLOT(close()));
-    btn_advanced = new QPushButton(tr("Advanced...")); //Advanced functions...
+    //: Menu button (hence ...): Advanced functions, more functions...
+    btn_advanced = new QPushButton(tr("Advanced...")); //advanced functions...
     QMenu *mnu_advanced = new QMenu;
     btn_advanced->setMenu(mnu_advanced);
+    //: On/off switch: Pre-check means quick test before the real test,
+    //: to detect a fake earlier, can be translated as superficial check.
     act_disable_precheck = mnu_advanced->addAction(tr("Run pre-check during initialization"));
     act_disable_precheck->setCheckable(true);
     act_disable_precheck->setChecked(true);
     connect(act_disable_precheck,
             SIGNAL(toggled(bool)),
             SLOT(toggleInitPrecheck(bool)));
+    //: On/off switch: Try to remount between write and read phases.
+    //: (This only affects the volume test, not the disk test.)
     act_toggle_remount = mnu_advanced->addAction(tr("Unmount and remount during test"));
     act_toggle_remount->setCheckable(true);
     connect(act_toggle_remount,
             SIGNAL(toggled(bool)),
             SLOT(toggleReqRemount(bool)));
     mnu_advanced->addSeparator();
+    //: Button: Format dialog where user can reformat his USB drive.
     act_show_format_window = mnu_advanced->addAction(tr("Format drive"));
     connect(act_show_format_window,
             SIGNAL(triggered()),
             SLOT(showFormatDialog()));
+    //: Button: Show list of USB drives to run disk test on selected drive.
+    //: The word destructive could probably be left out in the translation.
+    //: Disk test means the whole flash disk is tested, not just the volume,
+    //: and destructive means it'll overwrite it, destroying all data on it.
+    //: Another relevant property of this disk test is that it's very fast,
+    //: so in doubt, it could be translated as Fast disk test.
     act_destructive_test = mnu_advanced->addAction(tr("Destructive disk test"));
     connect(act_destructive_test,
             SIGNAL(triggered()),
@@ -391,6 +414,7 @@ CapacityTesterGui::startDiskTest(const QString &device)
 
     //DESTRUCTIVE DISK TEST - unmounted disk will be overwritten
 
+    //: Destructive / fast disk test, see hint above.
     if (QMessageBox::question(this, tr("Destructive disk test"),
         tr("Do you want to run a destructive test on the selected device?\n%1\nPlease note that this test routine will overwrite the device, destroying all data on it. After running this test, you will have to format it before you're able to use it again.\nIf you have any valuable files on this device, cancel NOW (press ESC).").arg(device),
         QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)

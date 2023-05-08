@@ -90,7 +90,7 @@ SelectionWindow::refresh()
     //Options under list
     QButtonGroup *chk_group = new QButtonGroup(wid_main);
     QRadioButton *chk_mountpoints = new QRadioButton(tr("All mountpoints"));
-    chk_mountpoints->setToolTip(tr("All mountpoints devices are listed, including system mountpoints."));
+    chk_mountpoints->setToolTip(tr("All mountpoints are listed, including system mountpoints."));
     chk_group->addButton(chk_mountpoints, 0);
     if (m_list_filter == 0) chk_mountpoints->setChecked(true);
     QRadioButton *chk_all_devs = new QRadioButton(tr("All filesystems"));
@@ -165,6 +165,7 @@ SelectionWindow::refresh()
     grid->addWidget(lbl, row, 0);
     grid->addWidget(txt_mountpoint, row, 1);
     row++;
+    //: Label means user-defined name/title (of the selected drive).
     lbl = new QLabel(tr("Label"));
     txt_label = new QLineEdit;
     txt_label->setReadOnly(true);
@@ -189,14 +190,17 @@ SelectionWindow::refresh()
 
     //Buttons: confirm selection; mount...
     QHBoxLayout *hbox_mount = new QHBoxLayout;
+    //: Button: Mount filesystem (action).
     btn_mount = new QPushButton(tr("Mount"));
     btn_mount->setDisabled(true);
     connect(btn_mount, SIGNAL(clicked()), SLOT(mount()));
     hbox_mount->addWidget(btn_mount);
+    //: Button: Unmount filesystem (action).
     btn_umount = new QPushButton(tr("Unmount"));
     btn_umount->setDisabled(true);
     connect(btn_umount, SIGNAL(clicked()), SLOT(umount()));
     hbox_mount->addWidget(btn_umount);
+    //: Button: Confirm selection, selected filesystem (action).
     btn_select = new QPushButton(tr("Select and Continue"));
     btn_select->setDisabled(true);
     connect(btn_select, SIGNAL(clicked()), SLOT(applySelection()));

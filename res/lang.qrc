@@ -1,8 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/i18n">
     <file>capacitytester_english.qm</file>
-    <file>capacitytester_german.qm</file>
-    <file>capacitytester_russian.qm</file>
+    <file>capacitytester_de.qm</file>
+    <file>capacitytester_ru.qm</file>
     <file>capacitytester_spanish.qm</file>
     <file>capacitytester_pt_br.qm</file>
 </qresource>

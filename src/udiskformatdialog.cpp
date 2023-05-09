@@ -29,6 +29,8 @@ UDiskFormatDialog::UDiskFormatDialog(QString dev, QWidget *parent)
     if (dev.isEmpty())
     {
         QMessageBox::critical(this, tr("Error"),
+        //: In the context of this dialog, drive means physical disk drive,
+        //: storage device, not filesystem.
             tr("No drive selected."));
         done(QDialog::Rejected);
         return;

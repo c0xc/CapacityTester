@@ -29,5 +29,6 @@ TRANSLATIONS = \
 languages/capacitytester_en.ts \
 languages/capacitytester_de.ts \
 languages/capacitytester_ru.ts \
-languages/capacitytester_es.ts
+languages/capacitytester_es.ts \
+languages/capacitytester_pt_br.ts
 

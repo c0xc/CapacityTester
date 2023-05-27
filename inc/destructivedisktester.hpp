@@ -23,13 +23,17 @@
 
 #include <cassert>
 #include <fcntl.h> //O_RDONLY
-#include <linux/fs.h> //BLKGETSIZE64
-#include <sys/ioctl.h>
 #include <unistd.h> //close()
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <QDebug>
+#include <QtGlobal> //Q_OS_...
+
+#if !defined(Q_OS_WIN)
+#include <linux/fs.h> //BLKGETSIZE64
+#include <sys/ioctl.h>
+#endif
+
 #include <QObject>
 #include <QVariant>
 #include <QFile>
@@ -37,19 +41,25 @@
 #include <QPointer>
 #include <QStorageInfo>
 
-//no NO_UDISK
-//#include "udiskmanager.hpp"
+#include "storagediskselection.hpp"
+#include "classlogger.hpp"
 
 /*! \class DestructiveDiskTester
  *
  * \brief The DestructiveDiskTester class provides an interface for
  * testing an unmounted USB storage disk.
  *
- * Unlike VolumeTester, which works on the filesystem on the partition
+ * Unlike VolumeTester, which works with the filesystem on the partition
  * of a USB drive (volume refers to a mounted filesystem),
- * this class works on the USB storage drive itself.
+ * this class works on the USB storage (block device) itself.
  * It tries to detect the real capacity of a fake drive faster
  * than the volume test, which can take days with some huge fake drives.
+ * Faster means it should only take a couple of minutes.
+ * That's possible because instead of slowly filling the filesystem
+ * to reach the capacity limit, it can write at random offsets.
+ *
+ * This disk test must be run as root (or as superuser with full access
+ * to the block device).
  *
  *
  *
@@ -90,6 +100,9 @@ public:
     static const int
     MB = 1024 * KB;
 
+    static const int
+    GB = 1024 * MB;
+
     static qint64
     getCapacity(int fd);
 
@@ -115,9 +128,21 @@ public:
 
     ~DestructiveDiskTester();
 
+    qint64
+    getCapacity();
+
+    int
+    getBlockSize();
+
+    bool
+    isWritable();
+
     //NOTE this routine is NOT 100% reliable!
     bool
-    isMounted();
+    isMounted(); //TODO
+
+    bool
+    exists();
 
     bool
     isValid();
@@ -166,7 +191,10 @@ private:
     m_dev_path;
 
     int
-    m_fd;
+    m_fd; //TODO
+
+    QSharedPointer<StorageDiskSelection::Device>
+    m_device;
 
     int
     m_dev_block_size;

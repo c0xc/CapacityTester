@@ -21,6 +21,8 @@
 
 #include "udiskformatdialog.hpp"
 
+#ifdef UDISKMANAGER_HPP
+
 UDiskFormatDialog::UDiskFormatDialog(QString dev, QWidget *parent)
                  : QDialog(parent)
 {
@@ -28,9 +30,9 @@ UDiskFormatDialog::UDiskFormatDialog(QString dev, QWidget *parent)
     //in that case we determine the device and ask to unmount it
     if (dev.isEmpty())
     {
-        QMessageBox::critical(this, tr("Error"),
-        //: In the context of this dialog, drive means physical disk drive,
-        //: storage device, not filesystem.
+        QMessageBox::critical(0, tr("Error"),
+            //: In the context of this dialog, drive means physical disk drive,
+            //: storage device, not filesystem.
             tr("No drive selected."));
         done(QDialog::Rejected);
         return;
@@ -40,7 +42,7 @@ UDiskFormatDialog::UDiskFormatDialog(QString dev, QWidget *parent)
         QString actual_dev = udisk.mountedDevice(dev);
         if (actual_dev.isEmpty())
         {
-            QMessageBox::critical(this, tr("Error"),
+            QMessageBox::critical(0, tr("Error"),
                 tr("This is not a valid drive: %1").arg(dev));
             done(QDialog::Rejected);
             return;
@@ -49,6 +51,18 @@ UDiskFormatDialog::UDiskFormatDialog(QString dev, QWidget *parent)
         QString parent_dev = udisk.underlyingBlockDevice(actual_dev);
         if (!parent_dev.isEmpty())
             dev = parent_dev;
+    }
+    if (dev.startsWith("/dev/"))
+    {
+        //Replace path with device filename for UDisk TODO improve UDiskManager
+        dev.replace(0, 5, ""); //remove /dev/ path TODO
+    }
+    if (udisk.deviceFilePath(dev).isEmpty())
+    {
+        QMessageBox::critical(0, tr("Error"),
+            tr("This is not a valid drive: %1").arg(dev));
+        done(QDialog::Rejected);
+        return;
     }
     m_dev = dev;
 
@@ -119,9 +133,11 @@ void
 UDiskFormatDialog::updateInfo()
 {
     QVariantMap data = udisk.deviceData(m_dev);
-    QString drive_name = data.value("Drive").toString().section('/', -1);
+    QString drive_name = udisk.driveModelName(m_dev);
+    if (drive_name.isEmpty())
+        drive_name = data.value("Drive").toString().section('/', -1);
     m_txt_drive_name->setText(drive_name);
-    Size capacity = data.value("Size").toLongLong();
+    Size capacity = udisk.capacity(m_dev);
     //TODO fix 2048408248320B shown as 1TB
     double gb = std::div(capacity.bytes(), (qint64)1024*1024*1024).quot;
     m_txt_dev_size->setText(QString("%1 GB").arg(gb, 0, 'f', 1));
@@ -202,110 +218,4 @@ UDiskFormatDialog::formatNow()
     done(QDialog::Accepted);
 }
 
-UDiskSelectionDialog::UDiskSelectionDialog(QWidget *parent)
-                    : QDialog(parent)
-{
-    QVBoxLayout *vbox = new QVBoxLayout;
-    setLayout(vbox);
-
-    //Title, separator line
-    QLabel *lbl_title = new QLabel(tr("Select a drive"));
-    lbl_title->setStyleSheet("font-weight:bold; color:darkgray; font-size:18pt;");
-    vbox->addWidget(lbl_title);
-    QFrame *hline1 = new QFrame;
-    hline1->setFrameShape(QFrame::HLine);
-    vbox->addWidget(hline1);
-
-    //Selection list with available devices
-    m_selection_list = new QListWidget;
-    m_selection_list->setStyleSheet("font-weight:bold; font-size:16pt;");
-    m_selection_list->setCursor(Qt::PointingHandCursor);
-    connect(m_selection_list, SIGNAL(itemActivated(QListWidgetItem*)),
-        SLOT(confirmSelection(QListWidgetItem*)));
-    connect(m_selection_list,
-        SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
-        SLOT(itemSelected(QListWidgetItem*, QListWidgetItem*)));
-    vbox->addWidget(m_selection_list);
-
-    //Details form
-    QWidget *wid_details = new QWidget;
-    vbox->addWidget(wid_details);
-    QFormLayout *form = new QFormLayout;
-    wid_details->setLayout(form);
-    m_txt_drive_name = new QLineEdit;
-    m_txt_drive_name->setReadOnly(true);
-    form->addRow(tr("Drive name"), m_txt_drive_name);
-    m_txt_dev_size = new QLineEdit;
-    m_txt_dev_size->setReadOnly(true);
-    form->addRow(tr("Size"), m_txt_dev_size);
-
-    //Control buttons
-    m_button_box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(m_button_box, SIGNAL(accepted()), this, SLOT(confirmSelection()));
-    vbox->addWidget(m_button_box);
-
-    //QTimer::singleShot(0, this, SLOT(reloadList()));
-    reloadList();
-}
-
-void
-UDiskSelectionDialog::reloadList()
-{
-    m_selection_list->clear();
-    m_button_box->button(QDialogButtonBox::Ok)->setDisabled(true);
-
-    foreach (QString dev, udisk.blockDevices())
-    {
-        //Skip devices which have parents (partitions)
-        if (!udisk.underlyingBlockDevice(dev).isEmpty()) continue;
-        //Skip blank drives
-        if (udisk.isBlankDevice(dev)) continue;
-
-        //Only USB devices
-        bool is_usb = udisk.isUsbDevice(dev);
-        if (!is_usb) continue;
-
-        //Add device item to list
-        //dev = "sda", dev_path = "/dev/sda"
-        QString dev_path = udisk.deviceFilePath(dev); //object/struct?
-        //m_selection_list->addItem(dev);
-        QListWidgetItem *item = new QListWidgetItem(dev, m_selection_list);
-        item->setData(Qt::UserRole, dev_path);
-        m_selection_list->addItem(item);
-
-    }
-
-}
-
-void
-UDiskSelectionDialog::itemSelected(QListWidgetItem *current, QListWidgetItem *previous)
-{
-    QString dev = current->text();
-
-    QVariantMap data = udisk.deviceData(dev);
-    QString drive_name = data.value("Drive").toString().section('/', -1);
-    m_txt_drive_name->setText(drive_name);
-    Size capacity = data.value("Size").toLongLong();
-    m_txt_dev_size->setText(QString("%1 / %2 B").
-        arg(capacity.formatted()). //TODO fix 2048408248320B shown as 1TB
-        arg((qint64)capacity));
-
-    m_button_box->button(QDialogButtonBox::Ok)->setDisabled(false);
-
-}
-
-void
-UDiskSelectionDialog::confirmSelection(QListWidgetItem *item)
-{
-    QString dev = item->text();
-    QString dev_path = item->data(Qt::UserRole).toString();
-    emit deviceSelected(dev, dev_path);
-    done(QDialog::Accepted);
-}
-
-void
-UDiskSelectionDialog::confirmSelection()
-{
-    confirmSelection(m_selection_list->currentItem());
-}
-
+#endif

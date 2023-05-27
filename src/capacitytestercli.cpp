@@ -30,9 +30,9 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
                    total_mb(0)
 {
     //Heading
-    out << "CapacityTester" << Qt::endl
-        << "==============" << Qt::endl
-        << Qt::endl;
+    out << "CapacityTester" << endl
+        << "==============" << endl
+        << endl;
 
     //Custom signal handler
     //stdin - also used for custom signal, see watchStdinSignal()
@@ -75,7 +75,7 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
     if (!args.isEmpty()) mountpoint = args.at(0);
     if (args.size() > 1)
     {
-        err << "Too many arguments." << Qt::endl;
+        err << "Too many arguments." << endl;
         close(1);
         return;
     }
@@ -179,27 +179,26 @@ CapacityTesterCli::watchStdinSignal()
     //because this may run as a subprocess as root
     //so the caller (the GUI) would not be allowed to send signals to it.
 
-#ifndef Q_OS_WIN
     if (!stdin_notifier)
     {
+
+#if !defined(Q_OS_WIN)
+
         stdin_notifier = new QSocketNotifier(0, QSocketNotifier::Read, this);
 
         // https://doc.qt.io/qt-5/qsocketnotifier.html#activated
         connect(stdin_notifier, SIGNAL(activated(int)), SLOT(readStdinSignal()));
-//        connect(stdin_notifier, QOverload<QSocketDescriptor, QSocketNotifier::Type>::of(&QSocketNotifier::activated),
-//        [=](QSocketDescriptor socket, QSocketNotifier::Type type)
-//        {
-//            std::string line;
-//            std::getline(std::cin, line);
-//            //if (std::cin.eof() || line == "QUIT") close();
-//        });
-    }
+
 #else
-    //Windows routine - experimental (I don't have a Windows vm running now)
-    //the Internet says: QWinEventNotifier(GetStdHandle(STD_INPUT_HANDLE));
-    QWinEventNotifier *stdin_notifier = new QWinEventNotifier(GetStdHandle(STD_INPUT_HANDLE), this);
-    connect(stdin_notifier, SIGNAL(activated(int)), SLOT(readStdinSignal()));
+
+        //Windows routine - experimental (I don't have a Windows vm running now)
+        //the Internet says: QWinEventNotifier(GetStdHandle(STD_INPUT_HANDLE));
+        stdin_notifier = new QWinEventNotifier(GetStdHandle(STD_INPUT_HANDLE), this);
+        connect(stdin_notifier, SIGNAL(activated(int)), SLOT(readStdinSignal()));
+
 #endif
+
+    }
 }
 
 void
@@ -209,7 +208,7 @@ CapacityTesterCli::readStdinSignal()
 
     if (line.startsWith("QUIT"))
     {
-        out << "ABORT - canceled..." << Qt::endl;
+        out << "ABORT - canceled..." << endl;
         close();
     }
 }
@@ -234,7 +233,7 @@ CapacityTesterCli::confirm()
 {
     if (is_yes)
     {
-        out << "yes" << Qt::endl;
+        out << "yes" << endl;
         return true;
     }
 
@@ -250,7 +249,7 @@ CapacityTesterCli::confirm()
         else
             yn.clear();
 
-        out << "yes or no?" << Qt::endl;
+        out << "yes or no?" << endl;
     }
     while (yn.isEmpty());
 
@@ -262,6 +261,7 @@ CapacityTesterCli::showVolumeList()
 {
     QStringList mountpoints;
     bool fetched_list = false;
+#ifdef UDISKMANAGER_HPP
     //Mounted USB devices
     UDiskManager manager;
     if (manager.isValid())
@@ -274,6 +274,7 @@ CapacityTesterCli::showVolumeList()
         }
         fetched_list = true;
     }
+#endif
 
     //All mounted filesystems (fallback)
     if (!fetched_list)
@@ -292,14 +293,14 @@ CapacityTesterCli::showVolumeList()
         //Print
         QString str_size =
             capacity.formatted(Size::Condensed).leftJustified(5);
-        out << "* " << str_size << "\t" << label << Qt::endl;
+        out << "* " << str_size << "\t" << label << endl;
 
     }
 
     //Nothing
     if (mountpoints.isEmpty())
     {
-        out << "No mountpoints found." << Qt::endl;
+        out << "No mountpoints found." << endl;
     }
 
 }
@@ -311,13 +312,13 @@ CapacityTesterCli::showVolumeInfo(const QString &mountpoint)
     VolumeTester tester(mountpoint);
     if (!tester.isValid())
     {
-        err << "The specified volume is not valid." << Qt::endl;
+        err << "The specified volume is not valid." << endl;
         return close(1);
     }
 
     //Print volume information
-    out << "Volume:\t\t" << mountpoint << Qt::endl;
-    out << Qt::endl;
+    out << "Volume:\t\t" << mountpoint << endl;
+    out << endl;
     Size capacity = tester.bytesTotal();
     Size used = tester.bytesUsed();
     int used_percentage =
@@ -329,22 +330,22 @@ CapacityTesterCli::showVolumeInfo(const QString &mountpoint)
         << capacity.formatted()
         << " / "
         << capacity.toLongLong() << " B"
-        << Qt::endl;
+        << endl;
     out << tr("Used:") << "\t\t"
         << used.formatted()
         << " / "
         << used.toLongLong() << " B"
         << " / "
         << used_percentage << "%"
-        << Qt::endl;
+        << endl;
     out << tr("Available:") << "\t"
         << available.formatted()
         << " / "
         << available.toLongLong() << " B"
         << " / "
         << available_percentage << "%"
-        << Qt::endl;
-    out << Qt::endl;
+        << endl;
+    out << endl;
 
     //Check for old test files that have not been removed (crash?)
     //Cannot test if those are present
@@ -355,12 +356,12 @@ CapacityTesterCli::showVolumeInfo(const QString &mountpoint)
         out << tr(
             "%n old test file(s) have been found.\n"
             "Cannot test with these files present, please delete them!", "", n)
-            << Qt::endl;
+            << endl;
         foreach (QString file, conflict_files)
         {
-            out << "!\t" << file << Qt::endl;
+            out << "!\t" << file << endl;
         }
-        out << Qt::endl;
+        out << endl;
     }
 
     //Check for files in selected filesystem (should be empty)
@@ -371,12 +372,12 @@ CapacityTesterCli::showVolumeInfo(const QString &mountpoint)
         out << tr(
             "%n file(s) have been found.\n"
             "The volume should be completely empty.", "", n)
-            << Qt::endl;
+            << endl;
         foreach (QString file, root_files)
         {
-            out << "X\t" << file << Qt::endl;
+            out << "X\t" << file << endl;
         }
-        out << Qt::endl;
+        out << endl;
     }
 
 }
@@ -389,7 +390,7 @@ CapacityTesterCli::startVolumeTest(const QString &mountpoint)
     tester.setSafetyBuffer(safety_buffer); //for calculation only
     if (!tester.isValid())
     {
-        err << "The specified volume is not valid." << Qt::endl;
+        err << "The specified volume is not valid." << endl;
         return close(1);
     }
 
@@ -397,7 +398,7 @@ CapacityTesterCli::startVolumeTest(const QString &mountpoint)
     if (!tester.bytesAvailable())
     {
         //Volume full or quota exhausted
-        err << tr("The selected volume is full.") << Qt::endl;
+        err << tr("The selected volume is full.") << endl;
         return close(1);
     }
 
@@ -411,7 +412,7 @@ CapacityTesterCli::startVolumeTest(const QString &mountpoint)
                 "The volume is not empty: %n file(s) have been found.\n"
                 "You should delete all those files first.\n"
                 "Are you really sure you want to continue?", "", n)
-                << Qt::endl;
+                << endl;
             if (!confirm()) return close(2);
         }
     }
@@ -503,7 +504,7 @@ CapacityTesterCli::startVolumeTest(const QString &mountpoint)
             SLOT(deleteLater()));
 
     //Get started
-    out << "Starting volume test... " << Qt::endl;
+    out << "Starting volume test... " << endl;
 
     //Start test in background
     thread->start();
@@ -540,11 +541,11 @@ void
 CapacityTesterCli::completedVolumeTest(bool success, int error_type)
 {
     //Result
-    out << Qt::endl;
-    out << Qt::endl;
+    out << endl;
+    out << endl;
     if (success)
     {
-        out << tr("Test completed successfully, no errors found.") << Qt::endl;
+        out << tr("Test completed successfully, no errors found.") << endl;
     }
     else
     {
@@ -565,18 +566,18 @@ CapacityTesterCli::completedVolumeTest(bool success, int error_type)
             comment += "\n" + tr("Write failed.");
         if (error_type & VolumeTester::Error::Verify)
             comment += "\n" + tr("Verification failed.");
-        out << tr("Test failed.") << "\n" << comment << Qt::endl;
+        out << tr("Test failed.") << "\n" << comment << endl;
     }
 
     //Time
-    out << Qt::endl;
+    out << endl;
     qint64 total_seconds = tmr_total_test_time.elapsed() / 1000;
     qlonglong elapsed_minutes = total_seconds / 60;
     qlonglong elapsed_seconds = total_seconds % 60;
     QString str_m_s = QString("%1:%2").
         arg(elapsed_minutes, 2, 10, QChar('0')).
         arg(elapsed_seconds, 2, 10, QChar('0'));
-    out << "Time:\t\t" << str_m_s << Qt::endl;
+    out << "Time:\t\t" << str_m_s << endl;
 
     if (success)
         close(); //success (code 0)
@@ -589,10 +590,10 @@ CapacityTesterCli::initializationStarted(qint64 total)
 {
     total_mb = total;
 
-    out << Qt::endl;
+    out << endl;
     out << "Initializing...\t";
     out << QString(4, 32);
-    out << Qt::endl;
+    out << endl;
 
 }
 
@@ -609,32 +610,32 @@ CapacityTesterCli::initialized(qint64 size, double avg_speed)
     QString str_p = QString("%1%").arg(p).rightJustified(4);
     out << QString(4, 8);
     out << str_p;
-    out << Qt::endl;
+    out << endl;
 
 }
 
 void
 CapacityTesterCli::writeStarted()
 {
-    out << Qt::endl;
+    out << endl;
     out << "Writing...\t";
     out << QString(1, 32);
     out << "...";
     out << QString(1, 32);
     str_write_speed.clear();
-    out << Qt::endl;
+    out << endl;
 
 }
 
 void
 CapacityTesterCli::verifyStarted()
 {
-    out << Qt::endl;
+    out << endl;
     out << "Verifying...\t";
     out << QString(4, 32); //100%
     out << QString(1, 32);
     str_verify_speed.clear();
-    out << Qt::endl;
+    out << endl;
 
 }
 
@@ -655,7 +656,7 @@ CapacityTesterCli::written(qint64 written, double avg_speed)
     str_write_speed = str_avg;
     out << str_p;
     out << " " << str_avg;
-    out << Qt::endl;
+    out << endl;
 
 }
 
@@ -676,7 +677,7 @@ CapacityTesterCli::verified(qint64 read, double avg_speed)
     str_verify_speed = str_avg;
     out << str_p;
     out << " " << str_avg;
-    out << Qt::endl;
+    out << endl;
 
 }
 
@@ -687,22 +688,22 @@ CapacityTesterCli::startDiskTest(const QString &device)
     DestructiveDiskTester tester(device);
     if (!tester.isValid())
     {
-        err << "The specified device is not valid." << Qt::endl;
+        err << "The specified device is not valid." << endl;
         return close(1);
     }
     //Abort if in use / mounted - NOTE not 100% reliable
     if (tester.isMounted())
     {
-        err << "The specified device is in use." << Qt::endl;
+        err << "The specified device is in use." << endl;
         return close(1);
     }
     //bool is_usb = udisk.isUsbDevice(dev); //TODO
 
     //Warn user
-    out << "This program will overwrite this device, destroying all data on it: " + device << Qt::endl;
-    out << "In doubt, press CTRL+C to abort NOW..." << Qt::endl;
+    out << "This program will overwrite this device, destroying all data on it: " + device << endl;
+    out << "In doubt, press CTRL+C to abort NOW..." << endl;
     QThread::sleep(5);
-    out << Qt::endl;
+    out << endl;
 
     //---
     //Test starts here
@@ -801,7 +802,7 @@ CapacityTesterCli::startDiskTest(const QString &device)
             SLOT(deleteLater()));
 
     //Get started
-    out << "Starting disk test... " << Qt::endl;
+    out << "Starting disk test... " << endl;
 
     //Start test in background
     thread->start();
@@ -817,7 +818,7 @@ CapacityTesterCli::startedDiskTest(qint64 total)
     total_mb = total;
 
     out << QString("[start] total=%1M").arg(total_mb);
-    out << Qt::endl;
+    out << endl;
 
 }
 
@@ -831,7 +832,7 @@ CapacityTesterCli::diskWritten(qint64 size, double avg)
     //this format will be parsed by the DestructiveDiskTesterWrapper
     QString str_p = QString("%1%").arg(percentage, 0, 'f', 2);
     out << QString("[write] progress: %1; @%2M").arg(str_p).arg(progress_mb); //NOTE change wrapper before translating "progress"
-    out << Qt::endl;
+    out << endl;
 
 }
 
@@ -841,7 +842,7 @@ CapacityTesterCli::diskWriteFailed(qint64 size)
     qint64 progress_mb = size;
 
     out << QString("[write] failed @%1M").arg(progress_mb);
-    out << Qt::endl;
+    out << endl;
 }
 
 void
@@ -853,7 +854,7 @@ CapacityTesterCli::diskVerified(qint64 size, double avg)
     //see diskWritten()
     QString str_p = QString("%1%").arg(percentage, 0, 'f', 2);
     out << QString("[verify] progress: %1; @%2M").arg(str_p).arg(progress_mb); //NOTE change wrapper before translating "progress"
-    out << Qt::endl;
+    out << endl;
 
 }
 
@@ -863,7 +864,7 @@ CapacityTesterCli::diskVerifyFailed(qint64 size)
     qint64 progress_mb = size;
 
     out << QString("[verify] failed @%1M").arg(progress_mb);
-    out << Qt::endl;
+    out << endl;
 }
 
 void
@@ -872,14 +873,14 @@ CapacityTesterCli::completedDiskTest(bool success)
     if (success)
     {
         out << "[done] success";
-        out << Qt::endl;
+        out << endl;
 
         close(); //success (code 0)
     }
     else
     {
         out << "[done] failed";
-        out << Qt::endl;
+        out << endl;
 
         close(9); //error
     }

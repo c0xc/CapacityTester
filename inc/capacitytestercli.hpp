@@ -25,15 +25,20 @@
 #include <iostream>
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <QTimer>
 #include <QTextStream>
 #include <QCommandLineParser>
 #include <QSignalMapper>
 #include <QThread>
+#if !defined(Q_OS_WIN)
 #include <QSocketNotifier>
+#else
+#include <QWinEventNotifier>
+#endif
 
+#ifndef NO_UDISK
 #include "udiskmanager.hpp"
+#endif
 
 #include "size.hpp"
 #include "volumetester.hpp"
@@ -46,6 +51,10 @@ class CapacityTesterCli : public QObject
 signals:
 
 public:
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    static constexpr const auto endl = Qt::endl;
+#endif
 
     CapacityTesterCli(QObject *parent = 0);
 
@@ -86,7 +95,7 @@ private:
     QString
     str_verify_speed;
 
-    QPointer<QSocketNotifier>
+    QPointer<QObject>
     stdin_notifier;
 
 private slots:

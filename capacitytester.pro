@@ -1,3 +1,5 @@
+DEFINES += PROGRAM=\\\"CapacityTester\\\"
+
 TARGET = capacity-tester
 DESTDIR = bin/
 OBJECTS_DIR = obj/
@@ -5,17 +7,21 @@ INCLUDEPATH = inc/
 HEADERS = inc/*
 SOURCES = src/*
 QT += widgets
-QT += dbus
 
-DEFINES += PROGRAM=\\\"CapacityTester\\\"
+!win32 {
+    QT += dbus
+}
+
+win32 {
+    LIBS += -lsetupapi
+}
+
+RESOURCES += res/lang.qrc
 
 # missing return statement should be fatal
 QMAKE_CXXFLAGS += -Werror=return-type
-
+QMAKE_CXXFLAGS += -std=c++11
 CONFIG += lrelease embed_translations
-RESOURCES += res/lang.qrc
-
-#LIBS += -lparted
 
 target.path = /usr/bin
 INSTALLS += target

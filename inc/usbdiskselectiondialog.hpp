@@ -19,8 +19,8 @@
 **
 ****************************************************************************/
 
-#ifndef UDISKFORMATDIALOG_HPP
-#define UDISKFORMATDIALOG_HPP
+#ifndef USBDISKSELECTIONDIALOG_HPP
+#define USBDISKSELECTIONDIALOG_HPP
 
 #include <QDialog>
 #include <QPointer>
@@ -34,65 +34,63 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QTimer>
 
-#include "udiskmanager.hpp"
 #include "size.hpp"
+#include "storagediskselection.hpp"
 
-#ifdef UDISKMANAGER_HPP
-class UDiskFormatDialog : public QDialog
+class StorageDiskSelection;
+
+class UsbDiskSelectionDialog : public QDialog
 {
     Q_OBJECT
 
 signals:
 
+    void
+    deviceSelected(const QString &dev_path, const QString &dev_title = "");
+
 public:
 
-    UDiskFormatDialog(QString dev, QWidget *parent);
+    UsbDiskSelectionDialog(QWidget *parent);
 
 private slots:
 
     void
-    updateInfo();
+    reloadList();
 
     void
-    umount();
+    itemSelected(QListWidgetItem *current, QListWidgetItem *previous);
 
     void
-    formatNow();
+    confirmSelection(QListWidgetItem *item);
+
+    void
+    confirmSelection();
 
 private:
 
-    UDiskManager
-    udisk;
+    StorageDiskSelection
+    m_device_selection;
 
-    QString
-    m_dev;
+    QListWidget
+    *m_selection_list;
+
+    QLineEdit
+    *m_txt_drive_path;
 
     QLineEdit
     *m_txt_drive_name;
 
     QLineEdit
-    *m_txt_dev_size;
+    *m_txt_drive_vendor;
 
     QLineEdit
-    *m_txt_partitions;
+    *m_txt_dev_size;
 
-    QComboBox
-    *m_cmb_fs;
-
-    QLabel
-    *m_lbl_warn_mounted;
-
-    QPushButton
-    *m_btn_umount;
-
-    QPushButton
-    *m_btn_format;
-
-    QPushButton
-    *m_btn_chmod;
+    QDialogButtonBox
+    *m_button_box;
 
 };
-#endif
 
 #endif

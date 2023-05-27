@@ -65,12 +65,16 @@ SelectionWindow::refresh()
     sel_index = -1;
 
     //Show warning if UDiskManager unavailable
+    bool have_manager = false;
+#ifdef UDISKMANAGER_HPP
     UDiskManager manager;
-    bool haveManager = manager.isValid();
-    if (!haveManager)
+    have_manager = manager.isValid();
+#endif
+    if (!have_manager)
     {
         QLabel *lbl_warn = new QLabel(
             tr("The USB device selection is not available on this platform. Instead, all available mountpoints are shown here. Please find your USB drive in the list below and confirm your selection (it must be mounted)."));
+        lbl_warn->setWordWrap(true);
         vbox->addWidget(lbl_warn);
         m_list_filter = 0;
     }
@@ -96,12 +100,12 @@ SelectionWindow::refresh()
     QRadioButton *chk_all_devs = new QRadioButton(tr("All filesystems"));
     chk_all_devs->setToolTip(tr("All detected storage devices are listed."));
     chk_group->addButton(chk_all_devs, 1);
-    if (!haveManager) chk_all_devs->setDisabled(true);
+    if (!have_manager) chk_all_devs->setDisabled(true);
     if (m_list_filter == 1) chk_all_devs->setChecked(true);
     QRadioButton *chk_usb_devs = new QRadioButton(tr("USB filesystems"));
     chk_usb_devs->setToolTip(tr("Only USB storage devices are listed."));
     chk_group->addButton(chk_usb_devs, 2);
-    if (!haveManager) chk_usb_devs->setDisabled(true);
+    if (!have_manager) chk_usb_devs->setDisabled(true);
     if (m_list_filter == 2) chk_usb_devs->setChecked(true);
     connect(chk_group, SIGNAL(idClicked(int)), SLOT(filterVolChanged(int)));
     QVBoxLayout *box_option = new QVBoxLayout;
@@ -114,8 +118,9 @@ SelectionWindow::refresh()
     vbox_left->addWidget(list);
     vbox_left->addLayout(box_option);
 
+#ifdef UDISKMANAGER_HPP
     //Fill list, get items from manager or Qt
-    if (haveManager && m_list_filter != 0)
+    if (have_manager && m_list_filter != 0)
     {
         //Use UDiskManager to get list of connected USB devices
         QStringList devs = manager.usbPartitions();
@@ -135,6 +140,7 @@ SelectionWindow::refresh()
         }
     }
     else
+#endif
     {
         //Fallback: Use QStorageInfo to get mountpoints, USB or not (unknown)
         foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes())
@@ -238,6 +244,7 @@ SelectionWindow::showSelection(int index)
         arg(capacity.formatted()).
         arg((qint64)capacity));
 
+#ifdef UDISKMANAGER_HPP
     UDiskManager manager;
     if (manager.isValid())
     {
@@ -251,6 +258,7 @@ SelectionWindow::showSelection(int index)
         txt_label->setText(label);
     }
     else
+#endif
     {
         QStorageInfo storage(mountpoint);
         txt_label->setText(storage.name());
@@ -260,8 +268,10 @@ SelectionWindow::showSelection(int index)
     updateContentsList("");
 
     //Enable mount, unmount buttons
+#ifdef UDISKMANAGER_HPP
     btn_mount->setDisabled(!mountpoint.isEmpty());
     btn_umount->setDisabled(mountpoint.isEmpty());
+#endif
     btn_select->setDisabled(false);
     QTimer::singleShot(0, btn_select, SLOT(setFocus()));
 
@@ -371,6 +381,8 @@ SelectionWindow::mount()
     QString mountpoint = currentMountpoint();
     QString device = currentDevice();
 
+#ifdef UDISKMANAGER_HPP
+
     //Need UDiskManager and selected device
     UDiskManager manager;
     if (device.isEmpty() || !manager.isValid()) return;
@@ -397,6 +409,12 @@ SelectionWindow::mount()
             arg(message));
     }
 
+#else
+
+    return;
+
+#endif
+
     //Refresh view
     QTimer::singleShot(0, this, SLOT(refresh()));
 }
@@ -406,6 +424,8 @@ SelectionWindow::umount()
 {
     QString mountpoint = currentMountpoint();
     QString device = currentDevice();
+
+#ifdef UDISKMANAGER_HPP
 
     //Need UDiskManager and selected device
     UDiskManager manager;
@@ -431,6 +451,12 @@ SelectionWindow::umount()
             tr("The selected device could not be unmounted. %1").
             arg(message));
     }
+
+#else
+
+    return;
+
+#endif
 
     //Refresh view
     QTimer::singleShot(0, this, SLOT(refresh()));

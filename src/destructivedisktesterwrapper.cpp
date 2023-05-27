@@ -36,6 +36,11 @@ DestructiveDiskTesterWrapper::~DestructiveDiskTesterWrapper()
 void
 DestructiveDiskTesterWrapper::start()
 {
+#ifdef Q_OS_WIN
+    emit startFailed();
+    return;
+#endif
+
     if (!QFile::exists(m_dev_path))
     {
         emit startFailed();
@@ -43,6 +48,8 @@ DestructiveDiskTesterWrapper::start()
     }
 
     //Use pkexec which is the recommended wrapper tool to run something as root
+    //pkexec is the official PolicyKit wrapper on Linux
+    //for Win, see QProcess::startDetachedUacPrompt()
     m_proc = new QProcess(this);
     m_proc->setProgram("pkexec");
 

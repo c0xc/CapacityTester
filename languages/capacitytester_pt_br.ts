@@ -45,22 +45,22 @@
         <translation>Volume a ser testado.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="328"/>
+        <location filename="../src/capacitytestercli.cpp" line="329"/>
         <source>Capacity:</source>
         <translation>Capacidade:</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="333"/>
+        <location filename="../src/capacitytestercli.cpp" line="334"/>
         <source>Used:</source>
         <translation>Utilizado:</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="340"/>
+        <location filename="../src/capacitytestercli.cpp" line="341"/>
         <source>Available:</source>
         <translation>Disponível:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/capacitytestercli.cpp" line="355"/>
+        <location filename="../src/capacitytestercli.cpp" line="356"/>
         <source>%n old test file(s) have been found.
 Cannot test with these files present, please delete them!</source>
         <translation>
@@ -71,7 +71,7 @@ Não podemos realizar os testes com esses arquivos presentes, por favor delete-o
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/capacitytestercli.cpp" line="371"/>
+        <location filename="../src/capacitytestercli.cpp" line="372"/>
         <source>%n file(s) have been found.
 The volume should be completely empty.</source>
         <translation>
@@ -82,7 +82,7 @@ O volume deve estar completamente vazio.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/capacitytestercli.cpp" line="410"/>
+        <location filename="../src/capacitytestercli.cpp" line="411"/>
         <source>The volume is not empty: %n file(s) have been found.
 You should delete all those files first.
 Are you really sure you want to continue?</source>
@@ -108,7 +108,7 @@ The volume should be completely empty.</source>
 O volume deve estar completamente vazio.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="400"/>
+        <location filename="../src/capacitytestercli.cpp" line="401"/>
         <source>The selected volume is full.</source>
         <translation>O volume selecionado está cheio.</translation>
     </message>
@@ -121,47 +121,47 @@ Você deve excluir todos os arquivos primeiro.
 Você tem certeza que deseja continuar?</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="547"/>
+        <location filename="../src/capacitytestercli.cpp" line="548"/>
         <source>Test completed successfully, no errors found.</source>
         <translation>Teste concluído com sucesso, nenhum erro encontrado.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="556"/>
+        <location filename="../src/capacitytestercli.cpp" line="557"/>
         <source>The volume might be bad.</source>
         <translation>O volume pode estar corrompido.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="557"/>
+        <location filename="../src/capacitytestercli.cpp" line="558"/>
         <source>An error has occurred.</source>
         <translation>Ocorreu um erro.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="559"/>
+        <location filename="../src/capacitytestercli.cpp" line="560"/>
         <source>Error creating test file.</source>
         <translation>Erro ao criar arquivo de teste.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="561"/>
+        <location filename="../src/capacitytestercli.cpp" line="562"/>
         <source>Permission denied.</source>
         <translation>Permissão negada.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="563"/>
+        <location filename="../src/capacitytestercli.cpp" line="564"/>
         <source>Resizing test file failed.</source>
         <translation>O redimensionamento do arquivo de teste falhou.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="565"/>
+        <location filename="../src/capacitytestercli.cpp" line="566"/>
         <source>Write failed.</source>
         <translation>Falha na escrita.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="567"/>
+        <location filename="../src/capacitytestercli.cpp" line="568"/>
         <source>Verification failed.</source>
         <translation>Falha na verificação.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestercli.cpp" line="568"/>
+        <location filename="../src/capacitytestercli.cpp" line="569"/>
         <source>Test failed.</source>
         <translation>Falha no teste.</translation>
     </message>
@@ -257,12 +257,6 @@ Volume, filesystem.</extracomment>
         <translation>&amp;Sair</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="206"/>
-        <source>Advanced...</source>
-        <extracomment>Menu button (hence ...): Advanced functions, more functions...</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/capacitytestergui.cpp" line="211"/>
         <source>Run pre-check during initialization</source>
         <extracomment>On/off switch: Pre-check means quick test before the real test, to detect a fake earlier, can be translated as superficial check.</extracomment>
@@ -282,8 +276,7 @@ Volume, filesystem.</extracomment>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="236"/>
-        <location filename="../src/capacitytestergui.cpp" line="418"/>
-        <location filename="../src/capacitytestergui.cpp" line="462"/>
+        <location filename="../src/capacitytestergui.cpp" line="427"/>
         <source>Destructive disk test</source>
         <extracomment>Button: Show list of USB drives to run disk test on selected drive. The word destructive could probably be left out in the translation. Disk test means the whole flash disk is tested, not just the volume, and destructive means it&apos;ll overwrite it, destroying all data on it. Another relevant property of this disk test is that it&apos;s very fast, so in doubt, it could be translated as Fast disk test.
 ----------
@@ -291,27 +284,27 @@ Destructive / fast disk test, see hint above.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="315"/>
+        <location filename="../src/capacitytestergui.cpp" line="319"/>
         <source>Abort test?</source>
         <translation>Cancelar teste?</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="316"/>
+        <location filename="../src/capacitytestergui.cpp" line="320"/>
         <source>Do you want to abort the running test?</source>
         <translation>Você quer cancelar o teste em execução?</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="395"/>
+        <location filename="../src/capacitytestergui.cpp" line="404"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="396"/>
+        <location filename="../src/capacitytestergui.cpp" line="405"/>
         <source>You have requested the volume to be remounted during the test. Normally, this should not be necessary. You might be asked for a password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="419"/>
+        <location filename="../src/capacitytestergui.cpp" line="428"/>
         <source>Do you want to run a destructive test on the selected device?
 %1
 Please note that this test routine will overwrite the device, destroying all data on it. After running this test, you will have to format it before you&apos;re able to use it again.
@@ -319,44 +312,75 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="428"/>
+        <location filename="../src/capacitytestergui.cpp" line="437"/>
+        <location filename="../src/capacitytestergui.cpp" line="444"/>
         <source>Cannot start test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="429"/>
+        <location filename="../src/capacitytestergui.cpp" line="438"/>
         <source>This device is in use: %1. Please unmount it. The destructive disk test requires that the device is not in use because it will overwrite it, destroying all data on it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="463"/>
-        <source>This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password.</source>
+        <location filename="../src/capacitytestergui.cpp" line="446"/>
+        <source>This device is not valid: %1.</source>
+        <extracomment>Invalid device selected, device not found.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="579"/>
+        <location filename="../src/capacitytestergui.cpp" line="476"/>
+        <location filename="../src/capacitytestergui.cpp" line="481"/>
+        <source>Disk test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/capacitytestergui.cpp" line="478"/>
+        <source>This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password.</source>
+        <extracomment>This hint is to inform the user that a password prompt will be triggered, usually asking for the sudo password (i.e., the user&apos;s password if s/he has sufficient sudo permissions to run this program as root). sudo does not have to be translated, it&apos;s a detail.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/capacitytestergui.cpp" line="483"/>
+        <source>This program is running with limited privileges. Try restarting the program as administrator.</source>
+        <extracomment>This warning is shown on Windows, so the term administrator is used. Alternative: Please start this program with elevated privileges.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/capacitytestergui.cpp" line="605"/>
         <source>TESTING</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="629"/>
-        <location filename="../src/capacitytestergui.cpp" line="1135"/>
+        <location filename="../src/capacitytestergui.cpp" line="655"/>
+        <location filename="../src/capacitytestergui.cpp" line="1173"/>
         <source>Test failed. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="732"/>
-        <location filename="../src/capacitytestergui.cpp" line="841"/>
+        <location filename="../src/capacitytestergui.cpp" line="758"/>
+        <location filename="../src/capacitytestergui.cpp" line="879"/>
         <source>Volume invalid</source>
         <translation>Volume inválido</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="733"/>
+        <location filename="../src/capacitytestergui.cpp" line="759"/>
         <source>The selected volume is not valid.</source>
         <translation>O volume selecionado é inválido.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="766"/>
+        <location filename="../src/capacitytestergui.cpp" line="767"/>
+        <source>Volume selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/capacitytestergui.cpp" line="769"/>
+        <source>It will take a long time to check %1 GB. Alternatively, you can try the disk test, which is much faster (minutes). It can be found under Advanced.</source>
+        <extracomment>Disk test is the name of the (alternative) test routine found in the menu. Advanced is the label of the button that opens that menu, so the translation of Advanced in this text must match that of the button label.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/capacitytestergui.cpp" line="804"/>
         <source>Old test files found</source>
         <translation>Arquivos de testes antigos encontrados</translation>
     </message>
@@ -365,9 +389,9 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <translation type="vanished">%1 arquivo(s) de teste antigos encontrados. Não é possível realizar os testes com esses arquivos presentes, por favor delete-os! O volume precisa estar completamente vazio.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="784"/>
-        <location filename="../src/capacitytestergui.cpp" line="806"/>
-        <location filename="../src/capacitytestergui.cpp" line="868"/>
+        <location filename="../src/capacitytestergui.cpp" line="822"/>
+        <location filename="../src/capacitytestergui.cpp" line="844"/>
+        <location filename="../src/capacitytestergui.cpp" line="906"/>
         <source>Volume not empty</source>
         <translation>Volume não está vazio</translation>
     </message>
@@ -376,17 +400,17 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <translation type="vanished">%1 arquivo(s) foram encontrados. O volume deve estar completamente vazio.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="842"/>
+        <location filename="../src/capacitytestergui.cpp" line="880"/>
         <source>The selected volume is not valid anymore.</source>
         <translation>O volume selecionado não é mais válido.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="855"/>
+        <location filename="../src/capacitytestergui.cpp" line="893"/>
         <source>Volume full</source>
         <translation>Volume está cheio</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="856"/>
+        <location filename="../src/capacitytestergui.cpp" line="894"/>
         <source>The selected volume is full.</source>
         <translation>O volume selecionado está cheio.</translation>
     </message>
@@ -401,7 +425,7 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <translation type="unfinished">Selecione &amp; o drive...</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/capacitytestergui.cpp" line="768"/>
+        <location filename="../src/capacitytestergui.cpp" line="806"/>
         <source>%n old test file(s) have been found! Cannot test with these files present, please delete them! The volume should be completely empty.</source>
         <translation>
             <numerusform>%n arquivo de teste antigo foi encontrado! Não é possível continuar os testes com esse arquivo presente, por favor, delete-o! O volume deve estar completamente vazio.</numerusform>
@@ -409,12 +433,12 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="785"/>
+        <location filename="../src/capacitytestergui.cpp" line="823"/>
         <source>This volume is %1% full. The volume should be completely empty.</source>
         <translation type="unfinished">O volume está %1% cheio. O volume deve estar completamente vazio.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/capacitytestergui.cpp" line="808"/>
+        <location filename="../src/capacitytestergui.cpp" line="846"/>
         <source>%n file(s) have been found. The volume should be completely empty.</source>
         <translation>
             <numerusform>%n arquivo foi encontrado. O volume deve estar completamente vazio.</numerusform>
@@ -422,7 +446,7 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/capacitytestergui.cpp" line="870"/>
+        <location filename="../src/capacitytestergui.cpp" line="908"/>
         <source>The volume is not empty: %n file(s) have been found. You should cancel, delete all those files and try again. Are you really sure you want to continue?</source>
         <translation>
             <numerusform>O volume não está vazio: %1 arquivo foi encontrado. Você deve cancelar, excluir o arquivo e tentar novamente. Você realmente quer continuar?</numerusform>
@@ -430,82 +454,88 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="540"/>
-        <location filename="../src/capacitytestergui.cpp" line="1032"/>
+        <location filename="../src/capacitytestergui.cpp" line="566"/>
+        <location filename="../src/capacitytestergui.cpp" line="1070"/>
         <source>STARTING</source>
         <translation>INICIANDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1049"/>
+        <location filename="../src/capacitytestergui.cpp" line="1087"/>
         <source>STOPPING</source>
         <translation>FINALIZANDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="606"/>
-        <location filename="../src/capacitytestergui.cpp" line="1070"/>
+        <location filename="../src/capacitytestergui.cpp" line="632"/>
+        <location filename="../src/capacitytestergui.cpp" line="1108"/>
         <source>TEST SUCCEEDED</source>
         <translation>TESTE BEM SUCEDIDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="607"/>
-        <location filename="../src/capacitytestergui.cpp" line="1073"/>
+        <location filename="../src/capacitytestergui.cpp" line="633"/>
+        <location filename="../src/capacitytestergui.cpp" line="1111"/>
         <source>TEST COMPLETED SUCCESSFULLY, NO ERRORS FOUND.</source>
         <translation>TESTE CONCLUÍDO COM SUCESSO, NENHUM ERRO ENCONTRADO.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1089"/>
+        <location filename="../src/capacitytestergui.cpp" line="1127"/>
         <source>Test succeeded</source>
         <translation>Teste bem sucedido</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1090"/>
+        <location filename="../src/capacitytestergui.cpp" line="1128"/>
         <source>Test completed successfully, no errors found.</source>
         <translation>Teste concluído com sucesso, nenhum erro encontrado.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="618"/>
-        <location filename="../src/capacitytestergui.cpp" line="1100"/>
+        <location filename="../src/capacitytestergui.cpp" line="644"/>
+        <location filename="../src/capacitytestergui.cpp" line="1138"/>
         <source>TEST FAILED</source>
         <translation>TESTE FALHOU</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1121"/>
+        <location filename="../src/capacitytestergui.cpp" line="206"/>
+        <source>&amp;Advanced...</source>
+        <extracomment>Menu button (hence ...): Advanced functions, more functions...</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/capacitytestergui.cpp" line="1159"/>
         <source>The volume might be bad.</source>
         <translation>O volume pode estar corrompido.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1122"/>
+        <location filename="../src/capacitytestergui.cpp" line="1160"/>
         <source>An error has occurred.</source>
         <translation>Ocorreu um erro.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1124"/>
+        <location filename="../src/capacitytestergui.cpp" line="1162"/>
         <source>Error creating test file.</source>
         <translation>Erro ao criar arquivo de teste.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1126"/>
+        <location filename="../src/capacitytestergui.cpp" line="1164"/>
         <source>Permission denied.</source>
         <translation>Permissão negada.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1128"/>
+        <location filename="../src/capacitytestergui.cpp" line="1166"/>
         <source>Resizing test file failed.</source>
         <translation>O redimensionamento do arquivo de teste falhou.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1130"/>
+        <location filename="../src/capacitytestergui.cpp" line="1168"/>
         <source>Write failed.</source>
         <translation>Falha na escrita.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1132"/>
+        <location filename="../src/capacitytestergui.cpp" line="1170"/>
         <source>Verification failed.</source>
         <translation>Falha na verificação.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="628"/>
-        <location filename="../src/capacitytestergui.cpp" line="1134"/>
+        <location filename="../src/capacitytestergui.cpp" line="654"/>
+        <location filename="../src/capacitytestergui.cpp" line="1172"/>
         <source>Test failed</source>
         <translation>Falha no teste</translation>
     </message>
@@ -514,32 +544,32 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <translation type="vanished">Falha no teste.</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1242"/>
+        <location filename="../src/capacitytestergui.cpp" line="1280"/>
         <source>INITIALIZING</source>
         <translation>INICIALIZANDO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1261"/>
+        <location filename="../src/capacitytestergui.cpp" line="1299"/>
         <source>WRITING</source>
         <translation>ESCRITA</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1271"/>
+        <location filename="../src/capacitytestergui.cpp" line="1309"/>
         <source>VERIFYING</source>
         <translation>VERIFICAÇÃO</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1284"/>
+        <location filename="../src/capacitytestergui.cpp" line="1322"/>
         <source>ACCESS ERROR!</source>
         <translation>ERRO DE ACESSO!</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1296"/>
+        <location filename="../src/capacitytestergui.cpp" line="1334"/>
         <source>WRITE ERROR AFTER %1 MB!</source>
         <translation>ERRO DE ESCRITA APÓS %1 MB!</translation>
     </message>
     <message>
-        <location filename="../src/capacitytestergui.cpp" line="1308"/>
+        <location filename="../src/capacitytestergui.cpp" line="1346"/>
         <source>READ ERROR AFTER %1 MB!</source>
         <translation>ERRO DE LEITURA APÓS %1 MB!</translation>
     </message>
@@ -562,18 +592,18 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <translation type="unfinished">Fechar</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="73"/>
+        <location filename="../src/selectionwindow.cpp" line="76"/>
         <source>The USB device selection is not available on this platform. Instead, all available mountpoints are shown here. Please find your USB drive in the list below and confirm your selection (it must be mounted).</source>
         <translation type="unfinished">O seleção de unidade USB não está disponível nesta plataforma. Em vez disso, todos os pontos de montagem disponíveis são mostrados aqui. Encontre sua unidade USB na lista abaixo e confirme sua seleção (ela deve estar montada).</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="84"/>
         <location filename="../src/selectionwindow.cpp" line="88"/>
+        <location filename="../src/selectionwindow.cpp" line="92"/>
         <source>Drives</source>
         <translation type="unfinished">Unidades</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="92"/>
+        <location filename="../src/selectionwindow.cpp" line="96"/>
         <source>All mountpoints</source>
         <translation type="unfinished">Todos os pontos de montagem</translation>
     </message>
@@ -582,143 +612,143 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <translation type="obsolete">Todos os dispositivos de pontos de montagem são listados, incluindo pontos de montagem do sistema.</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="93"/>
+        <location filename="../src/selectionwindow.cpp" line="97"/>
         <source>All mountpoints are listed, including system mountpoints.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="96"/>
+        <location filename="../src/selectionwindow.cpp" line="100"/>
         <source>All filesystems</source>
         <translation type="unfinished">Todos os sistemas de arquivos</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="97"/>
+        <location filename="../src/selectionwindow.cpp" line="101"/>
         <source>All detected storage devices are listed.</source>
         <translation type="unfinished">Todos os dispositivos de armazenamento detectados são listados</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="101"/>
+        <location filename="../src/selectionwindow.cpp" line="105"/>
         <source>USB filesystems</source>
         <translation type="unfinished">Sistemas de arquivos USB</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="102"/>
+        <location filename="../src/selectionwindow.cpp" line="106"/>
         <source>Only USB storage devices are listed.</source>
         <translation type="unfinished">Somente dispositivos de armazenamento USB são listados</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="154"/>
+        <location filename="../src/selectionwindow.cpp" line="160"/>
         <source>Details</source>
         <translation type="unfinished">Detalhes</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="162"/>
+        <location filename="../src/selectionwindow.cpp" line="168"/>
         <source>Mountpoint</source>
         <translation type="unfinished">Pontos de Montagem</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="169"/>
+        <location filename="../src/selectionwindow.cpp" line="175"/>
         <source>Label</source>
         <extracomment>Label means user-defined name/title (of the selected drive).</extracomment>
         <translation type="unfinished">Rótulo</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="175"/>
+        <location filename="../src/selectionwindow.cpp" line="181"/>
         <source>Capacity</source>
         <translation type="unfinished">Capacidade</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="185"/>
+        <location filename="../src/selectionwindow.cpp" line="191"/>
         <source>Contents of selected drive</source>
         <translation type="unfinished">Conteúdo da unidade selecionada</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="194"/>
+        <location filename="../src/selectionwindow.cpp" line="200"/>
         <source>Mount</source>
         <extracomment>Button: Mount filesystem (action).</extracomment>
         <translation type="unfinished">Montagem</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="199"/>
+        <location filename="../src/selectionwindow.cpp" line="205"/>
         <source>Unmount</source>
         <extracomment>Button: Unmount filesystem (action).</extracomment>
         <translation type="unfinished">Desmontagem</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="204"/>
+        <location filename="../src/selectionwindow.cpp" line="210"/>
         <source>Select and Continue</source>
         <extracomment>Button: Confirm selection, selected filesystem (action).</extracomment>
         <translation type="unfinished">Selecione e continue</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="276"/>
+        <location filename="../src/selectionwindow.cpp" line="286"/>
         <source>Invalid selection</source>
         <translation type="unfinished">Seleção inválida</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="277"/>
+        <location filename="../src/selectionwindow.cpp" line="287"/>
         <source>No mountpoint selected. The drive you want to select must be mounted.</source>
         <translation type="unfinished">Nenhum ponto de montagem selecionado. A unidade que você deseja selecionar deve estar montada.</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="319"/>
+        <location filename="../src/selectionwindow.cpp" line="329"/>
         <source>Cannot show directory</source>
         <translation type="unfinished">Não é possível mostrar o diretório</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="320"/>
+        <location filename="../src/selectionwindow.cpp" line="330"/>
         <source>The subdirectory %1 is outside of the selected mountpoint %2.</source>
         <translation type="unfinished">O subdiretório %1 está fora do ponto de montagem selecionado %2.</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="379"/>
+        <location filename="../src/selectionwindow.cpp" line="391"/>
         <source>Mount device?</source>
         <translation type="unfinished">Montar dispositivo?</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="380"/>
+        <location filename="../src/selectionwindow.cpp" line="392"/>
         <source>Do you want to mount the selected device %1?</source>
         <translation type="unfinished">Deseja montar o dispositivo selecionado %1?</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="389"/>
-        <location filename="../src/selectionwindow.cpp" line="395"/>
+        <location filename="../src/selectionwindow.cpp" line="401"/>
+        <location filename="../src/selectionwindow.cpp" line="407"/>
         <source>Mount device</source>
         <translation type="unfinished">Dispositivo de montagem</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="390"/>
+        <location filename="../src/selectionwindow.cpp" line="402"/>
         <source>The selected device has been mounted here: %1</source>
         <translation type="unfinished">O dispositivo selecionado foi montado aqui: %1</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="396"/>
+        <location filename="../src/selectionwindow.cpp" line="408"/>
         <source>The selected device could not be mounted. %1</source>
         <translation type="unfinished">O dispositivo selecionado não pode ser montado. %1</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="415"/>
+        <location filename="../src/selectionwindow.cpp" line="435"/>
         <source>Unmount device?</source>
         <translation type="unfinished">Desmontar dispositivo?</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="416"/>
+        <location filename="../src/selectionwindow.cpp" line="436"/>
         <source>Do you want to unmount the selected device, currently mounted at %1?</source>
         <translation type="unfinished">Você deseja desmontar o dispositivo selecionado, corretamente montado em %1?</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="425"/>
-        <location filename="../src/selectionwindow.cpp" line="430"/>
+        <location filename="../src/selectionwindow.cpp" line="445"/>
+        <location filename="../src/selectionwindow.cpp" line="450"/>
         <source>Unmount device</source>
         <translation type="unfinished">Dispositivo desmontado</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="426"/>
+        <location filename="../src/selectionwindow.cpp" line="446"/>
         <source>The selected device has been unmounted.</source>
         <translation type="unfinished">O dispositivo selecionado foi desmontado.</translation>
     </message>
     <message>
-        <location filename="../src/selectionwindow.cpp" line="431"/>
+        <location filename="../src/selectionwindow.cpp" line="451"/>
         <source>The selected device could not be unmounted. %1</source>
         <translation type="unfinished">O dispositivo selecionado não pode ser desmontado. %1</translation>
     </message>
@@ -726,120 +756,140 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
 <context>
     <name>UDiskFormatDialog</name>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="31"/>
-        <location filename="../src/udiskformatdialog.cpp" line="43"/>
-        <location filename="../src/udiskformatdialog.cpp" line="196"/>
+        <location filename="../src/udiskformatdialog.cpp" line="33"/>
+        <location filename="../src/udiskformatdialog.cpp" line="45"/>
+        <location filename="../src/udiskformatdialog.cpp" line="62"/>
+        <location filename="../src/udiskformatdialog.cpp" line="212"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="34"/>
+        <location filename="../src/udiskformatdialog.cpp" line="36"/>
         <source>No drive selected.</source>
         <extracomment>In the context of this dialog, drive means physical disk drive, storage device, not filesystem.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="44"/>
+        <location filename="../src/udiskformatdialog.cpp" line="46"/>
+        <location filename="../src/udiskformatdialog.cpp" line="63"/>
         <source>This is not a valid drive: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="60"/>
+        <location filename="../src/udiskformatdialog.cpp" line="74"/>
         <source>Format drive: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="72"/>
+        <location filename="../src/udiskformatdialog.cpp" line="86"/>
         <source>Drive name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="75"/>
+        <location filename="../src/udiskformatdialog.cpp" line="89"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="78"/>
+        <location filename="../src/udiskformatdialog.cpp" line="92"/>
         <source>Partitions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="81"/>
+        <location filename="../src/udiskformatdialog.cpp" line="95"/>
         <source>New filesystem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="94"/>
+        <location filename="../src/udiskformatdialog.cpp" line="108"/>
         <source>This drive is currently mounted! You need to unmount it before formatting it. Make sure you don&apos;t have any valuable data on it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="103"/>
+        <location filename="../src/udiskformatdialog.cpp" line="117"/>
         <source>Unmount</source>
         <translation type="unfinished">Desmontagem</translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="107"/>
+        <location filename="../src/udiskformatdialog.cpp" line="121"/>
         <source>Format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="108"/>
+        <location filename="../src/udiskformatdialog.cpp" line="122"/>
         <source>Format this drive now, wiping all data on it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="165"/>
+        <location filename="../src/udiskformatdialog.cpp" line="181"/>
         <source>Unmount device</source>
         <translation type="unfinished">Dispositivo desmontado</translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="166"/>
+        <location filename="../src/udiskformatdialog.cpp" line="182"/>
         <source>The selected device could not be unmounted. %1</source>
         <translation type="unfinished">O dispositivo selecionado não pode ser desmontado. %1</translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="184"/>
+        <location filename="../src/udiskformatdialog.cpp" line="200"/>
         <source>Format now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="185"/>
+        <location filename="../src/udiskformatdialog.cpp" line="201"/>
         <source>Are you sure you want to format this drive now? All data on this drive will be lost.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="197"/>
+        <location filename="../src/udiskformatdialog.cpp" line="213"/>
         <source>Failed to format drive.
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="200"/>
+        <location filename="../src/udiskformatdialog.cpp" line="216"/>
         <source>Drive formatted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="201"/>
+        <location filename="../src/udiskformatdialog.cpp" line="217"/>
         <source>The drive has been formatted.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>UDiskSelectionDialog</name>
+    <name>UsbDiskSelectionDialog</name>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="212"/>
+        <location filename="../src/usbdiskselectiondialog.cpp" line="31"/>
         <source>Select a drive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="237"/>
-        <source>Drive name</source>
+        <location filename="../src/usbdiskselectiondialog.cpp" line="58"/>
+        <source>Address</source>
+        <extracomment>Internal device address, path to device file.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/udiskformatdialog.cpp" line="240"/>
+        <location filename="../src/usbdiskselectiondialog.cpp" line="63"/>
+        <source>Name</source>
+        <extracomment>Name of storage device, i.e.: [model] name (e.g., of USB stick; not user-defined)</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/usbdiskselectiondialog.cpp" line="67"/>
+        <source>Vendor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/usbdiskselectiondialog.cpp" line="71"/>
         <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/usbdiskselectiondialog.cpp" line="136"/>
+        <source>Serial</source>
+        <extracomment>Serial number of storage device.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>

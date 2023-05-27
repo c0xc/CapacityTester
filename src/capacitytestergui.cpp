@@ -203,7 +203,7 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
             SIGNAL(clicked()),
             SLOT(close()));
     //: Menu button (hence ...): Advanced functions, more functions...
-    btn_advanced = new QPushButton(tr("Advanced...")); //advanced functions...
+    btn_advanced = new QPushButton(tr("&Advanced...")); //advanced functions...
     QMenu *mnu_advanced = new QMenu;
     btn_advanced->setMenu(mnu_advanced);
     //: On/off switch: Pre-check means quick test before the real test,
@@ -239,10 +239,14 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
             SLOT(startDiskTest()));
     //Disable format feature on unsupported platforms
     bool udisk_support = false;
-#ifndef NO_UDISK
+#ifdef UDISKMANAGER_HPP
     udisk_support = UDiskManager().isValid();
 #endif
-    if (!udisk_support) act_show_format_window->setEnabled(false);
+    if (!udisk_support)
+    {
+        act_toggle_remount->setEnabled(false);
+        act_show_format_window->setEnabled(false);
+    }
 
     //Initiate/unload view
     QTimer::singleShot(0, this, SLOT(unloadVolume()));
@@ -356,16 +360,19 @@ CapacityTesterGui::showDriveWindow()
 void
 CapacityTesterGui::showFormatDialog(const QString &target)
 {
+#ifdef UDISKMANAGER_HPP
     //Show format dialog for target which usually is a (block) device
     //It could also be a mountpoint in which case the device will be determined
     UDiskFormatDialog *format_dialog = new UDiskFormatDialog(target, this);
     format_dialog->setAttribute(Qt::WA_DeleteOnClose);
     format_dialog->open();
+#endif
 }
 
 void
 CapacityTesterGui::showFormatDialog()
 {
+#ifdef UDISKMANAGER_HPP
     //If mountpoint selected, use it as target and clear selection
     //because after formatting it will not be a valid mountpoint anymore
     if (!selected_mountpoint.isEmpty())
@@ -377,10 +384,12 @@ CapacityTesterGui::showFormatDialog()
     }
 
     //Show device selection dialog
-    UDiskSelectionDialog *selection_dialog = new UDiskSelectionDialog(this);
+    UsbDiskSelectionDialog *selection_dialog = new UsbDiskSelectionDialog(this);
     selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(selection_dialog, SIGNAL(deviceSelected(const QString&)), this, SLOT(showFormatDialog(const QString&)));
     selection_dialog->open();
+#else
+#endif
 }
 
 void
@@ -420,13 +429,21 @@ CapacityTesterGui::startDiskTest(const QString &device)
         QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
-    //Check if selected device is valid and not in use (quick check)
+    //Check if selected device is in use (quick check)
     //note that this is not 100% reliable
     DestructiveDiskTester checker(device);
     if (checker.isMounted())
     {
         QMessageBox::critical(this, tr("Cannot start test"),
             tr("This device is in use: %1. Please unmount it. The destructive disk test requires that the device is not in use because it will overwrite it, destroying all data on it.").arg(device));
+        return;
+    }
+    //Check if selected device is valid, exists
+    if (!checker.exists())
+    {
+        QMessageBox::critical(this, tr("Cannot start test"),
+            //: Invalid device selected, device not found.
+            tr("This device is not valid: %1.").arg(device));
         return;
     }
 
@@ -452,18 +469,27 @@ CapacityTesterGui::startDiskTest(const QString &device)
     //Initialize worker
     dd_worker = new DestructiveDiskTester(device);
 
-    //Thread for worker
-    QThread *thread = new QThread;
-    dd_worker->moveToThread(thread);
-
     //Use sudo wrapper if not running as root
-    if (!DestructiveDiskTester::amIRoot())
+    if (!dd_worker->isWritable())
     {
-        QMessageBox::warning(this, tr("Destructive disk test"),
+#if !defined(Q_OS_WIN)
+        QMessageBox::warning(this, tr("Disk test"),
+            //: This hint is to inform the user that a password prompt will be triggered, usually asking for the sudo password (i.e., the user's password if s/he has sufficient sudo permissions to run this program as root). sudo does not have to be translated, it's a detail.
             tr("This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password."));
         dd_worker = new DestructiveDiskTesterWrapper(device);
-        dd_worker->moveToThread(thread); //NOTE optional
+#elif defined(Q_OS_WIN)
+        QMessageBox::critical(this, tr("Disk test"),
+            //: This warning is shown on Windows, so the term administrator is used. Alternative: Please start this program with elevated privileges.
+            tr("This program is running with limited privileges. Try restarting the program as administrator."));
+        dd_worker->deleteLater();
+        return;
+#endif
     }
+
+    //Thread for worker
+    //... after the check above, otherwise dd_worker (+ GUI)  would get stuck.
+    QThread *thread = new QThread;
+    dd_worker->moveToThread(thread);
 
     //Start worker when thread starts
     connect(thread,
@@ -562,10 +588,10 @@ void
 CapacityTesterGui::startDiskTest()
 {
     //Show device selection dialog
-    UDiskSelectionDialog *selection_dialog = new UDiskSelectionDialog(this);
+    UsbDiskSelectionDialog *selection_dialog = new UsbDiskSelectionDialog(this);
     selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(selection_dialog, &UDiskSelectionDialog::deviceSelected, this, [this]
-    (const QString &dev, const QString &dev_path)
+    connect(selection_dialog, &UsbDiskSelectionDialog::deviceSelected, this, [this]
+    (const QString &dev_path, const QString &dev_title)
     {
         startDiskTest(dev_path);
     });
@@ -733,9 +759,21 @@ CapacityTesterGui::loadVolume(const QString &mountpoint)
             tr("The selected volume is not valid."));
         return;
     }
-    txt_volume->setText(mountpoint);
+
+    //Warn if the volume is large and offer alternative test routine
+    qint64 gb = tester.bytesTotal() / VolumeTester::GB;
+    if (gb > 15)
+    {
+        if (QMessageBox::information(this, tr("Volume selected"),
+            //: Disk test is the name of the (alternative) test routine found in the menu. Advanced is the label of the button that opens that menu, so the translation of Advanced in this text must match that of the button label.
+            tr("It will take a long time to check %1 GB. Alternatively, you can try the disk test, which is much faster (minutes). It can be found under Advanced.").arg(gb), QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
+        {
+            return;
+        }
+    }
 
     //Remember selected mountpoint
+    txt_volume->setText(mountpoint);
     selected_mountpoint = mountpoint;
 
     //Enable fields
@@ -1337,7 +1375,7 @@ CapacityTesterGui::verified(qint64 read, double avg_speed)
 void
 CapacityTesterGui::executeRemount(const QString &mountpoint)
 {
-#ifndef NO_UDISK
+#ifdef UDISKMANAGER_HPP
     //Unmount, mount
     UDiskManager diskmanager;
     QString old_mountpoint = mountpoint;

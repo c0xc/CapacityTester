@@ -34,7 +34,6 @@
 #include <errno.h>
 #endif
 
-#include <QDebug>
 #include <QObject>
 #include <QVariant>
 #include <QPair>
@@ -155,6 +154,9 @@ public:
 
     static const int
     MB = 1024 * KB;
+
+    static const int
+    GB = 1024 * MB;
 
     static bool
     isValid(const QString &mountpoint);

@@ -22,6 +22,7 @@
 #define SELECTIONWINDOW_HPP
 
 #include <QObject>
+#include <QPointer>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>

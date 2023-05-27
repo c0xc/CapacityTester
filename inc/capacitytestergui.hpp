@@ -23,7 +23,6 @@
 
 #include <cassert>
 
-#include <QDebug>
 #include <QApplication>
 #include <QPixmap>
 #include <QDesktopWidget>
@@ -53,6 +52,7 @@
 #include "destructivedisktesterwrapper.hpp"
 #include "selectionwindow.hpp"
 #include "udiskformatdialog.hpp"
+#include "usbdiskselectiondialog.hpp"
 
 #ifndef NO_UDISK
 #include "udiskmanager.hpp"

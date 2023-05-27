@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #ifndef UDISKMANAGER_HPP
+#if !defined(NO_UDISK) && defined(QT_DBUS_LIB) //!defined(Q_OS_WIN) <QtGlobal>
 #define UDISKMANAGER_HPP
 
 #include <QDebug>
@@ -109,8 +110,26 @@ public:
     QString
     idLabel(const QString &device);
 
+    qint64
+    capacity(const QString &device);
+
     QVariantMap
     deviceData(const QString &device);
+
+    //QVariantMap
+    //driveData(const QString &device);
+
+    QString
+    driveId(const QString &device);
+
+    QString
+    driveModelName(const QString &device);
+
+    QString
+    driveVendorName(const QString &device);
+
+    QString
+    driveSerialNumber(const QString &device);
 
     /**
      * Returns a list of names of all block devices.
@@ -284,4 +303,5 @@ private:
 
 };
 
+#endif
 #endif

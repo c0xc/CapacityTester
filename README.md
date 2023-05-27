@@ -46,24 +46,20 @@ Tip: You can run this program from a Linux live system like the Fedora installer
 Download
 --------
 
+**Linux Desktop**:  
 There are pre-compiled executable files available for Linux
 which can be downloaded from the "[Releases](https://github.com/c0xc/CapacityTester/releases)" page.
 
 From the latest release there, under "assets", you'll find them.
 
+<small>
 If the executable file does not run because you don't have some libraries
 installed, pick the AppImage file which is supposed to be portable.
 The AppImage file should run on most modern Linux systems
 out of the box.
-
 If you're experiencing issues running this program on Linux,
 you may open an [issue](https://github.com/c0xc/CapacityTester/issues).
-
-**An up-to-date version of CapacityTester for Windows is not available.**  
-A pre-compiled binary for Windows is available,
-but it's an older version of this program which did not have
-the USB drive selection window yet because that's a Linux feature.
-[Download old Windows version](https://github.com/c0xc/CapacityTester/releases/tag/v0.1)
+</small>
 
 
 
@@ -157,6 +153,9 @@ To start using CapacityTester now, it's recommended to
 use the pre-built binary file available for download on the [releases](https://github.com/c0xc/CapacityTester/releases) page.
 
 To build from source, use `qmake && make` (see [notes](BUILD_NOTES.md)).
+
+If you want to help translating this program,
+read the page on [how to translate](TRANSLATIONS.md) and/or open an issue.
 
 
 

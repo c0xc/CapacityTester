@@ -21,6 +21,8 @@
 
 #include "udiskmanager.hpp"
 
+#ifdef UDISKMANAGER_HPP
+
 /**
  * This class uses D-Bus to access UDisks2.
  * It won't help you if your operating system lacks these features.
@@ -217,9 +219,19 @@ UDiskManager::idLabel(const QString &device)
 {
     QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
 
+    //IdLabel is the label of the block device / partition (not the drive)
+    //see driveModelName()
     QVariant var = getVariant(deviceDbusPath(device), block_if, "IdLabel");
 
     return var.toString();
+}
+
+qint64
+UDiskManager::capacity(const QString &device)
+{
+    QVariantMap data = deviceData(device);
+    qint64 size = data.value("Size").toLongLong();
+    return size;
 }
 
 QVariantMap
@@ -261,6 +273,50 @@ UDiskManager::deviceData(const QString &device)
     }
 
     return dev_dict;
+}
+
+QString
+UDiskManager::driveId(const QString &device)
+{
+    QString drive_path = drive(device);
+    QString drive_if = "org.freedesktop.UDisks2.Drive"; //interface for drive section
+
+    QVariant var = getVariant(drive_path, drive_if, "Id");
+
+    return var.toString();
+}
+
+QString
+UDiskManager::driveModelName(const QString &device)
+{
+    QString drive_path = drive(device);
+    QString drive_if = "org.freedesktop.UDisks2.Drive"; //interface for drive section
+
+    QVariant var = getVariant(drive_path, drive_if, "Model");
+
+    return var.toString();
+}
+
+QString
+UDiskManager::driveVendorName(const QString &device)
+{
+    QString drive_path = drive(device);
+    QString drive_if = "org.freedesktop.UDisks2.Drive"; //interface for drive section
+
+    QVariant var = getVariant(drive_path, drive_if, "Vendor");
+
+    return var.toString();
+}
+
+QString
+UDiskManager::driveSerialNumber(const QString &device)
+{
+    QString drive_path = drive(device);
+    QString drive_if = "org.freedesktop.UDisks2.Drive"; //interface for drive section
+
+    QVariant var = getVariant(drive_path, drive_if, "Serial");
+
+    return var.toString();
 }
 
 QStringList
@@ -565,6 +621,7 @@ UDiskManager::dbusInterface(const QString &path, const QString &interface)
     }
     //Create new interface object
     QDBusInterface *bus = new QDBusInterface(UDISKS2_SERVICE, path, interface, QDBusConnection::systemBus(), this);
+    assert(bus);
     args.iface = bus;
     m_dbus_ifc_conns << args;
     return *bus;
@@ -734,3 +791,4 @@ UDiskManager::propertyNames(const QString &path)
     return properties;
 }
 
+#endif

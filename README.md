@@ -2,11 +2,11 @@ CapacityTester
 ==============
 
 - Test your new USB flash drive from China to find out if its full capacity can be used or if it's fake!
-- The *volume test* fills the filesystem, verifying that all of it can be used.
-- The *disk test* overwrites the drive itself and is much faster (some GB/TB large USB drives can be checked in less than 10 minutes); but it's experimental.
-- To learn more, keep reading. To start using CapacityTester now, download the latest [release](https://github.com/c0xc/CapacityTester/releases/tag/v0.5).
+- The *volume test* fills the filesystem, verifying that all of it can be used. It's slow, it takes hours.
+- The *disk test* overwrites the drive itself and is much faster (some GB/TB large USB drives can be checked in less than 10 minutes); but it's somewhat experimental.
+- To learn more, keep reading. To start using CapacityTester now, download and try [CapacityTester for Linux](https://github.com/c0xc/CapacityTester/releases/download/v0.5/Capacity_Tester-x86_64.AppImage) (or [Windows](https://github.com/c0xc/CapacityTester/releases/download/v0.5/capacity-tester.exe)) now.
 
-**New feature: Destructive Disk Test - test your flash drive within minutes; Linux only** ([feedback](https://github.com/c0xc/CapacityTester/issues/12) appreciated)
+**New feature: Destructive Disk Test - test your flash drive within minutes** ([feedback](https://github.com/c0xc/CapacityTester/issues/12) appreciated)
 
 ---
 
@@ -49,17 +49,21 @@ Download
 **Linux Desktop**:  
 There are pre-compiled executable files available for Linux
 which can be downloaded from the "[Releases](https://github.com/c0xc/CapacityTester/releases)" page.
+Direct [download for Linux](https://github.com/c0xc/CapacityTester/releases/download/v0.5/Capacity_Tester-x86_64.AppImage).
 
 From the latest release there, under "assets", you'll find them.
 
-<small>
+**Windows**:  
+There is a Windows version available, but it's slightly experimental,
+the format feature is missing. See release [v0.5](https://github.com/c0xc/CapacityTester/releases/tag/v0.5).
+Direct [download for Windows](https://github.com/c0xc/CapacityTester/releases/download/v0.5/capacity-tester.exe).
+
 If the executable file does not run because you don't have some libraries
 installed, pick the AppImage file which is supposed to be portable.
 The AppImage file should run on most modern Linux systems
 out of the box.
 If you're experiencing issues running this program on Linux,
 you may open an [issue](https://github.com/c0xc/CapacityTester/issues).
-</small>
 
 
 

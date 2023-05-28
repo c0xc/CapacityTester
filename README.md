@@ -48,18 +48,17 @@ Download
 
 **Linux Desktop**:  
 There are pre-compiled executable files available for Linux
-which can be downloaded from the "[Releases](https://github.com/c0xc/CapacityTester/releases)" page.
+which can be downloaded from the "[Releases](https://github.com/c0xc/CapacityTester/releases)" page.  
 Direct [download for Linux](https://github.com/c0xc/CapacityTester/releases/download/v0.5/Capacity_Tester-x86_64.AppImage).
 
 From the latest release there, under "assets", you'll find them.
 
 **Windows**:  
 There is a Windows version available, but it's slightly experimental,
-the format feature is missing. See release [v0.5](https://github.com/c0xc/CapacityTester/releases/tag/v0.5).
+the format feature is missing. See release [v0.5](https://github.com/c0xc/CapacityTester/releases/tag/v0.5).  
 Direct [download for Windows](https://github.com/c0xc/CapacityTester/releases/download/v0.5/capacity-tester.exe).
-The zip archive contains a couple of files, all of which should be extracted
+The [zip archive](https://github.com/c0xc/CapacityTester/releases/download/v0.5/CapacityTester_Win7.zip) contains a couple of files, all of which should be extracted
 into the same directory which is only used by CapacityTester.
-Direct [download for Windows](https://github.com/c0xc/CapacityTester/releases/download/v0.5/CapacityTester_Win7.zip).
 
 If the executable file does not run because you don't have some libraries
 installed, pick the AppImage file which is supposed to be portable.

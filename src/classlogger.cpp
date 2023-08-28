@@ -46,11 +46,17 @@ ClassLogger::log(const QString &msg, int level, const char *file, int line, cons
 
     //Construct log string
     QString final_entry;
+    //date
+    QString ts_str = QDateTime::currentDateTime().toString("hh:mm:ss");
+    final_entry += ts_str + " ";
+    //log level
     if (!level_name.isEmpty())
-        final_entry = QString("[%1]").arg(level_name);
+        final_entry += QString("[%1]").arg(level_name);
     if (!final_entry.isEmpty())
         final_entry += " ";
+    //function name
     final_entry += QString("(L%1) <%2>").arg(line).arg(func); //TODO func vs. pretty
+    //log message
     final_entry += " : " + msg;
     if (!msg.endsWith('\n'))
         final_entry += '\n';

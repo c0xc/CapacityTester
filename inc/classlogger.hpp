@@ -28,6 +28,7 @@
 #include <QRegExp>
 #include <QFile>
 #include <QProcessEnvironment>
+#include <QDateTime>
 
 #define QS(...) QString::asprintf(__VA_ARGS__)
 

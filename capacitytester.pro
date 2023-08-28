@@ -7,6 +7,7 @@ INCLUDEPATH = inc/
 HEADERS = inc/*
 SOURCES = src/*
 QT += widgets
+QT += concurrent
 
 !win32 {
     QT += dbus
@@ -16,6 +17,7 @@ win32 {
     LIBS += -lsetupapi
 }
 
+RESOURCES += res/res.qrc
 RESOURCES += res/lang.qrc
 
 # missing return statement should be fatal

@@ -86,6 +86,9 @@ private:
     qint64
     total_mb;
 
+    bool
+    full_ddt_mode;
+
     QElapsedTimer
     tmr_total_test_time;
 

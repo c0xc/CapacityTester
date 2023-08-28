@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
     else
     {
         #ifndef NO_GUI
+        foreach (QFileInfo fi, QDir(":/").entryInfoList(QStringList() << "*.ttf"))
+            QFontDatabase::addApplicationFont(fi.filePath());
         qApp->setWindowIcon(QPixmap(":/USB_flash_drive.png"));
         gui = new CapacityTesterGui;
         gui->show();

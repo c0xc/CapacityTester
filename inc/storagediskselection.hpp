@@ -65,7 +65,6 @@
 #include <windows.h>
 
 //required: -std=c++11
-// https://learn.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdigetclassdevsw?redirectedfrom=MSDN
 #ifdef DEFINE_SDS_INC
 #define INITGUID
 #include <initguid.h>
@@ -253,11 +252,26 @@ public:
         int
         open(int flags = 0);
 
+        int
+        openSync();
+
         bool
         close();
 
         bool
         seek(qint64 offset, qint64 *pos_ptr = 0);
+
+        qint64
+        write(const char *bytes, qint64 size);
+
+        qint64
+        read(char *bytes, qint64 size);
+
+        bool
+        writeBlock(const char *bytes);
+
+        bool
+        readBlock(char *bytes);
 
     private:
 

@@ -45,20 +45,29 @@ const
     return bytes();
 }
 
+double
+Size::gb()
+const
+{
+    int multiplier = 1024; //nobody uses 1000
+    double gb = bytes() / std::pow(multiplier, 3);
+    return gb;
+}
+
 QString
-Size::formatted(int format)
+Size::formatted(int precision, int format)
 const
 {
     //https://xkcd.com/394/
 
     //Get size and prefix separately
-    QPair<qint64, uchar> pair =
+    QPair<double, uchar> pair =
         valuePrefixPair(format & Decimal ? true : false);
-    qint64 number = pair.first;
+    double number = pair.first;
     uchar symbol = pair.second;
 
     //Numeric value
-    QString formatted = QString::number(number);
+    QString formatted = QString::number(number, 'f', precision);
 
     //Condensed: 123B or 123M (no whitespace)
     //Standard: 123 B or 123 MB (whitespace)
@@ -126,18 +135,18 @@ const
     return formatted;
 }
 
-QPair<qint64, uchar>
+QPair<double, uchar>
 Size::valuePrefixPair(bool use_decimal_power)
 const
 {
-    QPair<qint64, uchar> pair;
+    QPair<double, uchar> pair;
 
     int multiplier = 1024; //nobody uses 1000
     if (use_decimal_power)
         multiplier = 1000;
 
     qint64 bytes = _bytes;
-    qint64 value = bytes;
+    double value = bytes;
     uchar unit_prefix = 0; //empty for (< 1024) bytes
     foreach (uchar current_prefix, unitSymbols())
     {

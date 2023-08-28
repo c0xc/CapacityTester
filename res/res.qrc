@@ -2,5 +2,13 @@
 <qresource>
     <file>USB_flash_drive.svg</file>
     <file>USB_flash_drive.png</file>
+
+    <file>Prompt-ExtraBoldItalic.ttf</file>
+    <file>Prompt-ExtraBold.ttf</file>
+    <file>Roboto-Regular.ttf</file>
+    <file>RobotoMono-Italic.ttf</file>
+    <file>Inconsolata.ttf</file>
+    <file>VT323-Regular.ttf</file>
+
 </qresource>
 </RCC>

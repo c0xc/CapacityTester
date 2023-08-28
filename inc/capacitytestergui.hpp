@@ -53,6 +53,7 @@
 #include "selectionwindow.hpp"
 #include "udiskformatdialog.hpp"
 #include "usbdiskselectiondialog.hpp"
+#include "disktestwindow.hpp"
 
 #ifndef NO_UDISK
 #include "udiskmanager.hpp"
@@ -187,7 +188,7 @@ private:
     QPointer<DestructiveDiskTester>
     dd_worker;
 
-private slots:
+public slots:
 
     void
     closeEvent(QCloseEvent *event);
@@ -207,7 +208,7 @@ private slots:
     void
     toggleInitPrecheck(bool checked);
 
-    void
+    QPointer<DestructiveDiskTester>
     startDiskTest(const QString &device);
 
     void
@@ -215,6 +216,8 @@ private slots:
 
     void
     startedDiskTest(qint64 total);
+
+private slots:
 
     void
     completedDiskTest(bool success);

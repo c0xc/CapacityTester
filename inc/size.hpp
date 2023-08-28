@@ -21,6 +21,8 @@
 #ifndef SIZE_HPP
 #define SIZE_HPP
 
+#include <cmath>
+
 #include <QString>
 #include <QPair>
 #include <QStringList>
@@ -72,12 +74,15 @@ public:
 
     operator qint64() const;
 
+    double
+    gb() const;
+
     QString
-    formatted(int format = Standard | Binary) const;
+    formatted(int precision = 2, int format = Standard | Binary) const;
 
 private:
 
-    QPair<qint64, uchar>
+    QPair<double, uchar>
     valuePrefixPair(bool use_decimal_power = false) const;
 
     qint64

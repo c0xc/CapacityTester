@@ -19,8 +19,8 @@
 **
 ****************************************************************************/
 
-#ifndef USBDISKSELECTIONDIALOG_HPP
-#define USBDISKSELECTIONDIALOG_HPP
+#ifndef DISKTESTWINDOW_HPP
+#define DISKTESTWINDOW_HPP
 
 #include <QDialog>
 #include <QPointer>
@@ -36,85 +36,117 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QCheckBox>
+#include <QRadioButton>
 
 #include "size.hpp"
-#include "storagediskselection.hpp"
+#include "usbdiskselectiondialog.hpp"
+#include "destructivedisktester.hpp"
+#include "capacitytestergui.hpp" //TODO init disk test
+#include "performancegraph.hpp"
 
-class StorageDiskSelection;
-
-class UsbDiskSelectionWidget : public QDialog
+class DiskTestWindow : public QDialog
 {
     Q_OBJECT
 
 signals:
 
-    void
-    deviceSelected(const QString &dev_path, const QString &dev_title = "");
-
-    //void
-    //rejected
-
 public:
 
-    UsbDiskSelectionWidget(bool show_title = true, bool show_buttons = true, QWidget *parent = 0);
+    static QFrame*
+    newHLine();
 
-public slots:
-
-    void
-    accept();
+    DiskTestWindow(QWidget *parent = 0);
 
 private slots:
 
     void
-    reloadList();
+    cancel();
 
     void
-    setUsbFilter(int state);
+    confirm();
 
     void
-    itemSelected(QListWidgetItem *current, QListWidgetItem *previous);
+    showDevSelect();
 
     void
-    confirmSelection(QListWidgetItem *item);
+    showDev(const QString &dev_path, const QString &dev_title);
 
     void
-    confirmSelection();
+    showStartTest();
+
+    void
+    startTest();
+
+    void
+    startTestPhase(int phase);
+
+    void
+    handleTestFinished(bool success);
 
 private:
 
-    bool
-    m_only_usb;
+    QVBoxLayout*
+    resetMainLayout();
 
-    StorageDiskSelection
-    m_device_selection;
+    QWidget
+    *wid_dev_sel;
 
-    QListWidget
-    *m_selection_list;
-
-    QLineEdit
-    *m_txt_drive_path;
-
-    QLineEdit
-    *m_txt_drive_name;
-
-    QLineEdit
-    *m_txt_drive_vendor;
-
-    QLineEdit
-    *m_txt_dev_size;
+    QWidget
+    *wid_main;
 
     QDialogButtonBox
     *m_button_box;
 
-};
+    int
+    m_step;
 
-class UsbDiskSelectionDialog : public UsbDiskSelectionWidget
-{
-    Q_OBJECT
+    QString
+    m_dev_path;
 
-public:
+    QString
+    m_dev_title;
 
-    UsbDiskSelectionDialog(QWidget *parent);
+    qint64
+    m_claimed_capacity;
+
+    qint64
+    m_wr_err;
+
+    qint64
+    m_rd_err;
+
+    int
+    m_sel_type;
+
+    QPointer<UsbDiskSelectionWidget>
+    m_disk_selection_widget;
+
+    QPointer<DestructiveDiskTester>
+    m_dd_worker;
+
+    PerformanceGraph
+    *m_graph_write;
+
+    PerformanceGraph
+    *m_graph_read;
+
+    QLabel
+    *m_lbl_phase;
+
+    //QLabel
+    //*m_lbl_phase_writing;
+
+    //QLabel
+    //*m_lbl_phase_verifying;
+
+    int
+    m_ddt_phase;
+
+    QLabel
+    *m_lbl_finish_desc;
+
+
+
 };
 
 #endif

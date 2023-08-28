@@ -24,6 +24,7 @@
 #include <QCoreApplication>
 #include <QTranslator>
 #include <QProcessEnvironment>
+#include <QDir>
 
 #include "version.hpp"
 

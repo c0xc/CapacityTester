@@ -8,3 +8,5 @@ VERSION
 
 /languages/*.qm
 
+/moc_*.h
+/moc_*.cpp

@@ -228,12 +228,11 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
             SIGNAL(triggered()),
             SLOT(showFormatDialog()));
     //: Button: Show list of USB drives to run disk test on selected drive.
-    //: The word destructive could probably be left out in the translation.
-    //: Disk test means the whole flash disk is tested, not just the volume,
-    //: and destructive means it'll overwrite it, destroying all data on it.
-    //: Another relevant property of this disk test is that it's very fast,
-    //: so in doubt, it could be translated as Fast disk test.
-    act_destructive_test = mnu_advanced->addAction(tr("Destructive disk test"));
+    //: Disk test means the whole [flash] disk (block device) is tested,
+    //: not just the volume (mounted filesystem) on it.
+    //: The disk will be overwritten, destroying all partitions on it.
+    //: Original name: Destructive disk test.
+    act_destructive_test = mnu_advanced->addAction(tr("Disk test"));
     connect(act_destructive_test,
             SIGNAL(triggered()),
             SLOT(startDiskTest()));
@@ -416,18 +415,18 @@ CapacityTesterGui::toggleInitPrecheck(bool checked)
     disable_precheck = !checked;
 }
 
-void
+QPointer<DestructiveDiskTester>
 CapacityTesterGui::startDiskTest(const QString &device)
 {
-    if (device.isEmpty()) return;
+    if (device.isEmpty()) return 0;
 
-    //DESTRUCTIVE DISK TEST - unmounted disk will be overwritten
+    //DISK TEST - unmounted disk will be overwritten
 
-    //: Destructive / fast disk test, see hint above.
-    if (QMessageBox::question(this, tr("Destructive disk test"),
-        tr("Do you want to run a destructive test on the selected device?\n%1\nPlease note that this test routine will overwrite the device, destroying all data on it. After running this test, you will have to format it before you're able to use it again.\nIf you have any valuable files on this device, cancel NOW (press ESC).").arg(device),
+    //: Disk test (original name: destructive / fast disk test).
+    if (QMessageBox::question(this, tr("Disk test"),
+        tr("Do you want to run a disk test on the selected device?\n%1\nPlease note that this test routine will overwrite the device, destroying all data on it. After running this test, you will have to format it before you're able to use it again.\nIf you have any valuable files on this device, cancel NOW (press ESC).").arg(device),
         QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
-        return;
+        return 0;
 
     //Check if selected device is in use (quick check)
     //note that this is not 100% reliable
@@ -435,8 +434,8 @@ CapacityTesterGui::startDiskTest(const QString &device)
     if (checker.isMounted())
     {
         QMessageBox::critical(this, tr("Cannot start test"),
-            tr("This device is in use: %1. Please unmount it. The destructive disk test requires that the device is not in use because it will overwrite it, destroying all data on it.").arg(device));
-        return;
+            tr("This device is in use: %1. Please unmount it. The disk test requires that the device is not in use because it will overwrite it, destroying all data on it.").arg(device));
+        return 0;
     }
     //Check if selected device is valid, exists
     if (!checker.exists())
@@ -444,7 +443,7 @@ CapacityTesterGui::startDiskTest(const QString &device)
         QMessageBox::critical(this, tr("Cannot start test"),
             //: Invalid device selected, device not found.
             tr("This device is not valid: %1.").arg(device));
-        return;
+        return 0;
     }
 
     //Sanity checks above
@@ -468,6 +467,7 @@ CapacityTesterGui::startDiskTest(const QString &device)
 
     //Initialize worker
     dd_worker = new DestructiveDiskTester(device);
+    //if (set_full_mode) dd_worker->setFullMode();
 
     //Use sudo wrapper if not running as root
     if (!dd_worker->isWritable())
@@ -482,7 +482,7 @@ CapacityTesterGui::startDiskTest(const QString &device)
             //: This warning is shown on Windows, so the term administrator is used. Alternative: Please start this program with elevated privileges.
             tr("This program is running with limited privileges. Try restarting the program as administrator."));
         dd_worker->deleteLater();
-        return;
+        return 0;
 #endif
     }
 
@@ -577,16 +577,25 @@ CapacityTesterGui::startDiskTest(const QString &device)
     txt_result->setEnabled(true);
 
     //Start test in background
-    thread->start();
+    QTimer::singleShot(0, thread, SLOT(start()));
 
     //Start timer
     tmr_total_test_time.start();
 
+    return dd_worker;
 }
 
 void
 CapacityTesterGui::startDiskTest()
 {
+    //Show disk test dialog
+    DiskTestWindow *test_window = new DiskTestWindow(this);
+    test_window->setAttribute(Qt::WA_DeleteOnClose);
+    test_window->show();
+
+    //TODO using new Disk Test Window
+    return;
+
     //Show device selection dialog
     UsbDiskSelectionDialog *selection_dialog = new UsbDiskSelectionDialog(this);
     selection_dialog->setAttribute(Qt::WA_DeleteOnClose);

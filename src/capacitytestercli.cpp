@@ -27,7 +27,8 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
                    err(stderr, QIODevice::WriteOnly | QIODevice::Unbuffered | QIODevice::Text),
                    is_yes(false),
                    safety_buffer(-1),
-                   total_mb(0)
+                   total_mb(0),
+                   full_ddt_mode(false)
 {
     //Heading
     out << "CapacityTester" << endl
@@ -57,10 +58,12 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
         tr("Answers questions with yes.")));
     parser.addOption(QCommandLineOption(QStringList() << "destructive-test",
         tr("Run destructive test (+ -device).")));
+    parser.addOption(QCommandLineOption(QStringList() << "full-test-mode",
+        tr("Set disk test mode to full instead of fast mode.")));
     parser.addOption(QCommandLineOption(QStringList() << "safety-buffer",
         tr("Changes the size of the safety buffer zone."), "safety-buffer"));
     parser.addOption(QCommandLineOption(QStringList() << "device",
-        tr("Path to device to be tested (destructive test)."), "device"));
+        tr("Path to device to be tested (disk test)."), "device"));
     parser.addOption(QCommandLineOption(QStringList() << "mountpoint",
         tr("Volume to be tested."), "mountpoint"));
     parser.addPositionalArgument("mountpoint",
@@ -98,6 +101,11 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
     if (parser.isSet("yes"))
     {
         is_yes = true;
+    }
+    //Options
+    if (parser.isSet("full-test-mode"))
+    {
+        full_ddt_mode = true;
     }
 
     //Run command
@@ -712,6 +720,7 @@ CapacityTesterCli::startDiskTest(const QString &device)
     //Initialize worker
     QPointer<DestructiveDiskTester> worker;
     worker = new DestructiveDiskTester(device);
+    if (full_ddt_mode) worker->setFullMode();
 
     //Thread for worker
     QThread *thread = new QThread;
@@ -831,7 +840,7 @@ CapacityTesterCli::diskWritten(qint64 size, double avg)
     //Print progress
     //this format will be parsed by the DestructiveDiskTesterWrapper
     QString str_p = QString("%1%").arg(percentage, 0, 'f', 2);
-    out << QString("[write] progress: %1; @%2M").arg(str_p).arg(progress_mb); //NOTE change wrapper before translating "progress"
+    out << QString("[write] progress: %1; @%2M; %3M/s avg").arg(str_p).arg(progress_mb).arg(avg, 0, 'f', 2); //NOTE do not translate this
     out << endl;
 
 }
@@ -853,7 +862,7 @@ CapacityTesterCli::diskVerified(qint64 size, double avg)
 
     //see diskWritten()
     QString str_p = QString("%1%").arg(percentage, 0, 'f', 2);
-    out << QString("[verify] progress: %1; @%2M").arg(str_p).arg(progress_mb); //NOTE change wrapper before translating "progress"
+    out << QString("[verify] progress: %1; @%2M; %3M/s avg").arg(str_p).arg(progress_mb).arg(avg, 0, 'f', 2); //NOTE do not translate this
     out << endl;
 
 }

@@ -573,7 +573,7 @@ StorageDiskSelection::Device::open(int flags)
         flags = _O_RDWR; //open()
     }
     DWORD share_mode = access_mode ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE;
-    DWORD flags_attrs = FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
+    DWORD flags_attrs = 0;
     HANDLE handle = CreateFileA(
         m_int_addr.toLocal8Bit().constData(),
         access_mode,
@@ -591,6 +591,57 @@ StorageDiskSelection::Device::open(int flags)
 #endif
 
     //Save fd for later (but it's not closed automatically by default)
+    m_fd = fd;
+
+    return fd;
+}
+
+int
+StorageDiskSelection::Device::openSync()
+{
+    int fd = -1;
+    if (m_fd > -1)
+    {
+        return m_fd;
+    }
+
+    //Open block device, use synchronized I/O
+    QString dev_path = path();
+
+    int flags = 0;
+
+#if !defined(Q_OS_WIN) //normal OS
+
+    flags = O_RDWR | O_DIRECT | O_SYNC;
+    fd = ::open(dev_path.toLocal8Bit().constData(), flags);
+
+#elif defined(Q_OS_WIN)
+
+    //The ownership of the OS HANDLE is transferred to this file descriptor.
+    //So it won't be necessary to call CloseHandle() after close().
+
+    DWORD access_mode = 0;
+    access_mode = GENERIC_READ | GENERIC_WRITE; //CreateFileA()
+    flags = _O_RDWR; //open()
+    DWORD share_mode = access_mode ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE;
+    DWORD flags_attrs = FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
+    HANDLE handle = CreateFileA(
+        m_int_addr.toLocal8Bit().constData(),
+        access_mode,
+        share_mode,
+        NULL, //security attributes
+        OPEN_EXISTING,
+        flags_attrs, //flags and attributes
+        NULL
+    );
+    if (handle == INVALID_HANDLE_VALUE)
+        return -1;
+
+    fd = _open_osfhandle((intptr_t)handle, flags); // _O_RDWR
+
+#endif
+
+    //Save fd for later (not auto-closed by default)
     m_fd = fd;
 
     return fd;
@@ -631,6 +682,60 @@ StorageDiskSelection::Device::seek(qint64 offset, qint64 *pos_ptr)
 
     return pos != -1;
 }
+
+qint64
+StorageDiskSelection::Device::write(const char *bytes, qint64 size)
+{
+    qint64 bytes_written = 0;
+
+#if !defined(Q_OS_WIN)
+    bytes_written = ::write(m_fd, bytes, size);
+#elif defined(Q_OS_WIN)
+    bytes_written = ::_write(m_fd, bytes, size);
+#endif
+
+    return bytes_written;
+}
+
+qint64
+StorageDiskSelection::Device::read(char *bytes, qint64 size)
+{
+    qint64 bytes_read = 0;
+
+#if !defined(Q_OS_WIN)
+    bytes_read = ::read(m_fd, bytes, size);
+#elif defined(Q_OS_WIN)
+    bytes_read = ::_read(m_fd, bytes, size);
+#endif
+
+    return bytes_read;
+}
+
+bool
+StorageDiskSelection::Device::writeBlock(const char *bytes)
+{
+    qint64 bytes_written = 0;
+
+    static qint64 bs = blockSize();
+
+    //memcpy(m_block_buffer, data.constData() + write_count, chunk_size); //sync = true
+    bytes_written = write(bytes, bs);
+
+    return bytes_written == bs;
+}
+
+bool
+StorageDiskSelection::Device::readBlock(char *bytes)
+{
+    qint64 bytes_read = 0;
+
+    static qint64 bs = blockSize();
+
+    bytes_read = read(bytes, bs);
+
+    return bytes_read == bs;
+}
+
 
 #if defined(Q_OS_WIN)
 

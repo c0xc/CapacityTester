@@ -29,6 +29,7 @@
 #include <QFile>
 
 #include "destructivedisktester.hpp"
+#include "classlogger.hpp"
 
 class DestructiveDiskTesterWrapper : public DestructiveDiskTester
 {
@@ -65,6 +66,9 @@ public:
     DestructiveDiskTesterWrapper(const QString &dev_path);
 
     ~DestructiveDiskTesterWrapper();
+
+    void
+    setFullMode();
 
 public slots:
 

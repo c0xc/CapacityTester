@@ -332,10 +332,19 @@ const
 {
     QStringList file_name_list;
 
+    QStringList default_things;
+    default_things << "lost+found"; //ext2
+    default_things << "System Volume Information"; //Windows
+    default_things << ".Trash";
+
     foreach (QFileInfo fi, entryInfoList())
     {
         QString name = fi.fileName();
         if (fi.isDir()) name += "/";
+
+        if (default_things.contains(name)) continue;
+        if (fi.isHidden()) continue;
+
         file_name_list << name;
     }
 

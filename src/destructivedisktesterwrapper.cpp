@@ -17,7 +17,7 @@ DestructiveDiskTesterWrapper::DestructiveDiskTesterWrapper(const QString &dev_pa
     //to avoid confusion (progress rx matching error line)
     m_rx_start = QRegExp("^\\[start\\].*(total=(\\d+)M)");
     m_rx_start_err = QRegExp("^\\[start\\].*(failed)");
-    m_rx_progress = QRegExp("^\\[(\\w+)\\].*progress.*(\\d+[.]\\d+)%.*\\s@(\\d+)M");
+    m_rx_progress = QRegExp("^\\[(\\w+)\\].*progress.*(\\d+[.]\\d+)%.*\\s@(\\d+)M; ([\\d.]+)M/s avg");
     m_rx_progress_err = QRegExp("^\\[(\\w+)\\].*failed.*@(\\d+)M");
     m_rx_finished = QRegExp("^\\[done\\] (success|failed)");
 
@@ -31,6 +31,14 @@ DestructiveDiskTesterWrapper::~DestructiveDiskTesterWrapper()
     {
         m_proc->kill();
     }
+}
+
+void
+DestructiveDiskTesterWrapper::setFullMode()
+{
+    //This may never be executed if base class method is called instead, but ok
+    Debug(QS("set test mode to full disk test"));
+    m_mode_full = true;
 }
 
 void
@@ -82,7 +90,9 @@ DestructiveDiskTesterWrapper::start()
     args << exe_path;
     args << "--destructive-test";
     args << "--device" << m_dev_path;
+    if (m_mode_full) args << "--full-test-mode";
     m_proc->setArguments(args);
+    Debug(QS("starting wrapper: %s", args.join(" ").toUtf8().constData()));
 
     //Start process
     m_proc->start();
@@ -129,16 +139,19 @@ DestructiveDiskTesterWrapper::checkStatus(const QString &line)
         QString phase = rx_progress.cap(1);
         QString percent_str = rx_progress.cap(2);
         QString pos_m_str = rx_progress.cap(3);
+        QString avg_speed_str = rx_progress.cap(4);
         qint64 pos_m = pos_m_str.toLongLong();
         bool ok;
         double p = percent_str.toDouble(&ok);
+        double avg_speed = avg_speed_str.toDouble(&ok);
+        if (!ok) avg_speed = 0;
         if (phase == "write")
         {
-            emit written(pos_m, 0);
+            emit written(pos_m, avg_speed);
         }
         else if (phase == "verify")
         {
-            emit verified(pos_m, 0);
+            emit verified(pos_m, avg_speed);
         }
     }
     else if (rx_progress_err.indexIn(line) != -1)

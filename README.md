@@ -6,7 +6,7 @@ CapacityTester
 - The *disk test* overwrites the drive itself and is much faster (some GB/TB large USB drives can be checked in less than 10 minutes); but it's somewhat experimental.
 - To learn more, keep reading. To start using CapacityTester now, download and try [CapacityTester for Linux](https://github.com/c0xc/CapacityTester/releases/download/v0.5/Capacity_Tester-x86_64.AppImage) (or [Windows](https://github.com/c0xc/CapacityTester/releases/download/v0.5/capacity-tester.exe)) now.
 
-**New feature: Destructive Disk Test - test your flash drive within minutes** ([feedback](https://github.com/c0xc/CapacityTester/issues/12) appreciated)
+**New feature: Raw Disk Test - test your flash drive within minutes** ([feedback](https://github.com/c0xc/CapacityTester/issues/12) appreciated)
 
 ---
 
@@ -126,16 +126,16 @@ Some filesystems such as FAT32 do not need that buffer (SAFETY_BUFFER = 0).
 
 
 
-Destructive disk test
----------------------
+Raw disk test
+-------------
 
 Some fake flash drives are extremely slow due to their size
 and the fact that they are not USB 3.0 devices (even though some
 have fake blue-painted USB2 connectors).
 A volume test on a huge fake drive could take days in some extreme cases.
-For these cases, there's the *destructive disk test*.
+For these cases, there's the *disk test*.
 It works with the whole USB flash drive, so if it contains a partition,
-that partition must be unmounted. It's destructive as it overwrites
+that partition must be unmounted. It's "destructive" meaning overwrites
 the drive, wiping its partition(s). When done, you need to reformat the drive,
 see the format item under the advanced menu (Linux only).
 

@@ -21,19 +21,24 @@
 
 #include "usbdiskselectiondialog.hpp"
 
-UsbDiskSelectionDialog::UsbDiskSelectionDialog(QWidget *parent)
-                      : QDialog(parent)
+UsbDiskSelectionWidget::UsbDiskSelectionWidget(bool show_title, bool show_buttons, QWidget *parent)
+                      : QDialog(parent),
+                        m_only_usb(true)
 {
     QVBoxLayout *vbox = new QVBoxLayout;
     setLayout(vbox);
 
     //Title, separator line
-    QLabel *lbl_title = new QLabel(tr("Select a drive"));
-    lbl_title->setStyleSheet("font-weight:bold; color:darkgray; font-size:18pt;");
-    vbox->addWidget(lbl_title);
-    QFrame *hline1 = new QFrame;
-    hline1->setFrameShape(QFrame::HLine);
-    vbox->addWidget(hline1);
+    if (show_title)
+    {
+        //: Storage device (selection list) / usb thumb drive / disk
+        QLabel *lbl_title = new QLabel(tr("Select a storage device"));
+        lbl_title->setStyleSheet("font-weight:bold; color:darkgray; font-size:18pt;");
+        vbox->addWidget(lbl_title);
+        QFrame *hline1 = new QFrame;
+        hline1->setFrameShape(QFrame::HLine);
+        vbox->addWidget(hline1);
+    }
 
     //Selection list with available devices
     m_selection_list = new QListWidget;
@@ -45,6 +50,12 @@ UsbDiskSelectionDialog::UsbDiskSelectionDialog(QWidget *parent)
         SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
         SLOT(itemSelected(QListWidgetItem*, QListWidgetItem*)));
     vbox->addWidget(m_selection_list);
+    //Filter
+    QCheckBox *chk_filter_usb = new QCheckBox(tr("USB devices only"));
+    chk_filter_usb->setChecked(true);
+    connect(chk_filter_usb, SIGNAL(stateChanged(int)),
+            SLOT(setUsbFilter(int)));
+    vbox->addWidget(chk_filter_usb);
 
     //Details form
     QWidget *wid_details = new QWidget;
@@ -71,20 +82,31 @@ UsbDiskSelectionDialog::UsbDiskSelectionDialog(QWidget *parent)
     form->addRow(tr("Size"), m_txt_dev_size);
 
     //Control buttons
-    m_button_box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(m_button_box, SIGNAL(accepted()), this, SLOT(confirmSelection()));
-    connect(m_button_box, SIGNAL(rejected()), this, SLOT(close()));
-    vbox->addWidget(m_button_box);
+    m_button_box = 0;
+    if (show_buttons)
+    {
+        m_button_box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+        connect(m_button_box, SIGNAL(accepted()), this, SLOT(confirmSelection()));
+        connect(m_button_box, SIGNAL(rejected()), this, SIGNAL(rejected()));
+        vbox->addWidget(m_button_box);
+    }
 
     reloadList();
 }
 
 void
-UsbDiskSelectionDialog::reloadList()
+UsbDiskSelectionWidget::accept()
+{
+    confirmSelection();
+}
+
+void
+UsbDiskSelectionWidget::reloadList()
 {
     m_selection_list->blockSignals(true);
     m_selection_list->clear(); //clear list widget
-    m_button_box->button(QDialogButtonBox::Ok)->setDisabled(true);
+    if (m_button_box)
+        m_button_box->button(QDialogButtonBox::Ok)->setDisabled(true);
     m_device_selection = StorageDiskSelection(); //reset cached devices
 
     foreach (auto device, m_device_selection.blockDevices())
@@ -92,13 +114,19 @@ UsbDiskSelectionDialog::reloadList()
         QString dev_path = device.path();
 
         //Only USB devices
-        bool is_usb = device.isUsbDevice();
-        if (!is_usb) continue;
+        if (m_only_usb)
+        {
+            bool is_usb = device.isUsbDevice();
+            if (!is_usb) continue;
+        }
+
+        //Skip unnamed devices
+        QString dev_title = device.identifier();
+        if (dev_title.isEmpty()) continue;
 
         //Add device item to list
         //dev_path = "/dev/sda"; dev_title is some id string usually + serial
         //dev_path is the (internal) path to the block device on the system
-        QString dev_title = device.identifier();
         if (dev_title.isEmpty()) dev_title = dev_path;
         QListWidgetItem *item = new QListWidgetItem(dev_title, m_selection_list);
         item->setData(Qt::UserRole, dev_path);
@@ -106,13 +134,26 @@ UsbDiskSelectionDialog::reloadList()
         item->setToolTip(dev_path);
         m_selection_list->addItem(item);
 
+        //Highlight if mounted //TODO not fully implemented
+        //if (device.isMounted())
+        //{
+        //    item->setBackground("red");
+        //}
+
     }
     m_selection_list->blockSignals(false);
 
 }
 
 void
-UsbDiskSelectionDialog::itemSelected(QListWidgetItem *current, QListWidgetItem *previous)
+UsbDiskSelectionWidget::setUsbFilter(int state)
+{
+    m_only_usb = state;
+    reloadList();
+}
+
+void
+UsbDiskSelectionWidget::itemSelected(QListWidgetItem *current, QListWidgetItem *previous)
 {
     Q_UNUSED(previous);
     QString dev_path = current->data(Qt::UserRole).toString();
@@ -135,17 +176,19 @@ UsbDiskSelectionDialog::itemSelected(QListWidgetItem *current, QListWidgetItem *
         //: Serial number of storage device.
         m_txt_drive_name->setToolTip(tr("Serial") + ": " + serial);
     Size capacity = device.capacity();
-    m_txt_dev_size->setText(QString("%1 / %2 B").
-        arg(capacity.formatted()). //TODO fix 2048408248320B shown as 1TB
+    m_txt_dev_size->setText(capacity.formatted());
+    m_txt_dev_size->setToolTip(QString("%1 GB (%2 B)").
+        arg(capacity.gb()).
         arg((qint64)capacity));
     m_txt_drive_vendor->setText(device.vendorName());
 
-    m_button_box->button(QDialogButtonBox::Ok)->setDisabled(false);
+    if (m_button_box)
+        m_button_box->button(QDialogButtonBox::Ok)->setDisabled(false);
 
 }
 
 void
-UsbDiskSelectionDialog::confirmSelection(QListWidgetItem *item)
+UsbDiskSelectionWidget::confirmSelection(QListWidgetItem *item)
 {
     QString dev_path = item->data(Qt::UserRole).toString();
     QString dev_title = item->data(Qt::UserRole + 1).toString();
@@ -155,8 +198,19 @@ UsbDiskSelectionDialog::confirmSelection(QListWidgetItem *item)
 }
 
 void
-UsbDiskSelectionDialog::confirmSelection()
+UsbDiskSelectionWidget::confirmSelection()
 {
+    if (!m_selection_list->currentItem()) return;
     confirmSelection(m_selection_list->currentItem());
+}
+
+UsbDiskSelectionDialog::UsbDiskSelectionDialog(QWidget *parent)
+                      : UsbDiskSelectionWidget(true, true, parent)
+{
+    setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint | Qt::WindowTitleHint);
+    //Qt::WindowTitleHint | Qt::WindowSystemMenuHint
+    //Qt::WindowMinMaxButtonsHint
+
+    connect(this, SIGNAL(rejected()), this, SLOT(close()));
 }
 

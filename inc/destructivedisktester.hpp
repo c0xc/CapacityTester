@@ -22,10 +22,11 @@
 #define DESTRUCTIVEDISKTESTER_HPP
 
 #include <cassert>
-#include <fcntl.h> //O_RDONLY
-#include <unistd.h> //close()
+#include <ctime>
+#include <random>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <exception>
 
 #include <QtGlobal> //Q_OS_...
 
@@ -40,6 +41,13 @@
 #include <QFileInfo>
 #include <QPointer>
 #include <QStorageInfo>
+#include <QSemaphore>
+#include <QMutex>
+#include <QThread>
+#include <QTimer>
+#include <QCryptographicHash>
+#include <QtConcurrent>
+#include <QFuture>
 
 #include "storagediskselection.hpp"
 #include "classlogger.hpp"
@@ -69,6 +77,18 @@ class DestructiveDiskTester : public QObject
 {
     Q_OBJECT
 
+    struct MChunkPattern
+    {
+        QByteArray block;
+        QByteArray hash;
+
+        MChunkPattern();
+        MChunkPattern(const QByteArray &bytes);
+
+        QByteArray
+        toByteArray();
+    };
+
 signals:
 
     void
@@ -78,10 +98,10 @@ signals:
     startFailed();
 
     void
-    written(qint64 bytes, double avg_speed = 0);
+    written(qint64 pos, double avg_speed = 0, double current_speed = 0);
 
     void
-    verified(qint64 bytes, double avg_speed = 0);
+    verified(qint64 pos, double avg_speed = 0, double current_speed = 0);
 
     void
     writeFailed(qint64 start);
@@ -124,6 +144,9 @@ public:
     static bool
     amIRoot();
 
+    static QByteArray
+    generateRandomBytes0(int pattern_size);
+
     DestructiveDiskTester(const QString &dev_path);
 
     ~DestructiveDiskTester();
@@ -147,6 +170,21 @@ public:
     bool
     isValid();
 
+    bool
+    isFastMode();
+
+    bool
+    isFullMode();
+
+    void
+    setFullMode();
+
+    bool
+    useDirectIO();
+
+    void
+    setLimitGb(int limit);
+
 public slots:
 
     void
@@ -155,19 +193,90 @@ public slots:
     void
     cancel();
 
+private slots:
+
     bool
     runGBSteps();
 
     bool
     runGBSteps(int phase);
 
+    bool
+    runFullTest();
+
+    bool
+    runFullWrite();
+
+    bool
+    runFullRead();
+
+protected:
+
+    bool
+    m_mode_full;
+
 private:
 
-    QByteArray
-    generateTestPattern(int pattern_size);
+    enum RandomGenerator 
+    {
+        default_random_engine = 0,
+        minstd_rand0 = 1,
+        minstd_rand = 2,
+        mt19937 = 3,
+        mt19937_64 = 4,
+        ranlux24_base = 5,
+        ranlux48_base = 6,
+        ranlux24 = 7,
+        ranlux48 = 8,
+        knuth_b = 9,
+    };
+
+    template <typename RNG>
+    static QByteArray
+    generateRandomBytes(int count, const QString &src);
+
+    static QByteArray
+    generateRandomBytes(int count, RandomGenerator rng, const QString &src = "default");
 
     QByteArray
-    blockPattern(int block);
+    generateRandomBytes(int count);
+
+    template <typename RNG>
+    static qint64
+    testRandomGenerator(const QString &name);
+
+    void
+    initRandomBenchmark();
+
+    QByteArray
+    indexedBlockPattern(qint64 block, QByteArray *pattern_ptr = 0);
+
+    MChunkPattern
+    fullChunkPattern(qint64 index = -1);
+
+    MChunkPattern
+    fullChunkPattern1(qint64 index);
+
+    MChunkPattern
+    fullChunkPattern2();
+
+    QVariantList
+    fullChunkPattern10VariantList(qint64 start_index);
+
+    QList<MChunkPattern>
+    reqFullChunkPatterns(int count);
+
+    MChunkPattern
+    getFullChunkPattern(qint64 index);
+
+    static QByteArray
+    calcRawHash(const QByteArray &block);
+
+    bool
+    initBlockBuffer();
+
+    bool
+    openFD(bool sync);
 
     bool
     openFD();
@@ -178,11 +287,26 @@ private:
     bool
     reopen();
 
+    void
+    sync();
+
     bool
     seekFD(qint64 offset);
 
     QByteArray
-    readData(int size);
+    readBlocks(int size = 0);
+
+    QByteArray
+    readData(int size = 0);
+
+    bool
+    writeBlocks(const char *bytes, qint64 size);
+
+    bool
+    writeBlocks(const QByteArray &data);
+
+    bool
+    writeBlock(const char *bytes = 0);
 
     bool
     writeData(const QByteArray &data);
@@ -191,7 +315,7 @@ private:
     m_dev_path;
 
     int
-    m_fd; //TODO
+    m_fd;
 
     QSharedPointer<StorageDiskSelection::Device>
     m_device;
@@ -207,6 +331,9 @@ private:
 
     qint64
     m_size;
+
+    qint64
+    m_num_blocks;
     
     bool
     m_stop_req;
@@ -217,14 +344,30 @@ private:
     bool
     m_use_fsync;
 
-    QByteArray
-    m_test_pattern_0;
+    bool
+    m_direct_io;
+
+    int
+    m_limit_gb;
 
     QByteArray
-    m_test_pattern_n;
+    m_block_pattern_n;
 
-    //QElapsedTimer
-    //m_tmr;
+    QQueue<MChunkPattern>
+    patterns_q;
+
+    QVector<QByteArray>
+    m_chunk_hashes;
+
+    QMap<RandomGenerator, qint64>
+    m_rng_time;
+
+    RandomGenerator
+    m_sel_rng;
+
+    QString
+    m_sel_src;
+
 
 
 

@@ -41,11 +41,11 @@ DiskTestWindow::DiskTestWindow(QWidget *parent)
     //not supported: font-variant-caps: small-caps;
     QHBoxLayout *hbox_top = new QHBoxLayout;
     vbox->addLayout(hbox_top);
-    QLabel *lbl_title = new QLabel(tr("Capacity Tester"));
+    QLabel *lbl_title = new QLabel("Capacity Tester");
     lbl_title->setStyleSheet("font-weight:800; font-family:'Prompt', sans-serif; color:black; font-size:30pt; font-style:italic;");
     //"font-family:'Prompt', sans-serif; color:black; font-size:30pt; font-style:italic;"
     hbox_top->addWidget(lbl_title);
-    QLabel *lbl_title_by = new QLabel(tr("by c0xc"));
+    QLabel *lbl_title_by = new QLabel("by c0xc");
     lbl_title_by->setStyleSheet("font-weight:italic; font-family:roboto; color:lightgray; font-size:8pt;");
     hbox_top->addWidget(lbl_title_by, 0, Qt::AlignBottom);
     QFrame *hline1 = new QFrame;

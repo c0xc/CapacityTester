@@ -1296,7 +1296,7 @@ CapacityTesterGui::initialized(qint64 size, double avg_speed)
     Q_UNUSED(avg_speed);
 
     //Initialized MB (progress)
-    int initialized_mb = size;
+    qint64 initialized_mb = size;
     pro_initializing->setValue(initialized_mb);
 
 }
@@ -1337,7 +1337,7 @@ void
 CapacityTesterGui::writeFailed(qint64 start)
 {
     //MB
-    int start_mb = start;
+    qint64 start_mb = start;
 
     //Result - ERROR
     txt_result->setPlainText(tr("WRITE ERROR AFTER %1 MB!").arg(start_mb));
@@ -1349,7 +1349,7 @@ void
 CapacityTesterGui::verifyFailed(qint64 start)
 {
     //MB
-    int start_mb = start;
+    qint64 start_mb = start;
 
     //Result - ERROR
     txt_result->setPlainText(tr("READ ERROR AFTER %1 MB!").arg(start_mb));
@@ -1361,7 +1361,7 @@ void
 CapacityTesterGui::written(qint64 written, double avg_speed)
 {
     //MB
-    int written_mb = written;
+    qint64 written_mb = written;
     pro_writing->setValue(written_mb);
 
     //Speed
@@ -1373,7 +1373,7 @@ void
 CapacityTesterGui::verified(qint64 read, double avg_speed)
 {
     //MB
-    int read_mb = read;
+    qint64 read_mb = read;
     pro_verifying->setValue(read_mb);
 
     //Speed

@@ -269,7 +269,13 @@ DiskTestWindow::startTest()
     QPointer<DestructiveDiskTester> dd_worker = gui->startDiskTest(m_dev_path);
     if (!dd_worker) return;
     m_dd_worker = dd_worker;
+    m_wr_err = -1;
+    m_rd_err = -1;
     m_ddt_phase = 0;
+    connect(m_dd_worker.data(), SIGNAL(writeFailed(qint64)),
+            this, SLOT(writeFailed(qint64)));
+    connect(m_dd_worker.data(), SIGNAL(verifyFailed(qint64)),
+            this, SLOT(readFailed(qint64)));
 
     //Configure worker
     m_graph_write = 0;
@@ -345,6 +351,18 @@ DiskTestWindow::startTestPhase(int phase)
 }
 
 void
+DiskTestWindow::writeFailed(qint64 pos)
+{
+    m_wr_err = pos;
+}
+
+void
+DiskTestWindow::readFailed(qint64 pos)
+{
+    m_rd_err = pos;
+}
+
+void
 DiskTestWindow::handleTestFinished(bool success)
 {
     double size_g = Size(m_claimed_capacity).gb();
@@ -374,7 +392,7 @@ DiskTestWindow::handleTestFinished(bool success)
     {
         //Bad disk detected
         m_lbl_phase->setText(tr("FAKE DETECTED"));
-        qint64 err_at_m = m_wr_err ? m_wr_err > -1 : m_rd_err; //> -1 M (pos)
+        qint64 err_at_m = m_wr_err > -1 ? m_wr_err : m_rd_err; //> -1 M (pos)
         qint64 err_at_g = 0;
         if (err_at_m > -1) //if -1, failed signal with position didn't work
         {

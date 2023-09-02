@@ -81,6 +81,12 @@ private slots:
     startTestPhase(int phase);
 
     void
+    writeFailed(qint64 pos);
+
+    void
+    readFailed(qint64 pos);
+
+    void
     handleTestFinished(bool success);
 
 private:

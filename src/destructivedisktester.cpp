@@ -814,9 +814,12 @@ QByteArray
 DestructiveDiskTester::generateRandomBytes(int count, const QString &src)
 {
     //Get random number generator, static (per thread)
+    //Use default source for random bytes (/dev/urandom)
+    //On AMD Phenom(tm) II X6 1100T, ctor arg "default": unsupported token
+    //using default-constructed instance instead
+    thread_local std::random_device rd; //src.toUtf8().constData()
     //std::mt19937 is a fast generator, but minstd_rand may be even faster
     //taus88 is said to be very fast
-    thread_local std::random_device rd(src.toUtf8().constData());
     thread_local RNG gen(rd());
 
     //Generate random bytes
@@ -892,21 +895,24 @@ DestructiveDiskTester::testRandomGenerator(const QString &name)
 void
 DestructiveDiskTester::initRandomBenchmark()
 {
-    Debug(QS("testing rng..."));
+    Debug(QS("running rng benchmark..."));
 
     //Check availability of rng source
+    //On AMD Phenom(tm) II X6 1100T, ctor arg "default": unsupported token
+    //See generateRandomBytes()
     QString src;
     try
     {
         std::random_device("hw");
         src = "hw"; //use hardware source
-        Debug(QS("selecting hardware source for rng"));
+        //Debug(QS("selecting hardware source for rng"));
     }
     catch (std::exception &e)
     {
         //continue with default, pass
     }
     m_sel_src = src;
+    //Debug(QS("using random device src: %s", src.isEmpty() ? "default" : src.toUtf8().constData()));
 
     //Name mapping
     QMap<RandomGenerator, QString> rng_name_map;
@@ -942,7 +948,7 @@ DestructiveDiskTester::initRandomBenchmark()
     //Save results
     m_rng_time = rng_time;
     m_sel_rng = ns_rng_map.first();
-    Debug(QS("testing complete - using %s generator from now on", rng_name_map[m_sel_rng].toUtf8().constData()));
+    Debug(QS("benchmark complete - using %s generator from now on", rng_name_map[m_sel_rng].toUtf8().constData()));
 
 }
 

@@ -257,6 +257,8 @@ DiskTestWindow::startTest()
     m_lbl_finish_desc = new QLabel;
     m_lbl_finish_desc->setWordWrap(true);
     vbox->addWidget(m_lbl_finish_desc);
+    //: Alternative label: "TEST IN PROGRESS", ("TEST RUNNING")
+    m_lbl_phase->setText(tr("TESTING"));
 
     //Start disk test worker
     //TODO ugly HACK using GUI

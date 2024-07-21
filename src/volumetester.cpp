@@ -340,11 +340,11 @@ const
     foreach (QFileInfo fi, entryInfoList())
     {
         QString name = fi.fileName();
-        if (fi.isDir()) name += "/";
 
         if (default_things.contains(name)) continue;
         if (fi.isHidden()) continue;
 
+        if (fi.isDir()) name += "/";
         file_name_list << name;
     }
 
@@ -1002,8 +1002,11 @@ const
 
 bool
 VolumeTester::abortRequested()
-const
 {
+    if (thread()->isInterruptionRequested())
+    {
+        cancel(); //sets error_type, _canceled
+    }
     return _canceled;
 }
 

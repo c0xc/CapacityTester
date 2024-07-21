@@ -42,6 +42,7 @@
 #include <QStorageInfo>
 #include <QPointer>
 #include <QElapsedTimer>
+#include <QThread>
 
 #define USE_FSYNC
 #ifdef NO_FSYNC
@@ -301,7 +302,7 @@ private:
     blockData(int file_index, int block_index) const;
 
     bool
-    abortRequested() const;
+    abortRequested();
 
     qint64
     block_size_max;

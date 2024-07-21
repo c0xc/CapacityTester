@@ -33,6 +33,8 @@
 #if !defined(Q_OS_WIN)
 #include <linux/fs.h> //BLKGETSIZE64
 #include <sys/ioctl.h>
+//#include <sys/types.h>
+#include <signal.h> //kill()
 #endif
 
 #include <QObject>
@@ -95,7 +97,10 @@ signals:
     started(qint64 total);
 
     void
-    startFailed();
+    startFailed(const QString &error_msg = "");
+
+    void
+    filesystemUnmounted(const QString &mountpoint);
 
     void
     written(qint64 pos, double avg_speed = 0, double current_speed = 0);
@@ -110,7 +115,7 @@ signals:
     verifyFailed(qint64 start);
 
     void
-    finished(bool success = false);
+    finished(int result = 1);
 
 public:
 
@@ -151,6 +156,9 @@ public:
 
     ~DestructiveDiskTester();
 
+    void
+    setParentPid(unsigned int pid);
+
     qint64
     getCapacity();
 
@@ -185,13 +193,22 @@ public:
     void
     setLimitGb(int limit);
 
+    bool
+    prepareDevice(QString *error_msg_ptr = 0);
+
+    bool
+    postResetDevice();
+
+    qint64
+    elapsed();
+
 public slots:
 
     void
     start();
 
-    void
-    cancel();
+    virtual void
+    cancel(bool force_quit = false);
 
 private slots:
 
@@ -311,6 +328,12 @@ private:
     bool
     writeData(const QByteArray &data);
 
+    bool
+    checkParentPid();
+
+    unsigned int
+    m_parent_pid = 0;
+
     QString
     m_dev_path;
 
@@ -334,8 +357,8 @@ private:
 
     qint64
     m_num_blocks;
-    
-    bool
+
+    std::atomic<bool>
     m_stop_req;
 
     bool
@@ -368,7 +391,8 @@ private:
     QString
     m_sel_src;
 
-
+    QElapsedTimer
+    m_total_timer;
 
 
 };

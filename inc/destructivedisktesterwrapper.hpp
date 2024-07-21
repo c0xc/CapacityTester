@@ -55,8 +55,10 @@ signals:
     void
     verifyFailed(qint64 start);
 
+    //void
+    //finished(bool success = false);
     void
-    finished(bool success = false);
+    finished(int result);
 
     void
     gotError(const QString &err);
@@ -76,7 +78,7 @@ public slots:
     start();
 
     void
-    cancel();
+    cancel(bool force_quit = false);
 
 private slots:
 
@@ -105,6 +107,9 @@ private:
 
     bool
     m_finished;
+
+    int
+    m_result = -1;
 
     QTimer
     *m_tmr_status;

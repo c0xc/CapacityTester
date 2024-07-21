@@ -69,25 +69,29 @@ private:
     QTextStream
     err;
 
-    //QTextStream
-    //in;
-    QFile
-    *in_file;
+    QFile //not QTextStream, see watchStdinSignal()
+    *m_in_file;
 
     bool
-    is_yes;
+    m_is_yes;
 
     int
-    safety_buffer;
+    m_safety_buffer;
+
+    int
+    m_parent_pid = 0;
 
     QPointer<VolumeTester>
-    worker;
+    m_worker;
+
+    QPointer<DestructiveDiskTester>
+    m_dd_worker;
 
     qint64
-    total_mb;
+    m_total_mb;
 
     bool
-    full_ddt_mode;
+    m_full_ddt_mode;
 
     QElapsedTimer
     tmr_total_test_time;
@@ -111,6 +115,9 @@ private slots:
 
     void
     close();
+
+    void
+    terminate(bool force_quit);
 
     void
     watchStdinSignal();
@@ -182,7 +189,7 @@ private slots:
     diskVerifyFailed(qint64 size);
 
     void
-    completedDiskTest(bool success);
+    completedDiskTest(int result);
 
 };
 

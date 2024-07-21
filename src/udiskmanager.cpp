@@ -214,6 +214,28 @@ UDiskManager::isUsbDevice(const QString &device)
     return connection_bus == "usb";
 }
 
+bool
+UDiskManager::isLoopDevice(const QString &device)
+{
+    QString loop_if = "org.freedesktop.UDisks2.Loop"; //interface for loop section
+
+    bool failed = false;
+    getVariant(deviceDbusPath(device), loop_if, "SetupByUID", &failed);
+
+    return !failed;
+}
+
+bool
+UDiskManager::isSwapDevice(const QString &device)
+{
+    QString swap_if = "org.freedesktop.UDisks2.Swapspace"; //interface for swap section
+
+    bool failed = false;
+    getVariant(deviceDbusPath(device), swap_if, "Active", &failed);
+
+    return !failed;
+}
+
 QString
 UDiskManager::idLabel(const QString &device)
 {
@@ -397,21 +419,72 @@ UDiskManager::partitions(bool dbus_path, bool fs_only)
 }
 
 QStringList
-UDiskManager::partitionDevices(const QString &device, bool dbus_path)
+UDiskManager::partitionDevices(const QString &device, bool dbus_path, PartitionTableInfo *table_info)
 {
     QStringList sub_devices; //list of partitions in device
+    QString partitiontable_if = "org.freedesktop.UDisks2.PartitionTable"; //interface for partitiontable section
+    QString partition_if = "org.freedesktop.UDisks2.Partition"; //interface for partition section
+    QString filesystem_if = "org.freedesktop.UDisks2.Filesystem"; //interface for filesystem section
+
+    //Check partition table of device
+    //If table_info is a valid pointer to a PartitionTableInfo object (owned by the caller, on stack),
+    //the function will fill in the type of the partition table and the partitions.
+    if (table_info)
+    {
+        //Return if this device is not partitioned
+        if (getVariant(device, partitiontable_if, "Type").isValid())
+            return sub_devices;
+        table_info->type = getVariant(device, partitiontable_if, "Type").toString();
+    }
 
     //The property called Partitions contains an array of dbus path objects
     //For example: /org/freedesktop/UDisks2/block_devices/sda1
-    QString partitiontable_if = "org.freedesktop.UDisks2.PartitionTable"; //interface for partitiontable section
     QDBusInterface &iface = dbusInterface(deviceDbusPath(device), partitiontable_if);
     QVariant v_partitions = iface.property("Partitions");
     QList<QDBusObjectPath> obj_list = qvariant_cast<QList<QDBusObjectPath>>(v_partitions);
     foreach (const QDBusObjectPath &o, obj_list)
     {
-        QString dev = o.path();
+        //Resolve dbus path to device name
+        QString dev_path = o.path();
+        QString dev = dev_path;
         if (!dbus_path) dev = dev.section('/', -1);
         sub_devices << dev;
+
+        //Fill in partition info, if requested
+        if (table_info)
+        {
+            PartitionInfo part_info{}; //zero-initialize
+            part_info.path = dev_path;
+            part_info.number = getVariant(dev_path, partition_if, "Number").toUInt();
+            part_info.start = getVariant(dev_path, partition_if, "Offset").toULongLong();
+            part_info.size = getVariant(dev_path, partition_if, "Size").toULongLong();
+
+            //Check if partition has a filesystem
+            bool has_fs_ifc = false; //dbusInterface(deviceDbusPath(dev), filesystem_if).isValid();
+            bool failed = false;
+            //If it contains no filesystem, it won't have a Filesystem interface, causing this error:
+            //"No such interface “org.freedesktop.UDisks2.Filesystem”"
+            //error().type() == QDBusError::InvalidArgs
+            getVariant(dev_path, filesystem_if, "Size", &failed);
+            if (!failed) has_fs_ifc = true;
+            part_info.fs = has_fs_ifc;
+            if (has_fs_ifc)
+            {
+                //Note that some filesystems like exfat may report a size of 0
+                //> Currently limited to xfs and ext filesystems only. 
+                part_info.fs_size = getVariant(dev_path, filesystem_if, "Size").toULongLong();
+            }
+            table_info->partitions << part_info;
+        }
+    }
+
+    //Sort partitions by number (unfortunately, they are not sorted by default)
+    if (table_info)
+    {
+        std::sort(table_info->partitions.begin(), table_info->partitions.end(), [](const PartitionInfo &a, const PartitionInfo &b)
+        {
+            return a.number < b.number;
+        });
     }
 
     return sub_devices;
@@ -588,6 +661,44 @@ UDiskManager::createPartition(const QString &device, const QString &type, QStrin
 }
 
 QString
+UDiskManager::findDeviceDBusPath(const QString &device)
+{
+    //Dbus does not use the real path to the device file
+    //For example, the device "sda" (which would be at /dev/sda):
+    // /org/freedesktop/UDisks2/block_devices/sda
+    //The other function accepts sda1 only because it happens to be the same base name
+    //as the corresponding dbus path, but doesn't resolve /dev/sda or anything.
+    //This function is meant to be used with /dev/sda or sda1.
+
+    //Check if it's already an internal path, handle that too
+    bool is_dbus_path = device.startsWith("/org/freedesktop/UDisks2/block_devices/");
+
+    //Resolve path if it's a symlink
+    QString path = device;
+    if (QFileInfo(path).isSymLink())
+        path = QFileInfo(path).symLinkTarget();
+
+    //Make sure it's a device file
+    //Note this isn't really necessary because we only return a valid matching dbus path
+    //struct stat path_stat;
+    //if (stat(path.toStdString().c_str(), &path_stat) != 0)
+    //    return ""; // stat failed, return empty string
+    //if (!S_ISBLK(path_stat.st_mode))
+    //    return ""; // not a block device, return empty string
+
+    //Find device in list of block devices
+    foreach (QString dev, blockDevices(true))
+    {
+        if (is_dbus_path && dev == device)
+            return dev;
+        if (deviceFilePath(dev) == path)
+            return dev;
+    }
+
+    return "";
+}
+
+QString
 UDiskManager::deviceDbusPath(const QString &name)
 {
     //Dbus does not use the real path to the device file
@@ -628,7 +739,7 @@ UDiskManager::dbusInterface(const QString &path, const QString &interface)
 }
 
 QVariant
-UDiskManager::getVariant(const QString &path, const QString &interface, const QString &prop)
+UDiskManager::getVariant(const QString &path, const QString &interface, const QString &prop, bool *failed_ptr, QDBusError *dbus_error_ptr)
 {
     //Call "Get" method through D-Bus interface
     //on object with specified D-Bus path (path)
@@ -638,6 +749,10 @@ UDiskManager::getVariant(const QString &path, const QString &interface, const QS
     QString prop_if = "org.freedesktop.DBus.Properties"; //D-Bus interface for properties
     QDBusInterface &iface = dbusInterface(path, prop_if);
     QDBusReply<QVariant> reply = iface.call("Get", interface, prop);
+    if (failed_ptr)
+        *failed_ptr = reply.error().isValid();
+    if (dbus_error_ptr)
+        *dbus_error_ptr = reply.error();
     return reply.value();
 }
 

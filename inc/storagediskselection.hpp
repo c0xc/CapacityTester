@@ -17,6 +17,12 @@
 ** You should have received a copy of the GNU General Public License
 ** along with CapacityTester. If not, see <http://www.gnu.org/licenses/>.
 **
+****************************************************************************
+** NOTICE: The copyright notice including the name of the author (Philip Seeger)
+** must be preserved in all copies or substantial portions of the software. 
+** If you use this module in another project, an acknowledgment in the product 
+** documentation or a visible attribution in the software itself would be 
+** appreciated.
 ****************************************************************************/
 
 #ifndef STORAGEDISKSELECTION_HPP
@@ -127,12 +133,46 @@ public:
         QString msg;
     };
 
+    enum class PartitionTableType
+    {
+        Unknown = 0,
+        MBR = 1 << 1,
+        GPT = 1 << 2
+    };
+
+    struct PartitionGeometry
+    {
+        quint64
+        start;
+
+        quint64
+        size;
+
+        int
+        number;
+    };
+
+    struct FilesystemInfo
+    {
+        QString
+        type;
+
+        QString
+        path;
+
+        QString
+        mountpoint;
+
+        quint64
+        _part_start;
+    };
+
     class Device;
 
     /*
      * The Access/Enumerator object contains the logic to scan
      * the system for block devices.
-     * The Enumerator instance that was used to list the devices on the system
+     * An Enumerator instance that was used to list the devices on the system
      * will remain in the background until the last Device object
      * goes out of scope.
      */
@@ -273,6 +313,50 @@ public:
         bool
         readBlock(char *bytes);
 
+        PartitionTableType
+        partitionTableType();
+
+        QList<PartitionGeometry>
+        partitions();
+
+        PartitionGeometry
+        partition(int number);
+
+        QList<FilesystemInfo>
+        filesystems();
+
+        int
+        partitionNumberOfFilesystem(const QString &filesystem_path);
+
+        /**
+         * @brief Attempts to determine the first mountpoint of the first filesystem on the device.
+         * 
+         * Note that this will return the first mountpoint that is found, which may not be the
+         * mountpoint of the first partition.
+         * The optional parameter mountpoints_ptr will be filled with all mountpoints found,
+         * however only one mountpoint per filesystem is returned.
+         * 
+         * @return QString 
+         */
+        QString
+        mountpoint(QStringList *mountpoints_ptr = 0);
+
+    //public slots: //not a QObject
+
+        /**
+         * @brief Attempts to mount the specified filesystem.
+         * 
+         * @param filesystem_path like /dev/sda1, refer to the result of filesystems()
+         * @param message_ref 
+         * @return true 
+         * @return false 
+         */
+        bool
+        mount(const QString &dev_path, QString *message_ref = 0);
+
+        bool
+        unmount(const QString &dev_path, QString *message_ref = 0);
+
     private:
 
         friend class StorageDiskSelection; //for Device() ctor
@@ -296,13 +380,19 @@ public:
         HANDLE
         m_win_handle;
 
+        QString
+        m_win_instance;
+
         HANDLE
-        driveHandle();
+        driveHandle(bool temporary = false);
 
         bool
         checkWinDevDescProps(QString *description_ptr = 0);
 
-#endif
+        int
+        deviceNumber();
+
+#endif //end of Windows
 
     };
 

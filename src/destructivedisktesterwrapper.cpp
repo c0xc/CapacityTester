@@ -19,7 +19,7 @@ DestructiveDiskTesterWrapper::DestructiveDiskTesterWrapper(const QString &dev_pa
     m_rx_start_err = QRegExp("^\\[start\\].*(failed)");
     m_rx_progress = QRegExp("^\\[(\\w+)\\].*progress.*(\\d+[.]\\d+)%.*\\s@(\\d+)M; ([\\d.]+)M/s avg");
     m_rx_progress_err = QRegExp("^\\[(\\w+)\\].*failed.*@(\\d+)M");
-    m_rx_finished = QRegExp("^\\[done\\] (success|failed)");
+    m_rx_finished = QRegExp("^\\[done\\] (success|failed|res:\s*(-?\\d+))");
 
     //NOTE this wrapper is Linux-only, it uses pkexec (sudo)
 
@@ -27,9 +27,13 @@ DestructiveDiskTesterWrapper::DestructiveDiskTesterWrapper(const QString &dev_pa
 
 DestructiveDiskTesterWrapper::~DestructiveDiskTesterWrapper()
 {
+    //QProcess: Destroyed while process ("pkexec") is still running.
     if (m_proc)
     {
+        Debug(QS("destroying wrapper, killing process \"%s\"...", CSTR(m_proc->program())));
         m_proc->kill();
+        m_proc->waitForFinished(-1); //wait until process is terminated (blocking)
+        //Wait, prevent defunct process...
     }
 }
 
@@ -91,6 +95,7 @@ DestructiveDiskTesterWrapper::start()
     args << "--destructive-test";
     args << "--device" << m_dev_path;
     if (m_mode_full) args << "--full-test-mode";
+    args << "--parent-pid" << QString::number(QCoreApplication::applicationPid());
     m_proc->setArguments(args);
     Debug(QS("starting wrapper: %s", args.join(" ").toUtf8().constData()));
 
@@ -99,21 +104,35 @@ DestructiveDiskTesterWrapper::start()
 }
 
 void
-DestructiveDiskTesterWrapper::cancel()
+DestructiveDiskTesterWrapper::cancel(bool force_quit)
 {
     if (!m_proc) return;
+    Debug(QS("stop request - canceling process, force quit: %d", force_quit));
 
     //Before terminating the process gracefully, we send a custom signal
     //This signal will make it close, quit
     //We cannot send SIGTERM/SIGKILL to the process if it's running as root!
-    m_proc->write("QUIT\n"); //send custom quit signal
-    m_proc->close(); //this alone may not work while the process is busy
+    if (!force_quit)
+    {
+        //This is the only way to terminate the process gracefully
+        //We cannot send SIGTERM/SIGKILL to the process if it's running as root!
+        //The process will still be running, but it will close itself
+        //when it receives the quit signal
+        m_proc->write("QUIT\n"); //send custom quit signal
+    }
+    else
+    {
+        //Send force quit signal (which is not SIGKILL, impossible as root)
+        m_proc->write("QUIT FORCE\n");
+        m_proc->closeWriteChannel(); //close stdin
+    }
 
 }
 
 void
 DestructiveDiskTesterWrapper::checkStatus(const QString &line)
 {
+    Debug(QS("status: %s", CSTR(line)));
 
     QRegExp &rx_start = m_rx_start;
     QRegExp &rx_start_err = m_rx_start_err;
@@ -171,10 +190,12 @@ DestructiveDiskTesterWrapper::checkStatus(const QString &line)
     else if (rx_finished.indexIn(line) != -1)
     {
         bool success = rx_finished.cap(1) == "success";
+        int result = success ? 1 : rx_finished.cap(2).toInt();
         //finish signal is not forwarded yet because process still running
         //instead we mark it as received, it will be forwarded later
         //see checkStateFinished()
         m_finished = success;
+        m_result = result;
     }
 
     //Typical behavior with caching:
@@ -190,8 +211,7 @@ void
 DestructiveDiskTesterWrapper::checkStatus()
 {
     if (!m_proc->canReadLine()) return;
-
-    if (m_started) m_started = true;
+    if (!m_started) m_started = true; //started signal has been emitted
 
     QString line(m_proc->readLine());
     checkStatus(line);
@@ -202,6 +222,7 @@ DestructiveDiskTesterWrapper::checkStateFinished(int rc, QProcess::ExitStatus st
 {
     //Stop status timer which continuously reads from the process
     m_tmr_status->stop();
+    Debug(QS("process finished with rc %d, status %d", rc, status));
 
     //Read stderr and all the rest (in case we need it, in a destroyed/slot)
     //Actually, stderr might be useful for the user (GUI)
@@ -228,13 +249,19 @@ DestructiveDiskTesterWrapper::checkStateFinished(int rc, QProcess::ExitStatus st
     //could be terminated before this finished slot is executed:
     //Destroyed while process is still running.
     bool proc_ok = status == QProcess::NormalExit && rc == 0;
-    emit finished(proc_ok && m_finished);
+    if (m_started)
+        emit finished(m_result);
+    else
+        emit finished(-1);
 }
 
 void
 DestructiveDiskTesterWrapper::checkProcError(QProcess::ProcessError error)
 {
+    Debug(QS("process error: %d", error));
     if (error == QProcess::FailedToStart)
+        emit startFailed();
+    else if (!m_started)
         emit startFailed();
 }
 

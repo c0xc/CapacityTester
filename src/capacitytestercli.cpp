@@ -25,10 +25,10 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
                    app(*qApp),
                    out(stdout, QIODevice::WriteOnly | QIODevice::Unbuffered | QIODevice::Text),
                    err(stderr, QIODevice::WriteOnly | QIODevice::Unbuffered | QIODevice::Text),
-                   is_yes(false),
-                   safety_buffer(-1),
-                   total_mb(0),
-                   full_ddt_mode(false)
+                   m_is_yes(false),
+                   m_safety_buffer(-1),
+                   m_total_mb(0),
+                   m_full_ddt_mode(false)
 {
     //Heading
     out << "CapacityTester" << endl
@@ -37,8 +37,9 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
 
     //Custom signal handler
     //stdin - also used for custom signal, see watchStdinSignal()
-    in_file = new QFile(this);
-    in_file->open(stdin, QIODevice::ReadOnly | QIODevice::Text);
+    m_in_file = new QFile(this);
+    m_in_file->open(stdin, QIODevice::ReadOnly | QIODevice::Text);
+    //QTextStream: No device
 
     //Command line argument parser
     QCommandLineParser parser;
@@ -64,6 +65,8 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
         tr("Changes the size of the safety buffer zone."), "safety-buffer"));
     parser.addOption(QCommandLineOption(QStringList() << "device",
         tr("Path to device to be tested (disk test)."), "device"));
+    parser.addOption(QCommandLineOption(QStringList() << "parent-pid",
+        tr(""), "parent-pid"));
     parser.addOption(QCommandLineOption(QStringList() << "mountpoint",
         tr("Volume to be tested."), "mountpoint"));
     parser.addPositionalArgument("mountpoint",
@@ -94,19 +97,19 @@ CapacityTesterCli::CapacityTesterCli(QObject *parent)
     {
         bool ok;
         int number = str_safety_buffer.toInt(&ok);
-        if (ok) safety_buffer = number;
+        if (ok) m_safety_buffer = number;
     }
 
     //Answer with yes
     if (parser.isSet("yes"))
     {
-        is_yes = true;
+        m_is_yes = true;
     }
     //Options
     if (parser.isSet("full-test-mode"))
-    {
-        full_ddt_mode = true;
-    }
+        m_full_ddt_mode = true;
+    if (parser.isSet("parent-pid"))
+        m_parent_pid = parser.value("parent-pid").toInt(); //default 0 (no parent)
 
     //Run command
     if (parser.isSet("list"))
@@ -144,6 +147,7 @@ CapacityTesterCli::exit(int code)
 void
 CapacityTesterCli::close(int code, int delay)
 {
+    //Schedule delayed exit() == app.exit()
     QTimer *timer = new QTimer;
     timer->setSingleShot(true);
     QSignalMapper *mapper = new QSignalMapper(timer); //deleted with timer
@@ -168,6 +172,56 @@ CapacityTesterCli::close()
 {
     //Close (success)
     close(0);
+}
+
+void
+CapacityTesterCli::terminate(bool force_quit)
+{
+    //Terminate worker and close this program when the worker is done
+    //If force_quit is true, the worker's thread is stopped (its event loop)
+    //This is no guarantee that the worker is stopped immediately,
+    //but note that it would be worse if this wrapper/control process
+    //would end without the worker being stopped, leaving an invisible worker
+    //running in the background forever. So we close only after the worker is gone.
+    if (!force_quit)
+    {
+        //Stop worker
+        if (m_worker)
+        {
+            m_worker->cancel();
+        }
+        if (m_dd_worker)
+        {
+            m_dd_worker->cancel();
+        }
+    }
+    else
+    {
+        //Force quit
+        if (m_worker)
+        {
+            m_worker->cancel();
+            m_worker->thread()->quit();
+        }
+        if (m_dd_worker)
+        {
+            m_dd_worker->cancel();
+            m_dd_worker->thread()->quit();
+        }
+    }
+    //Close after worker
+    if (m_dd_worker)
+    {
+        connect(m_dd_worker,
+                SIGNAL(destroyed()),
+                this,
+                SLOT(close()));
+    }
+    else
+    {
+        //No worker active, close now
+        close();
+    }
 }
 
 void
@@ -212,12 +266,16 @@ CapacityTesterCli::watchStdinSignal()
 void
 CapacityTesterCli::readStdinSignal()
 {
-    QString line = in_file->readLine().trimmed();
+    QString line = m_in_file->readLine().trimmed();
 
+    //Check for QUIT signal
+    //We need to be able to cancel test execution via this signal
+    //as the process is running as root
     if (line.startsWith("QUIT"))
     {
-        out << "ABORT - canceled..." << endl;
-        close();
+        bool force_quit = line.contains("FORCE");
+        out << "ABORT - canceling... force = " << force_quit << endl;
+        terminate(force_quit);
     }
 }
 
@@ -229,7 +287,7 @@ CapacityTesterCli::checkStdinSignal()
     //QTextStream cannot be used to wait for input asynchronously
     //QFile has canReadLine() but it does not work with stdin
     //QSocketNotifier can be used (::Read), but it may not work on Windows
-    if (!in_file->canReadLine()) return;
+    if (!m_in_file->canReadLine()) return;
     //again, this does not work, the code is left here so we don't try it again
     //see above for the routine using the socket notifier
 
@@ -239,7 +297,7 @@ CapacityTesterCli::checkStdinSignal()
 bool
 CapacityTesterCli::confirm()
 {
-    if (is_yes)
+    if (m_is_yes)
     {
         out << "yes" << endl;
         return true;
@@ -248,7 +306,7 @@ CapacityTesterCli::confirm()
     QString yn;
     do
     {
-        yn = in_file->readLine().trimmed().toLower();
+        yn = m_in_file->readLine().trimmed().toLower();
 
         if (yn == "yes")
             return true;
@@ -395,7 +453,7 @@ CapacityTesterCli::startVolumeTest(const QString &mountpoint)
 {
     //Volume
     VolumeTester tester(mountpoint);
-    tester.setSafetyBuffer(safety_buffer); //for calculation only
+    tester.setSafetyBuffer(m_safety_buffer); //for calculation only
     if (!tester.isValid())
     {
         err << "The specified volume is not valid." << endl;
@@ -426,83 +484,83 @@ CapacityTesterCli::startVolumeTest(const QString &mountpoint)
     }
 
     //Worker
-    worker = new VolumeTester(mountpoint);
-    worker->setSafetyBuffer(safety_buffer);
+    m_worker = new VolumeTester(mountpoint);
+    m_worker->setSafetyBuffer(m_safety_buffer);
 
     //Thread for worker
     QThread *thread = new QThread;
-    worker->moveToThread(thread);
+    m_worker->moveToThread(thread);
 
     //Start worker when thread starts
     connect(thread,
             SIGNAL(started()),
-            worker,
+            m_worker,
             SLOT(start()));
 
     //Initialization started
-    connect(worker,
+    connect(m_worker,
             SIGNAL(initializationStarted(qint64)),
             this,
             SLOT(initializationStarted(qint64)));
 
     //Block initialized
-    connect(worker,
+    connect(m_worker,
             SIGNAL(initialized(qint64, double)),
             this,
             SLOT(initialized(qint64, double)));
 
     //Written
-    connect(worker,
+    connect(m_worker,
             SIGNAL(written(qint64, double)),
             this,
             SLOT(written(qint64, double)));
 
     //Verified
-    connect(worker,
+    connect(m_worker,
             SIGNAL(verified(qint64, double)),
             this,
             SLOT(verified(qint64, double)));
 
     //Write started
-    connect(worker,
+    connect(m_worker,
             SIGNAL(writeStarted()),
             this,
             SLOT(writeStarted()));
 
     //Verify started
-    connect(worker,
+    connect(m_worker,
             SIGNAL(verifyStarted()),
             this,
             SLOT(verifyStarted()));
 
     //Test failed handler (after write/verify failed, with delay)
-    connect(worker,
+    connect(m_worker,
             SIGNAL(failed(int)),
             this,
             SLOT(failedVolumeTest(int)));
 
     //Test succeeded handler
-    connect(worker,
+    connect(m_worker,
             SIGNAL(succeeded()),
             this,
             SLOT(succeededVolumeTest()));
 
     //Test completed handler (successful or not)
-    connect(worker,
+    connect(m_worker,
             SIGNAL(finished(bool, int)),
             this,
             SLOT(completedVolumeTest(bool, int)));
 
     //Stop thread when worker done (stops event loop -> thread->finished())
-    connect(worker,
+    connect(m_worker,
             SIGNAL(finished()),
             thread,
             SLOT(quit()));
 
     //Delete worker when done
-    connect(worker,
+    connect(m_worker,
             SIGNAL(finished()),
-            worker,
+            m_worker,
             SLOT(deleteLater()));
 
     //Delete thread when thread done (event loop stopped)
@@ -526,10 +584,10 @@ bool
 CapacityTesterCli::stopVolumeTest()
 {
     //No action if no test running
-    if (!worker) return false;
+    if (!m_worker) return false;
 
     //Set stop flag
-    worker->cancel();
+    m_worker->cancel();
 
     return true; //stop requested
 }
@@ -596,7 +654,7 @@ CapacityTesterCli::completedVolumeTest(bool success, int error_type)
 void
 CapacityTesterCli::initializationStarted(qint64 total)
 {
-    total_mb = total;
+    m_total_mb = total;
 
     out << endl;
     out << "Initializing...\t";
@@ -612,7 +670,7 @@ CapacityTesterCli::initialized(qint64 size, double avg_speed)
 
     //Initialized MB (progress)
     int initialized_mb = size;
-    int p = ((double)initialized_mb / total_mb) * 100;
+    int p = ((double)initialized_mb / m_total_mb) * 100;
 
     //Print progress
     QString str_p = QString("%1%").arg(p).rightJustified(4);
@@ -652,7 +710,7 @@ CapacityTesterCli::written(qint64 written, double avg_speed)
 {
     //MB
     int written_mb = written;
-    int p = ((double)written_mb / total_mb) * 100;
+    int p = ((double)written_mb / m_total_mb) * 100;
 
     //Print progress
     QString str_p = QString("%1%").arg(p).rightJustified(4);
@@ -673,7 +731,7 @@ CapacityTesterCli::verified(qint64 read, double avg_speed)
 {
     //MB
     int read_mb = read;
-    int p = ((double)read_mb / total_mb) * 100;
+    int p = ((double)read_mb / m_total_mb) * 100;
 
     //Print progress
     QString str_p = QString("%1%").arg(p).rightJustified(4);
@@ -720,7 +778,9 @@ CapacityTesterCli::startDiskTest(const QString &device)
     //Initialize worker
     QPointer<DestructiveDiskTester> worker;
     worker = new DestructiveDiskTester(device);
-    if (full_ddt_mode) worker->setFullMode();
+    if (m_full_ddt_mode) worker->setFullMode();
+    worker->setParentPid(m_parent_pid);
+    m_dd_worker = worker;
 
     //Thread for worker
     QThread *thread = new QThread;
@@ -760,9 +820,9 @@ CapacityTesterCli::startDiskTest(const QString &device)
 
     //Test completed handler (successful or not)
     connect(worker,
-            SIGNAL(finished(bool)),
+            SIGNAL(finished(int)),
             this,
-            SLOT(completedDiskTest(bool)));
+            SLOT(completedDiskTest(int)));
 
     //Stop thread when worker done (stops event loop -> thread->finished())
     connect(worker,
@@ -824,9 +884,9 @@ CapacityTesterCli::startDiskTest(const QString &device)
 void
 CapacityTesterCli::startedDiskTest(qint64 total)
 {
-    total_mb = total;
+    m_total_mb = total;
 
-    out << QString("[start] total=%1M").arg(total_mb);
+    out << QString("[start] total=%1M").arg(m_total_mb);
     out << endl;
 
 }
@@ -835,7 +895,7 @@ void
 CapacityTesterCli::diskWritten(qint64 size, double avg)
 {
     qint64 progress_mb = size;
-    double percentage = std::div(progress_mb * 100, total_mb).quot;
+    double percentage = std::div(progress_mb * 100, m_total_mb).quot;
 
     //Print progress
     //this format will be parsed by the DestructiveDiskTesterWrapper
@@ -858,7 +918,7 @@ void
 CapacityTesterCli::diskVerified(qint64 size, double avg)
 {
     qint64 progress_mb = size;
-    double percentage = std::div(progress_mb * 100, total_mb).quot;
+    double percentage = std::div(progress_mb * 100, m_total_mb).quot;
 
     //see diskWritten()
     QString str_p = QString("%1%").arg(percentage, 0, 'f', 2);
@@ -877,9 +937,9 @@ CapacityTesterCli::diskVerifyFailed(qint64 size)
 }
 
 void
-CapacityTesterCli::completedDiskTest(bool success)
+CapacityTesterCli::completedDiskTest(int result)
 {
-    if (success)
+    if (result == 1)
     {
         out << "[done] success";
         out << endl;
@@ -888,7 +948,7 @@ CapacityTesterCli::completedDiskTest(bool success)
     }
     else
     {
-        out << "[done] failed";
+        out << "[done] res: " << result;
         out << endl;
 
         close(9); //error

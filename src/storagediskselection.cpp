@@ -22,6 +22,9 @@
 #define DEFINE_SDS_INC
 #include "storagediskselection.hpp"
 
+//The compiler macros are not indented to match the coding style of the project
+//and because they're interpreted by the preprocessor, not the compiler.
+
 StorageDiskSelection::Access::Access()
 {
 #if defined(Q_OS_WIN)
@@ -29,7 +32,7 @@ StorageDiskSelection::Access::Access()
     //Apparently, this function is hidden and
     //you need to pull it out of the sink wearing gloves.
     SetupDiGetDevicePropertyW = (FN_SetupDiGetDevicePropertyW)GetProcAddress(GetModuleHandle(TEXT("Setupapi.dll")), "SetupDiGetDevicePropertyW");
-    // https://stackoverflow.com/a/3439805
+    //Micro Soft... it's funny, right? "micro soft"
 #endif
 }
 
@@ -52,6 +55,12 @@ StorageDiskSelection::Access::~Access()
 }
 
 #if defined(Q_OS_WIN)
+
+//Normally, all classes are declared in the header file, but this is a special case
+struct DRIVE_LAYOUT_INFORMATION_EX_FIXED : DRIVE_LAYOUT_INFORMATION_EX
+{
+    PARTITION_INFORMATION_EX PartitionEntry[99]; //base class has too few entries
+};
 
 QString
 StorageDiskSelection::Access::toString(const wchar_t *str_wchar)
@@ -736,22 +745,385 @@ StorageDiskSelection::Device::readBlock(char *bytes)
     return bytes_read == bs;
 }
 
+StorageDiskSelection::PartitionTableType
+StorageDiskSelection::Device::partitionTableType()
+{
+    PartitionTableType table_type = PartitionTableType::Unknown;
+
+    auto a = m_enumerator;
+    assert(a);
+
+#if !defined(Q_OS_WIN)
+
+    UDiskManager &udisk = a->m_udisk;
+    UDiskManager::PartitionTableInfo table_info{};
+    udisk.partitionDevices(m_int_addr, false, &table_info);
+    if (table_info.type == "dos")
+        table_type = PartitionTableType::MBR;
+    else if (table_info.type == "gpt")
+        table_type = PartitionTableType::GPT;
+
+#elif defined(Q_OS_WIN)
+
+    //IOCTL_DISK_GET_DRIVE_LAYOUT_EX
+    HANDLE knob = driveHandle();
+    DRIVE_LAYOUT_INFORMATION_EX_FIXED st_parts_layout;
+    DWORD rsize = 0;
+    DeviceIoControl(
+        knob,
+        IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
+        0, 0,
+        &st_parts_layout, sizeof(st_parts_layout),
+        &rsize,
+        NULL
+    );
+    if (rsize)
+    {
+        if (st_parts_layout.PartitionStyle == PARTITION_STYLE_MBR)
+            table_type = PartitionTableType::MBR;
+        else if (st_parts_layout.PartitionStyle == PARTITION_STYLE_GPT)
+            table_type = PartitionTableType::GPT;
+    }
+
+#endif
+
+    return table_type;
+}
+
+QList<StorageDiskSelection::PartitionGeometry>
+StorageDiskSelection::Device::partitions()
+{
+    QList<PartitionGeometry> partitions;
+
+    auto a = m_enumerator;
+    assert(a);
+
+#if !defined(Q_OS_WIN)
+
+    UDiskManager &udisk = a->m_udisk;
+    UDiskManager::PartitionTableInfo table_info{};
+    udisk.partitionDevices(m_int_addr, false, &table_info);
+
+    foreach (UDiskManager::PartitionInfo table_part, table_info.partitions)
+    {
+        PartitionGeometry part{};
+
+        part.start = table_part.start;
+        part.size = table_part.size;
+        part.number = table_part.number;
+        partitions << part;
+    }
+
+#elif defined(Q_OS_WIN)
+
+    //IOCTL_DISK_GET_DRIVE_LAYOUT_EX
+    HANDLE knob = driveHandle();
+    DRIVE_LAYOUT_INFORMATION_EX_FIXED st_parts_layout;
+    DWORD rsize = 0;
+    DeviceIoControl(
+        knob,
+        IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
+        0, 0,
+        &st_parts_layout, sizeof(st_parts_layout),
+        &rsize,
+        NULL
+    );
+    if (!rsize)
+    {
+        //error //TODO formatWinError
+        return partitions;
+    }
+
+    int parts_count_max = st_parts_layout.PartitionCount; //MBR: 4
+    for (int j = 0; j < parts_count_max; j++)
+    {
+        PartitionGeometry part{};
+
+        if (st_parts_layout.PartitionStyle == PARTITION_STYLE_MBR)
+        {
+            if (st_parts_layout.PartitionEntry[j].Mbr.PartitionType == PARTITION_ENTRY_UNUSED)
+                continue;
+        }
+
+        part.start = st_parts_layout.PartitionEntry[j].StartingOffset.QuadPart;
+        part.size = st_parts_layout.PartitionEntry[j].PartitionLength.QuadPart;
+        part.number = st_parts_layout.PartitionEntry[j].PartitionNumber;
+        partitions << part;
+    }
+
+#endif
+
+    return partitions;
+}
+
+StorageDiskSelection::PartitionGeometry
+StorageDiskSelection::Device::partition(int number)
+{
+    PartitionGeometry part{};
+
+    foreach (PartitionGeometry part, partitions())
+    {
+        if (part.number == number)
+        {
+            return part;
+        }
+    }
+
+    return part; //empty
+}
+
+QList<StorageDiskSelection::FilesystemInfo>
+StorageDiskSelection::Device::filesystems()
+{
+    QList<FilesystemInfo> filesystems;
+
+    auto a = m_enumerator;
+    assert(a);
+
+#if !defined(Q_OS_WIN)
+
+    UDiskManager &udisk = a->m_udisk;
+    UDiskManager::PartitionTableInfo table_info{};
+    udisk.partitionDevices(m_int_addr, false, &table_info);
+
+    foreach (UDiskManager::PartitionInfo table_part, table_info.partitions)
+    {
+        //Skip partitions which have no valid filesystem interface
+        //Unfortunately, we cannot check for a size of 0 because some (exfat) report 0
+        if (!table_part.fs) continue;
+
+        //Unfortunately, we cannot determine the size of the filesystem
+        //because this information is not available in the UDiskManager (via udisks).
+        //It will be available in the future, with libparted, but for now we have to skip this.
+        //Use the partition size instead. The filesystem usually isn't significantly smaller.
+
+        FilesystemInfo fs_info{};
+
+        fs_info.path = table_part.path;
+        fs_info.mountpoint = udisk.mountpoint(table_part.path);
+        fs_info._part_start = table_part.start;
+        filesystems << fs_info;
+    }
+
+#elif defined(Q_OS_WIN)
+
+    //List "volumes", i.e., known and mounted filesystems (letter-mounted)
+    int our_dev_num = deviceNumber();
+    int required_size = MAX_PATH;
+    std::vector<wchar_t> vol_name_bytes(required_size);
+    wchar_t *vol_name_data = (wchar_t*)vol_name_bytes.data();
+    HANDLE vol_query_knob = FindFirstVolumeW(vol_name_data, required_size);
+    bool vol_query_ok = vol_query_knob != INVALID_HANDLE_VALUE;
+    while (vol_query_ok)
+    {
+        //path example:
+        //\\?\ide#diskqemu_harddisk___________________________2.5+____#5&3a2a5854&0&1.0.0#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}
+        QString vol_path = Access::toString(vol_name_data);
+
+        //Get volume letter (mount point)
+        std::vector<wchar_t> vol_letter_bytes(required_size);
+        DWORD retlen = 0;
+        GetVolumePathNamesForVolumeNameW((const wchar_t*)vol_name_data, vol_letter_bytes.data(), required_size, &retlen);
+        QString letter_str = Access::toString((const wchar_t*)vol_letter_bytes.data()); //array?
+
+        //Prepare/fix path
+        if (letter_str.length() == 3)
+            letter_str = letter_str.mid(0, 2); //remove trailing backslash
+        if (vol_path.endsWith("\\"))
+            vol_path.chop(1); //remove trailing backslash! otherwise the following call fails
+        //Filesystem found, but not necessarily on the current partition
+        FilesystemInfo fs_info{}; //zero-initialize because of partition offset member
+        fs_info.path = vol_path;
+        fs_info.mountpoint = letter_str;
+
+        //Open volume, get info on disk
+        DWORD access_mode = 0;
+        DWORD share_mode = access_mode ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE;
+        HANDLE knob = CreateFileA(vol_path.toUtf8().constData(),
+            0, //access_mode
+            FILE_SHARE_READ | FILE_SHARE_WRITE, //share_mode
+            NULL, //security attributes
+            OPEN_EXISTING,
+            0, //flags and attributes
+            NULL
+        );
+        if (knob != INVALID_HANDLE_VALUE)
+        {
+            int required_size = 1000 + sizeof(VOLUME_DISK_EXTENTS);
+            std::vector<char> extents_bytes(required_size);
+            VOLUME_DISK_EXTENTS *extents_ptr = reinterpret_cast<VOLUME_DISK_EXTENTS*>(extents_bytes.data());
+            long unsigned int retlen = 0;
+            bool ok = DeviceIoControl(knob,
+                IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
+                0, 0,
+                extents_ptr, required_size,
+                &retlen, 0
+            );
+            if (ok && extents_ptr->NumberOfDiskExtents)
+            {
+                auto st_extent = extents_ptr->Extents[0];
+                int disknum = st_extent.DiskNumber;
+                qint64 ext_start = st_extent.StartingOffset.QuadPart;
+                qint64 ext_length = st_extent.ExtentLength.QuadPart;
+
+                if (disknum == our_dev_num)
+                {
+                    //filesystem is on this device, one of its partitions
+                    fs_info._part_start = ext_start;
+                    filesystems << fs_info;
+                }
+            }
+        }
+        else
+        {
+            //TODO store error using Access::formatWinError()
+        }
+        CloseHandle(knob);
+
+        vol_query_ok = FindNextVolumeW(vol_query_knob, vol_name_data, required_size);
+        if (!vol_query_ok)
+        {
+            FindVolumeClose(vol_query_knob);
+        }
+    }
+
+#endif
+
+    return filesystems;
+}
+
+int
+StorageDiskSelection::Device::partitionNumberOfFilesystem(const QString &filesystem_path)
+{
+    int number = -1;
+    FilesystemInfo fs_info;
+
+    //Get filesystem info
+    foreach (FilesystemInfo fs, filesystems())
+    {
+        if (fs.path == filesystem_path)
+        {
+            fs_info = fs;
+            break;
+        }
+    }
+    if (fs_info.path.isEmpty())
+        return number;
+    
+    foreach (PartitionGeometry part, partitions())
+    {
+        if (fs_info._part_start == part.start)
+        {
+            number = part.number;
+            break;
+        }
+    }
+
+    return number;
+}
+
+QString
+StorageDiskSelection::Device::mountpoint(QStringList *mountpoints_ptr)
+{
+    QString mountpoint;
+    QStringList mountpoints; //list of mountpoints but only 1 each
+
+    foreach (auto fs, filesystems())
+    {
+        if (fs.mountpoint.isEmpty()) continue;
+
+        if (mountpoint.isEmpty())
+        {
+            mountpoint = fs.mountpoint; //first one
+        }
+        mountpoints << fs.mountpoint;
+    }
+
+    if (mountpoints_ptr)
+        *mountpoints_ptr = mountpoints;
+    return mountpoint;
+}
+
+bool
+StorageDiskSelection::Device::mount(const QString &dev_path, QString *message_ref)
+{
+    bool success = false;
+
+    //TODO check if dev_path is (a partition of) this device, also accept partition number
+
+#if !defined(Q_OS_WIN)
+
+    //Mount filesystem in specified partition device
+    //Note UDiskManager expects a valid (udev) path
+    //e.g., for /dev/sda1 it would be /org/freedesktop/UDisks2/block_devices/sda1 or sda1
+    QString udisk_name = dev_path;
+    udisk_name = m_enumerator->m_udisk.findDeviceDBusPath(dev_path);
+    if (udisk_name.isEmpty())
+    {
+        if (message_ref)
+            *message_ref = "Invalid device path";
+    }
+    else
+    {
+        success = m_enumerator->m_udisk.mount(udisk_name, message_ref);
+    }
+
+#elif defined(Q_OS_WIN)
+
+    //Does Windows even have a mount command?
+
+#endif
+
+    return success;
+}
+
+bool
+StorageDiskSelection::Device::unmount(const QString &dev_path, QString *message_ref)
+{
+    bool success = false;
+
+#if !defined(Q_OS_WIN)
+
+    //Unmount filesystem in specified partition device
+    //Note UDiskManager expects a valid (udev) path
+    //e.g., for /dev/sda1 it would be /org/freedesktop/UDisks2/block_devices/sda1 or sda1
+    //A device path is required, not a mountpoint!
+    QString udisk_name;
+    udisk_name = m_enumerator->m_udisk.findDeviceDBusPath(dev_path);
+    if (udisk_name.isEmpty())
+    {
+        if (message_ref)
+            *message_ref = "Invalid device path";
+    }
+    else
+    {
+        success = m_enumerator->m_udisk.umount(udisk_name, message_ref);
+    }
+
+#elif defined(Q_OS_WIN)
+
+    //Does Windows even have an umount command?
+
+#endif
+
+    return success;
+}
 
 #if defined(Q_OS_WIN)
 
 HANDLE
-StorageDiskSelection::Device::driveHandle()
+StorageDiskSelection::Device::driveHandle(bool temporary)
 {
-    HANDLE handle = m_win_handle;
+    HANDLE knob = m_win_handle;
 
-    if (handle != INVALID_HANDLE_VALUE)
+    if (knob != INVALID_HANDLE_VALUE && !temporary)
     {
-        return handle;
+        return knob;
     }
 
     DWORD access_mode = 0;
     DWORD share_mode = access_mode ? 0 : FILE_SHARE_READ | FILE_SHARE_WRITE;
-    handle = CreateFileA(m_int_addr.toLocal8Bit().constData(),
+    knob = CreateFileA(m_int_addr.toLocal8Bit().constData(),
         access_mode,
         share_mode,
         NULL, //security attributes
@@ -760,12 +1132,12 @@ StorageDiskSelection::Device::driveHandle()
         NULL
     );
 
-    if (handle != INVALID_HANDLE_VALUE)
+    if (knob != INVALID_HANDLE_VALUE && !temporary)
     {
-        m_win_handle = handle;
+        m_win_handle = knob;
     }
 
-    return handle;
+    return knob;
 }
 
 bool
@@ -795,7 +1167,34 @@ StorageDiskSelection::Device::checkWinDevDescProps(QString *description_ptr)
     return success;
 }
 
-#endif
+int
+StorageDiskSelection::Device::deviceNumber()
+{
+    int dev_num = -1;
+
+    //Get device number, required for linking filesystems to this disk device
+    HANDLE dev_handle = driveHandle();
+
+    //STORAGE_DEVICE_NUMBER
+    STORAGE_DEVICE_NUMBER st_devnum;
+    DWORD rsize = 0;
+    DeviceIoControl(
+        dev_handle,
+        IOCTL_STORAGE_GET_DEVICE_NUMBER,
+        0, 0,
+        &st_devnum, sizeof(st_devnum),
+        &rsize,
+        NULL
+    );
+    if (rsize)
+    {
+        dev_num = st_devnum.DeviceNumber;
+    }
+
+    return dev_num;
+}
+
+#endif //Q_OS_WIN
 
 //QSharedPointer<StorageDiskSelection::Enumerator>
 //StorageDiskSelection::enumerator()
@@ -826,22 +1225,30 @@ StorageDiskSelection::blockDevices()
     QSharedPointer<Access> a(new Access);
     assert(a);
 
+    //Collect block devices (not partitions), e.g., hdds, ssds, usb sticks
+
 #if !defined(Q_OS_WIN)
 
     foreach (QString dev, a->m_udisk.blockDevices())
     {
         QString dev_path = a->m_udisk.deviceFilePath(dev);
-        //Skip devices which have parents (partitions)
+        //Skip devices which have parents (i.e., partitions)
         if (!a->m_udisk.underlyingBlockDevice(dev).isEmpty()) continue;
         //Skip blank drives
         if (a->m_udisk.isBlankDevice(dev)) continue;
+        //Skip loop devices (e.g., /dev/loop0)
+        if (a->m_udisk.isLoopDevice(dev)) continue;
+        //Skip swap devices (e.g., /dev/zram0)
+        if (a->m_udisk.isSwapDevice(dev)) continue;
 
+        //Create Device object
         Device device(a, dev);
         devices << device;
     }
 
 #elif defined(Q_OS_WIN)
 
+    //Storage disk interface...
     a->m_h_dev_info_set = SetupDiGetClassDevs(&GUID_DEVINTERFACE_DISK, 0, 0, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
     if (a->m_h_dev_info_set == INVALID_HANDLE_VALUE)
     {
@@ -872,29 +1279,42 @@ StorageDiskSelection::blockDevices()
         a->m_interfaces.push_back(if_container);
     }
 
-    //interface -> device path
+    //interface -> device path, create and store Device objects
     for (int i = 0; i < (int)a->m_interfaces.size(); i++)
     {
         Access::Interface if_container = a->m_interfaces.at(i);
         std::shared_ptr<SP_INTERFACE_DEVICE_DATA> if_data_ptr = if_container.m_interface_device_data;
 
+        //Get device path    
         DWORD required_size = 0;
         SetupDiGetDeviceInterfaceDetailA(a->m_h_dev_info_set, if_data_ptr.get(), 0, (DWORD)0, &required_size, 0);
-        SP_INTERFACE_DEVICE_DETAIL_DATA_A *data = 0; //deleted below
-        data = (SP_INTERFACE_DEVICE_DETAIL_DATA_A*)malloc(required_size);
-        assert(data);
-        data->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA);
-        if (!SetupDiGetDeviceInterfaceDetailA(a->m_h_dev_info_set, if_data_ptr.get(), data, required_size, 0, 0))
+        SP_INTERFACE_DEVICE_DETAIL_DATA_A *dev_path_data = 0; //deleted below
+        dev_path_data = (SP_INTERFACE_DEVICE_DETAIL_DATA_A*)malloc(required_size);
+        assert(dev_path_data);
+        dev_path_data->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA);
+        if (!SetupDiGetDeviceInterfaceDetailA(a->m_h_dev_info_set, if_data_ptr.get(), dev_path_data, required_size, 0, 0))
         {
             continue;
         }
+        QString dev_path = dev_path_data->DevicePath;
+        free(dev_path_data); //SP_INTERFACE_DEVICE_DETAIL_DATA
 
-        QString dev_path = data->DevicePath;
+        //Get device instance id
+        //Example:
+        //IDE\DISKQEMU_HARDDISK___________________________2.5+____\5&3A2A5854&0&1.1.0
+        QString inst_id_str;
+        SetupDiGetDeviceInstanceIdW(a->m_h_dev_info_set, if_container.m_devinfo_data.get(), 0, (DWORD)0, &required_size);
+        std::vector<wchar_t> dev_id_chars(required_size);
+        wchar_t *dev_id_data = (wchar_t*)dev_id_chars.data();
+        if (SetupDiGetDeviceInstanceIdW(a->m_h_dev_info_set, if_container.m_devinfo_data.get(), dev_id_data, required_size, 0))
+        {
+            inst_id_str = Access::toString((const wchar_t*)dev_id_data);
+        }
 
-        free(data); //SP_INTERFACE_DEVICE_DETAIL_DATA
-
+        //Create Device object
         Device device(a, dev_path);
         device.m_index = i;
+        device.m_win_instance = inst_id_str;
         devices << device;
     }
 

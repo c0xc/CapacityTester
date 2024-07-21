@@ -37,30 +37,40 @@
 #include <QTimer>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QProgressBar>
+#include <QGroupBox>
 
 #include "size.hpp"
-#include "usbdiskselectiondialog.hpp"
+#include "usbdiskselectiondialog.hpp" //old
 #include "destructivedisktester.hpp"
-#include "capacitytestergui.hpp" //TODO init disk test
+#include "destructivedisktesterwrapper.hpp"
 #include "performancegraph.hpp"
 
-class DiskTestWindow : public QDialog
+//class DiskTestWindow : public QDialog //do we need this?
+
+class DiskTestWidget : public QWidget
 {
     Q_OBJECT
 
 signals:
+
+    void
+    backToMain();
+
+    void
+    testFinished(bool success);
 
 public:
 
     static QFrame*
     newHLine();
 
-    DiskTestWindow(QWidget *parent = 0);
+    DiskTestWidget(QString dev_path = "", QWidget *parent = 0);
 
-private slots:
+public slots:
 
     void
-    cancel();
+    back();
 
     void
     confirm();
@@ -69,16 +79,27 @@ private slots:
     showDevSelect();
 
     void
-    showDev(const QString &dev_path, const QString &dev_title);
+    showDevTestSelect(const QString &dev_path, const QString &dev_title = "");
 
     void
     showStartTest();
+
+private slots:
+
+    DestructiveDiskTester*
+    createWorker(bool schedule_start = true);
 
     void
     startTest();
 
     void
     startTestPhase(int phase);
+
+    void
+    written(qint64 pos, double avg_speed = 0, double current_speed = 0);
+
+    void
+    verified(qint64 pos, double avg_speed = 0, double current_speed = 0);
 
     void
     writeFailed(qint64 pos);
@@ -95,13 +116,10 @@ private:
     resetMainLayout();
 
     QWidget
-    *wid_dev_sel;
-
-    QWidget
     *wid_main;
 
-    QDialogButtonBox
-    *m_button_box;
+    //QDialogButtonBox
+    //*m_button_box;
 
     int
     m_step;
@@ -111,6 +129,9 @@ private:
 
     QString
     m_dev_title;
+
+    //QScopedPointer<StorageDiskSelection::Device>
+    //m_selected_device;
 
     qint64
     m_claimed_capacity;
@@ -124,7 +145,7 @@ private:
     int
     m_sel_type;
 
-    QPointer<UsbDiskSelectionWidget>
+    QPointer<UsbDiskSelectionWidget> //old
     m_disk_selection_widget;
 
     QPointer<DestructiveDiskTester>
@@ -136,14 +157,17 @@ private:
     PerformanceGraph
     *m_graph_read;
 
+    QProgressBar
+    *m_progress;
+
+    QLabel
+    *m_lbl_time_elapsed;
+
+    QLabel
+    *m_lbl_time_estimate;
+
     QLabel
     *m_lbl_phase;
-
-    //QLabel
-    //*m_lbl_phase_writing;
-
-    //QLabel
-    //*m_lbl_phase_verifying;
 
     int
     m_ddt_phase;
@@ -151,6 +175,11 @@ private:
     QLabel
     *m_lbl_finish_desc;
 
+    QGroupBox
+    *m_grp_graph_write;
+
+    QGroupBox
+    *m_grp_graph_read;
 
 
 };

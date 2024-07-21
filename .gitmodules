@@ -1,0 +1,3 @@
+[submodule "lib-cpp-class-logger"]
+	path = lib-cpp-class-logger
+	url = git@github.com:c0xc/lib-cpp-class-logger.git

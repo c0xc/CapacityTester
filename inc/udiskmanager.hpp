@@ -42,6 +42,22 @@ public:
 
     typedef QPair<QString, QString> QStringPair;
 
+    struct PartitionInfo
+    {
+        QString path;
+        quint64 start;
+        quint64 size;
+        int number;
+        bool fs;
+        quint64 fs_size;
+    };
+
+    struct PartitionTableInfo
+    {
+        QString type;
+        QList<PartitionInfo> partitions;
+    };
+
     /**
      * Constructor.
      * A parent object can be specified to enable garbage collection.
@@ -106,6 +122,12 @@ public:
 
     bool
     isUsbDevice(const QString &device);
+
+    bool
+    isLoopDevice(const QString &device);
+
+    bool
+    isSwapDevice(const QString &device);
 
     QString
     idLabel(const QString &device);
@@ -175,7 +197,7 @@ public:
      * instead of sda1. Otherwise it might be [sda1, sda2] (for device = sda).
      */
     QStringList
-    partitionDevices(const QString &device, bool dbus_path = false);
+    partitionDevices(const QString &device, bool dbus_path = false, PartitionTableInfo *table_info = 0);
 
     QStringList
     usbPartitions();
@@ -258,6 +280,18 @@ public slots:
     bool
     createPartition(const QString &device, const QString &type, QString *message_ref = 0);
 
+    /**
+     * Resolve device path to udisks/dbus path for use with this class.
+     * Most functions in this class require the internal dbus path - or the short form,
+     * which is the device file path without /dev/ - but not the full path like /dev/sda1.
+     * This function resolves such a path to the internal dbus path.
+     * It takes a full device path like /dev/sda1, a device filename like sda1
+     * or a valid symlink like /dev/disk/by-label/MyLabel.
+     * If an invalid path is passed, an empty string is returned.
+     */
+    QString
+    findDeviceDBusPath(const QString &device);
+
 private:
 
     static constexpr const char *UDISKS2_SERVICE = "org.freedesktop.UDisks2";
@@ -279,7 +313,7 @@ private:
     dbusInterface(const QString &path, const QString &interface);
 
     QVariant
-    getVariant(const QString &path, const QString &interface, const QString &prop);
+    getVariant(const QString &path, const QString &interface, const QString &prop, bool *failed_ptr = 0, QDBusError *dbus_error_ptr = 0);
 
     QVariantMap
     getAllVariantMap(const QString &path, const QString &interface);

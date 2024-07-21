@@ -149,6 +149,7 @@ DestructiveDiskTester::generateRandomBytes0(int pattern_size)
 
 DestructiveDiskTester::DestructiveDiskTester(const QString &dev_path)
                      : QObject(),
+                       m_parent_pid(0),
                        m_mode_full(false),
                        m_fd(-1),
                        m_dev_block_size(0),
@@ -204,6 +205,12 @@ DestructiveDiskTester::~DestructiveDiskTester()
         free(m_block_buffer);
 }
 
+void
+DestructiveDiskTester::setParentPid(unsigned int pid)
+{
+    m_parent_pid = pid;
+}
+
 qint64
 DestructiveDiskTester::getCapacity()
 {
@@ -213,7 +220,7 @@ DestructiveDiskTester::getCapacity()
 
     //Within this class instance, we prefer to query by file descriptor,
     //specifically to prevent something like /dev/sdx now pointing
-    //to another device than it did earlier.
+    //to another device as it did earlier.
     capacity = getCapacity(m_fd);
 
 #elif defined(Q_OS_WIN)
@@ -366,9 +373,94 @@ DestructiveDiskTester::setLimitGb(int limit)
     m_limit_gb = limit;
 }
 
+bool
+DestructiveDiskTester::prepareDevice(QString *error_msg_ptr)
+{
+    //Prepare device for testing
+    //Unless in manual mode, check if device or any of its partitions are mounted, unmount.
+    //This is done for USB storage devices (which is the main use case).
+
+    //All filesystems on the device should be unmounted (they would be overwritten)
+    //There are different ways a filesystem can be mounted and we might not detect all,
+    //but this program is used to check USB sticks and similar devices
+    //which are usually mounted directly, so this shouldn't be an issue.
+    //We also don't take care of LVM, RAID or filesystems mounted twice.
+
+    //Try to find and unmount all filesystems on the device
+    StorageDiskSelection::Device device = StorageDiskSelection().blockDevice(m_dev_path);
+    Debug(QS("preparing device %s", CSTR(m_dev_path)));
+    bool no_auto_unmount = false;
+    foreach (auto fs, device.filesystems())
+    {
+        //Check if mounted
+        if (fs.mountpoint.isEmpty()) continue; //skip unless mounted
+        Debug(QS("filesystem is mounted: %s", CSTR(fs.path)));
+        //TODO fs.path is dbus path, add attribute with device path
+
+        //Check if we're allowed to unmount this filesystem
+        if (no_auto_unmount)
+        {
+            if (error_msg_ptr)
+                *error_msg_ptr = tr("Filesystem is mounted, cannot continue: %1").arg(fs.path);
+            return false;
+        }
+        if (!device.isUsbDevice())
+        {
+            Debug(QS("filesystem is mounted, not unmounting automatically because this is not a USB device: %s", CSTR(fs.path)));
+            if (error_msg_ptr)
+                *error_msg_ptr = tr("Filesystem is mounted, not unmounting automatically because this is not a USB device: %1").arg(fs.path);
+            return false;
+        }
+
+        //Unmount filesystem
+        QString error_msg;
+        if (!device.unmount(fs.path, &error_msg))
+        {
+            Debug(QS("failed to unmount %s: %s", CSTR(fs.path), CSTR(error_msg)));
+            if (error_msg_ptr)
+                *error_msg_ptr = tr("Failed to unmount %1: %2").arg(fs.path).arg(error_msg);
+            return false;
+        }
+        Debug(QS("unmounted filesystem %s", CSTR(fs.path)));
+        emit filesystemUnmounted(fs.path); //unused
+    }
+
+    //If configured and necessary, also rewrite the MBR to remove the partition table
+
+    //Get the capacity again
+    qint64 capacity = getCapacity(m_dev_path);
+    m_size = capacity;
+    Debug(QS("prepared device %s; size = %lld", CSTR(m_dev_path), m_size));
+
+    return true;
+}
+
+bool
+DestructiveDiskTester::postResetDevice()
+{
+    //Format device after test, create new partition table with filesystem
+    //TODO not yet implemented by StorageDiskSelection
+
+    return false;
+}
+
+qint64
+DestructiveDiskTester::elapsed()
+{
+    return m_total_timer.elapsed();
+}
+
 void
 DestructiveDiskTester::start()
 {
+    QString error_msg;
+    if (!prepareDevice(&error_msg))
+    {
+        Debug(QS("failed to prepare device: %s", CSTR(error_msg)));
+        emit startFailed(error_msg);
+        return;
+    }
+
     Debug(QS("starting test..."));
     //Open block device
     if (isFastMode())
@@ -378,11 +470,19 @@ DestructiveDiskTester::start()
     }
     else
     {
-        Debug(QS("opening device (default i/o): %s", m_device->path().toUtf8().constData()));
+        Debug(QS("opening device (default i/o): %s", CSTR(m_device->path())));
         openFD(false);
     }
     Debug(QS("opened dev, fd = %d", m_fd));
-    if (m_fd == -1) return;
+    if (m_fd == -1)
+    {
+        Debug(QS("failed to open device"));
+        emit startFailed();
+        return;
+    }
+    //NOTE if we return anywhere without returning an appropriate signal,
+    //the GUI (and/or wrapper process) will hang forever, waiting for a signal.
+    //IDEA set up a timer, heartbeat
 
     //Abort if device not accessible / invalid (empty)
     if (m_size <= 0)
@@ -409,6 +509,8 @@ DestructiveDiskTester::start()
     bool ok = false;
     qint64 total_mb = m_size / MB;
     Debug(QS("total size: %lld MB; block size: %d; blocks: %lld", total_mb, m_dev_block_size, m_num_blocks));
+    m_total_timer.invalidate();
+    m_total_timer.start();
     emit started(total_mb);
 
     //IDEA faster algorithm: binary search, check 0% (ok) 100% (nok), next 50%
@@ -420,13 +522,27 @@ DestructiveDiskTester::start()
         ok = runFullTest();
 
     Debug(QS("completed, ok = %d", ok));
-    emit finished(ok);
+    int res = ok ? 1 : 0;
+    if (m_stop_req || !checkParentPid()) res = -1; //make sure to return abort if stop signal received
+    emit finished(res);
+
+    postResetDevice();
 }
 
 void
-DestructiveDiskTester::cancel()
+DestructiveDiskTester::cancel(bool force_quit)
 {
+    Debug(QS("stop request received - canceling test, force quit: %d", force_quit));
+
+    //Set stop request flag, similar to requestInterruption()
     m_stop_req = true;
+
+    //Force quit not really implemented (implemented in wrapper)
+    if (force_quit)
+    {
+        //TODO force quit
+        this->thread()->quit();
+    }
 }
 
 bool
@@ -485,7 +601,7 @@ DestructiveDiskTester::runGBSteps(int phase)
         //Now checking first MB at g GB
         qint64 m = g * 1024;
         qint64 b = m * MB; //exact position
-        if (m_stop_req)
+        if (m_stop_req || !checkParentPid())
         {
             Debug(QS("stop requested at %llu / %lld GB", b, g));
             return false;
@@ -640,7 +756,7 @@ DestructiveDiskTester::runFullWrite()
         chunk_timer.start();
         g += (m % KB == 0 ? 1 : 0); //position in GB
         if (m_limit_gb && g == m_limit_gb) break;
-        if (m_stop_req)
+        if (m_stop_req || !checkParentPid())
         {
             Debug(QS("stop requested at %lld MB", m));
             return false;
@@ -750,7 +866,7 @@ DestructiveDiskTester::runFullRead()
         chunk_timer.start();
         g += (m % KB == 0 ? 1 : 0); //position in GB
         if (m_limit_gb && g == m_limit_gb) break;
-        if (m_stop_req)
+        if (m_stop_req || !checkParentPid())
         {
             Debug(QS("stop requested at %lld MB", m));
             return false;
@@ -1459,6 +1575,21 @@ DestructiveDiskTester::writeData(const QByteArray &data)
 {
     //Write QByteArray to device
     return m_device->write(data.constData(), data.size()) == data.size();
+}
+
+bool
+DestructiveDiskTester::checkParentPid()
+{
+    bool parent_alive = m_parent_pid ? false : true;
+#if !defined(Q_OS_WIN)
+    if (m_parent_pid)
+    {
+        parent_alive = ::kill(m_parent_pid, 0) == 0;
+    }
+    if (!parent_alive)
+        Debug(QS("parent process %d is dead", m_parent_pid));
+#endif
+    return parent_alive;
 }
 
 DestructiveDiskTester::MChunkPattern::MChunkPattern() {}

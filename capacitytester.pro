@@ -17,6 +17,30 @@ win32 {
     LIBS += -lsetupapi
 }
 
+# udev + libusb (optional)
+QT_CONFIG -= no-pkg-config
+CONFIG += link_pkgconfig
+!win32 {
+    LIBS += -ludev
+    DEFINES += HAVE_LIBUDEV
+}
+# libusb1, libusb0
+# LIBS += -lusb (or SUBLIBS=-lusb make)
+isEmpty(NO_LIBUSB) {
+    !win32 {
+        PKGCONFIG += libusb-1.0 libusb
+
+        #contains(PKGCONFIG, libusb-1.09) {
+        contains(PKGCONFIG, libusb-1.0) {
+            LIBS += -lusb-1.0
+            DEFINES += HAVE_LIBUSB1
+        } else:contains(PKGCONFIG, libusb) {
+            LIBS += -lusb
+            DEFINES += HAVE_LIBUSB0
+        }
+    }
+}
+
 RESOURCES += res/res.qrc
 RESOURCES += res/lang.qrc
 

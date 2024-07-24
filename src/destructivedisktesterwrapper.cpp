@@ -258,10 +258,9 @@ DestructiveDiskTesterWrapper::checkStateFinished(int rc, QProcess::ExitStatus st
 void
 DestructiveDiskTesterWrapper::checkProcError(QProcess::ProcessError error)
 {
-    Debug(QS("process error: %d", error));
     if (error == QProcess::FailedToStart)
-        emit startFailed();
+        emit startFailed("failed to start process");
     else if (!m_started)
-        emit startFailed();
+        emit startFailed("unknown process error occurred");
 }
 

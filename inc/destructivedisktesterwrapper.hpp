@@ -40,8 +40,8 @@ signals:
     void
     started(qint64 total);
 
-    void
-    startFailed();
+    //void
+    //startFailed(); //wrong signature causes signal to get lost
 
     void
     written(qint64 bytes, double avg_speed);

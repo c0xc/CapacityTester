@@ -758,11 +758,13 @@ CapacityTesterCli::startDiskTest(const QString &device)
         return close(1);
     }
     //Abort if in use / mounted - NOTE not 100% reliable
-    if (tester.isMounted())
-    {
-        err << "The specified device is in use." << endl;
-        return close(1);
-    }
+    //This would prevent a run via the sudo wrapper
+    //DestructiveDiskTester will also check if mounted and auto-unmount
+    //if (tester.isMounted())
+    //{
+    //    err << "The specified device is in use." << endl;
+    //    return close(1);
+    //}
     //bool is_usb = udisk.isUsbDevice(dev); //TODO
 
     //Warn user

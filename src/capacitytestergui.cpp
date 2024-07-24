@@ -64,10 +64,9 @@ CapacityTesterGui::CapacityTesterGui(QWidget *parent)
 
     //Control buttons
     m_button_box = new QDialogButtonBox();
-    QPushButton *btn_next = m_button_box->addButton(QDialogButtonBox::Ok);
-    btn_next->setText(tr("&Next"));
+    QPushButton *btn_next = m_button_box->addButton(tr("&Next"), QDialogButtonBox::AcceptRole);
     m_btn_next = btn_next;
-    QPushButton *btn_back = m_button_box->addButton("&Back", QDialogButtonBox::NoRole);
+    QPushButton *btn_back = m_button_box->addButton(tr("&Back"), QDialogButtonBox::RejectRole);
     m_btn_back = btn_back;
     connect(btn_next, SIGNAL(clicked()), this, SLOT(nextStep()));
     connect(btn_back, SIGNAL(clicked()), this, SLOT(prevStep()));
@@ -228,7 +227,10 @@ CapacityTesterGui::showWelcome(bool first_call)
     bool is_root = DestructiveDiskTester::amIRoot(); // (geteuid() == 0);
     if (!is_root)
     {
-        QLabel *lbl_root = new QLabel(tr("This program should be run as root."));
+        //QLabel *lbl_root = new QLabel(tr("This program should be run as root."));
+        QLabel *lbl_root = new QLabel(tr("Note: This program was started as a regular user. If this user lacks sudo permissions, the test will fail to start. It is recommended to run this program as root."));
+        lbl_root->setStyleSheet("color:gray; font-size:8pt;");
+        lbl_root->setWordWrap(true);
         vbox->addWidget(lbl_root);
     }
 
@@ -1057,6 +1059,7 @@ CapacityTesterGui::startDiskTest()
         //m_step = 0;
         return;
     }
+    Debug(QS("connecting worker..."));
     m_wr_err = -1;
     m_rd_err = -1;
     m_ddt_phase = 0;
@@ -1084,6 +1087,22 @@ CapacityTesterGui::startDiskTest()
             this, SLOT(written(qint64, double)));
     connect(m_dd_worker.data(), SIGNAL(verified(qint64, double)),
             this, SLOT(verified(qint64, double)));
+    //Delete when navigating away (the progress widget serves as scope container)
+    //this will also remove the cancel button, which is visible for the lifetime of the worker
+    connect(m_progress, &QObject::destroyed, [=]()
+    {
+        if (m_dd_worker && m_dd_worker->thread() != this->thread())
+        {
+            Debug("widget closed - terminating worker thread...");
+            m_dd_worker->thread()->quit();
+            m_dd_worker->thread()->wait();
+        }
+        else if (m_dd_worker)
+        {
+            Debug("widget closed - deleting wrapper for worker process...");
+            m_dd_worker->deleteLater();
+        }
+    });
 
     //Configure worker
     if (m_test_type == 1)
@@ -1245,11 +1264,11 @@ CapacityTesterGui::startFailed(const QString &error_msg)
     m_btn_cancel->setEnabled(false);
 
     //Delete worker by stopping its thread (if it's still running), making sure we're not stopping our own thread
-    if (m_dd_worker && m_dd_worker->thread() != thread())
-    {
-        m_dd_worker->thread()->quit();
-    }
-    m_dd_worker.clear();
+    //if (m_dd_worker && m_dd_worker->thread() != thread())
+    //{
+    //    m_dd_worker->thread()->quit(); //see destructor lambda for cleanup
+    //}
+    //m_dd_worker.clear();
     m_step = 4;
 
 }
@@ -1592,7 +1611,6 @@ CapacityTesterGui::resetMainLayout()
 DestructiveDiskTester*
 CapacityTesterGui::createDiskTestWorker(bool schedule_start)
 {
-
     //TODO auto_unmount_init flag is on by default, otherwise we might check if in use
 
     //Initialize worker
@@ -1610,6 +1628,7 @@ CapacityTesterGui::createDiskTestWorker(bool schedule_start)
     }
 
     //Use sudo wrapper if not running as root
+    bool is_wrapper = false;
     //This is for convenience, so the user doesn't have to restart the program as root
     //But it's not 100% reliable, because the user may not have sudo permissions
     if (!dd_worker->isWritable())
@@ -1621,7 +1640,10 @@ CapacityTesterGui::createDiskTestWorker(bool schedule_start)
         //    tr("This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password."));
         //NOTE wrapper process may fail to start!
         dd_worker->deleteLater();
+        //dd_wrapper = new DestructiveDiskTesterWrapper(m_dev_path);
+        //dd_worker = dd_wrapper;
         dd_worker = new DestructiveDiskTesterWrapper(m_dev_path);
+        is_wrapper = true;
 #elif defined(Q_OS_WIN)
         QMessageBox::critical(this, tr("Disk test"),
             //: This warning is shown on Windows, so the term administrator is used. Alternative: Please start this program with elevated privileges.
@@ -1641,51 +1663,70 @@ CapacityTesterGui::createDiskTestWorker(bool schedule_start)
 
     //Thread for worker
     //... after the check above, otherwise dd_worker (+ GUI) would get stuck.
-    QThread *thread = new QThread;
-    dd_worker->moveToThread(thread);
+    //The wrapper (for Linux to start without root) is a special case,
+    //it starts the worker in a new process, so it should not be moved to a thread;
+    //it would not be able to send the stop signal to the worker if running in a thread.
+    QThread *thread = 0;
+    if (!is_wrapper) thread = new QThread;
+    if (thread) dd_worker->moveToThread(thread);
     //Here we connect the typical signals between worker and thread, see caller for more
+    if (thread)
+    {
 
-    //Start worker when thread starts
-    connect(thread,
-            SIGNAL(started()),
-            dd_worker,
-            SLOT(start()));
+        //Start worker when thread starts
+        connect(thread,
+                SIGNAL(started()),
+                dd_worker,
+                SLOT(start()));
 
-    //Stop thread when worker done (stops event loop -> thread->finished())
-    connect(dd_worker,
-            SIGNAL(finished()),
-            thread,
-            SLOT(quit()));
+        //Stop thread when worker done (stops event loop -> thread->finished())
+        connect(dd_worker,
+                SIGNAL(finished()),
+                thread,
+                SLOT(quit()));
 
-    //Delete worker when done
-    //This signal can be connected to QObject::deleteLater(), to free objects in that thread.
-    //https://doc.qt.io/qt-5/qthread.html#finished
-    connect(thread,
-            SIGNAL(finished()),
-            dd_worker,
-            SLOT(deleteLater())); //delete worker after loop
+        //Delete worker when done
+        //This signal can be connected to QObject::deleteLater(), to free objects in that thread.
+        //https://doc.qt.io/qt-5/qthread.html#finished
+        connect(thread,
+                SIGNAL(finished()),
+                dd_worker,
+                SLOT(deleteLater())); //delete worker after loop
 
-    //Delete thread when thread done (event loop stopped)
-    connect(dd_worker,
-            SIGNAL(destroyed()),
-            thread,
-            SLOT(deleteLater())); //delete thread after worker
+        //Delete thread when thread done (event loop stopped)
+        connect(dd_worker,
+                SIGNAL(destroyed()),
+                thread,
+                SLOT(deleteLater())); //delete thread after worker
 
-    //Stop worker on request
+    }
+    else
+    {
+        //Delete worker when done
+        connect(dd_worker,
+                SIGNAL(finished(int)),
+                dd_worker,
+                SLOT(deleteLater())); //delete worker when done
+    }
+
+    //Stop worker on request //unused, see cancel()
     //connect(this,
     //        SIGNAL(reqStop()),
     //        dd_worker,
     //        SLOT(cancel()));
 
-    //Delete on quit (GUI) //TODO ?
-    connect(this,
-            SIGNAL(destroyed()),
-            dd_worker,
-            SLOT(deleteLater())); //delete worker on quit
+    //Delete on quit (GUI) //TODO thread->wait() ?
+    //connect(this,
+    //        SIGNAL(destroyed()),
+    //        dd_worker,
+    //        SLOT(deleteLater())); //delete worker on quit
+    //Delete on quit - see caller, m_progress widget holds m_dd_worker
 
     //Start test in background
-    if (schedule_start)
+    if (schedule_start && !is_wrapper)
         QTimer::singleShot(0, thread, SLOT(start()));
+    else if (schedule_start)
+        QTimer::singleShot(0, dd_worker, SLOT(start()));
 
     return dd_worker;
 }

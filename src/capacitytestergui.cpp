@@ -369,7 +369,7 @@ CapacityTesterGui::showDevSelect()
     vbox_quick->addWidget(m_btn_quick);
     connect(m_btn_quick, &QAbstractButton::clicked, this, [=]()
     {
-        applyDev(m_dev_path, true);
+        applyDev(m_selected_dev, true);
     });
     //font / css (store default css as button property to reset it later)
     m_btn_quick->setStyleSheet("font-weight:bold; font-size:16pt;");
@@ -492,12 +492,12 @@ void
 CapacityTesterGui::checkDevSelection()
 {
     //Get selected device (from list)
-    QString path;
+    QString path; //selected device path
     if (!m_dev_table->selectedItems().isEmpty())
         path = m_dev_table->selectedItems().first()->data(Qt::UserRole).toString();
 
     //Set device path to selected list item
-    m_dev_path = path;
+    m_selected_dev = path;
     if (path.isEmpty())
     {
         m_dev_title.clear();
@@ -539,7 +539,7 @@ void
 CapacityTesterGui::applyDev()
 {
     //Get selected device
-    QString path = m_dev_path; //set in checkDevSelection()
+    QString path = m_selected_dev; //set in checkDevSelection()
     if (path.isEmpty())
     {
         QMessageBox::critical(this, tr("No device selected"),
@@ -574,6 +574,7 @@ CapacityTesterGui::applyDev(const QString &path, bool quick)
         m_dev_path.clear();
         return;
     }
+    m_dev_path = path;
     if (m_dev_title.isEmpty())
         m_dev_title = device.displayModelName();
     if (m_dev_title.isEmpty())
@@ -588,6 +589,7 @@ CapacityTesterGui::applyDev(const QString &path, bool quick)
     vbox->addLayout(hbox);
     QLabel *lbl_label1 = new QLabel(tr("Device:"));
     lbl_label1->setStyleSheet("font-family:'Prompt', sans-serif; color:black;"); //or VT323
+    lbl_label1->setToolTip(tr("Device path: %1").arg(path));
     hbox->addWidget(lbl_label1);
     QLabel *lbl_size = new QLabel(m_claimed_capacity.formatted(0));
     lbl_size->setStyleSheet("font-family:'Prompt', sans-serif; color:black; font-weight:bold;"); //or VT323
@@ -598,6 +600,7 @@ CapacityTesterGui::applyDev(const QString &path, bool quick)
     lbl_name->setReadOnly(true);
     lbl_name->setCursorPosition(0); //otherwise beginning of text truncated
     lbl_name->setContextMenuPolicy(Qt::NoContextMenu);
+    lbl_name->setToolTip(tr("Device path: %1").arg(path));
     hbox->addWidget(lbl_name);
     vbox->addWidget(newHLine());
 
@@ -977,10 +980,14 @@ CapacityTesterGui::startDiskTest()
     m_lbl_time_estimate = new QLabel;
     grid_test_frame->addWidget(m_lbl_time_estimate, 3, 1);
     m_progress = new QProgressBar;
+    QLabel *lbl_speed = new QLabel(tr("Speed:"));
+    grid_test_frame->addWidget(lbl_speed, 4, 0);
+    m_lbl_speed = new QLabel;
+    grid_test_frame->addWidget(m_lbl_speed, 4, 1);
     QObject *scope_widget = m_progress;
     m_progress->setRange(0, 100);
     m_progress->setValue(0);
-    grid_test_frame->addWidget(m_progress, 4, 0, 1, 2);
+    grid_test_frame->addWidget(m_progress, 5, 0, 1, 2);
     //Prepare timer
     m_tmr_time = new QTimer(m_progress);
     connect(m_tmr_time, SIGNAL(timeout()), this, SLOT(updateTime()));
@@ -1339,14 +1346,23 @@ CapacityTesterGui::startTestPhase(int phase)
 void
 CapacityTesterGui::written(qint64 pos, double avg_speed, double current_speed)
 {
+    //If current speed is 0, use average speed
+    if (current_speed == 0)
+        current_speed = avg_speed;
+
     //Set data point in graph
     if (m_ddt_phase == 0)
     {
         startTestPhase(1);
     }
     m_graph_write->addPoint(pos, current_speed);
+    Debug(QS("written: %lld MB, speed: %f MB/s", pos, current_speed));
+    if (current_speed > 0)
+        m_lbl_speed->setText(QString("%1 MB/s").arg(current_speed, 0, 'f', 1));
+    //NOTE we wanted to display the speed in a progress bar but some themes don't support it
 
     //Calculate current speed NOTE should be done by worker, see argument, but isn't...
+    //3 second avg speed (TODO calculate in worker)
     double speed = 0;
     if (m_tmr_elapsed_current.isValid())
     {
@@ -1370,12 +1386,19 @@ CapacityTesterGui::written(qint64 pos, double avg_speed, double current_speed)
 void
 CapacityTesterGui::verified(qint64 pos, double avg_speed, double current_speed)
 {
+    //If current speed is 0, use average speed
+    if (current_speed == 0)
+        current_speed = avg_speed;
+
     //Set data point in graph
     if (m_ddt_phase == 1)
     {
         startTestPhase(2);
     }
     m_graph_read->addPoint(pos, current_speed);
+    Debug(QS("verified: %lld MB, speed: %f MB/s", pos, current_speed));
+    if (current_speed > 0)
+        m_lbl_speed->setText(QString("%1 MB/s").arg(current_speed, 0, 'f', 1));
 
     //Calculate current read speed
     double speed = 0;

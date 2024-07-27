@@ -19,7 +19,7 @@ DestructiveDiskTesterWrapper::DestructiveDiskTesterWrapper(const QString &dev_pa
     m_rx_start_err = QRegExp("^\\[start\\].*(failed)");
     m_rx_progress = QRegExp("^\\[(\\w+)\\].*progress.*(\\d+[.]\\d+)%.*\\s@(\\d+)M; ([\\d.]+)M/s avg");
     m_rx_progress_err = QRegExp("^\\[(\\w+)\\].*failed.*@(\\d+)M");
-    m_rx_finished = QRegExp("^\\[done\\] (success|failed|res:\s*(-?\\d+))");
+    m_rx_finished = QRegExp("^\\[done\\] (success|failed|res:\\s*(-?\\d+))");
 
     //NOTE this wrapper is Linux-only, it uses pkexec (sudo)
 
@@ -164,6 +164,7 @@ DestructiveDiskTesterWrapper::checkStatus(const QString &line)
         double p = percent_str.toDouble(&ok);
         double avg_speed = avg_speed_str.toDouble(&ok);
         if (!ok) avg_speed = 0;
+        Debug(QS("progress: %s p=%f pos=%lld speed=%f", CSTR(phase), p, pos_m, avg_speed));
         if (phase == "write")
         {
             emit written(pos_m, avg_speed);

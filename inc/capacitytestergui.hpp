@@ -207,6 +207,9 @@ private:
     m_dev_filter;
 
     QString
+    m_selected_dev;
+
+    QString
     m_dev_path;
 
     QString
@@ -253,6 +256,9 @@ private:
 
     QPointer<QLabel>
     m_lbl_time_estimate;
+
+    QPointer<QLabel>
+    m_lbl_speed;
 
     QPointer<QTimer>
     m_tmr_time;

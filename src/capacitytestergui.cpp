@@ -280,7 +280,7 @@ CapacityTesterGui::showWelcome(bool first_call)
     //On first call, schedule next step to be shown
     if (first_call && is_root)
     {
-        QTimer::singleShot(1000, this, SLOT(nextStep));
+        QTimer::singleShot(1000, this, SLOT(nextStep()));
     }
 
     m_step = 0;

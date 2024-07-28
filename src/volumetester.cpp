@@ -751,6 +751,9 @@ VolumeTester::initialize()
 
         //Cancel gracefully
         if (abortRequested()) return false;
+
+        //Close fd
+        file->close();
     }
 
     //Verify all files (quick test, just first and last few bytes)
@@ -758,6 +761,14 @@ VolumeTester::initialize()
     {
         FileInfo file_info = file_infos[i];
         QFile *file = file_info.file;
+        if (!file->isOpen() && !file->open(QIODevice::ReadOnly))
+        {
+            error_type |= Error::Verify;
+            if (file->error() & QFileDevice::PermissionsError)
+                error_type |= Error::Permissions;
+            emit verifyFailed(file_info.offset);
+            return false;
+        }
 
         //Verify last byte
         char c;
@@ -782,6 +793,9 @@ VolumeTester::initialize()
 
         //Cancel gracefully
         if (abortRequested()) return false;
+
+        //Close fd
+        file->close();
     }
 
     return true;
@@ -801,9 +815,18 @@ VolumeTester::writeFull()
     {
         FileInfo file_info = file_infos[i];
         QFile *file = file_info.file;
-        int fd = file->handle();
+        //Open file
+        if (!file->isOpen() && !file->open(QIODevice::ReadWrite))
+        {
+            error_type |= Error::Write;
+            if (file->error() & QFileDevice::PermissionsError)
+                error_type |= Error::Permissions;
+            emit writeFailed(file_info.offset);
+            return false;
+        }
 
         //Flush cache
+        int fd = file->handle();
         //Might block for a while if initialized files not on disk yet (cache)
         #ifdef USE_FSYNC
         fsync(fd);
@@ -850,6 +873,7 @@ VolumeTester::writeFull()
         posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
         #endif
 
+        //Close fd
         file->close();
     }
 
@@ -910,6 +934,9 @@ VolumeTester::verifyFull()
             //Cancel gracefully
             if (abortRequested()) return false;
         }
+
+        //Close fd
+        file->close();
     }
 
     return true;

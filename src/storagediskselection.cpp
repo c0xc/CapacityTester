@@ -1109,6 +1109,46 @@ StorageDiskSelection::Device::unmount(const QString &dev_path, QString *message_
     return success;
 }
 
+bool
+StorageDiskSelection::Device::makePartitionTable(PartitionTableType type)
+{
+    bool success = false;
+
+#if !defined(Q_OS_WIN)
+
+    //Make a new partition table on the disk, clearing all partitions
+    QString udisk_type_str;
+    if (type == PartitionTableType::MBR)
+        udisk_type_str = "dos";
+    else if (type == PartitionTableType::GPT)
+        udisk_type_str = "gpt";
+    else if (type == PartitionTableType::Unknown)
+        udisk_type_str = "zero";
+    QString udisk_name;
+    udisk_name = m_enumerator->m_udisk.findDeviceDBusPath(m_int_addr);
+    if (udisk_name.isEmpty())
+    {
+        //*message_ref = "Invalid device path";
+    }
+    else
+    {
+        if (udisk_type_str.isEmpty())
+            m_enumerator->m_udisk.makeDiskLabel(udisk_name);
+        else
+            m_enumerator->m_udisk.makeDiskLabel(udisk_name, udisk_type_str);
+        success = true; //success not reported by UDisks2
+    }
+
+#elif defined(Q_OS_WIN)
+
+
+#endif
+
+    return success;
+}
+
+//--- Windows specific functions ---
+
 #if defined(Q_OS_WIN)
 
 HANDLE

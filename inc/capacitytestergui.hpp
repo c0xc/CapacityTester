@@ -57,9 +57,8 @@
 #include "destructivedisktester.hpp"
 #include "destructivedisktesterwrapper.hpp"
 #include "selectionwindow.hpp"
-#include "udiskformatdialog.hpp"
-#include "usbdiskselectiondialog.hpp"
-//#include "disktestwindow.hpp"
+//#include "udiskformatdialog.hpp" //obsolete
+//#include "usbdiskselectiondialog.hpp" //obsolete
 #include "usbstoragedevice.hpp"
 #include "performancegraph.hpp"
 
@@ -112,7 +111,7 @@ private slots:
     applyDev();
 
     void
-    applyDev(const QString &path, bool quick = false);
+    applyDev(const QString &path, bool quick = false, bool not_continue = false);
 
     void
     showDevControls();

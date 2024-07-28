@@ -664,17 +664,22 @@ QString
 UDiskManager::findDeviceDBusPath(const QString &device)
 {
     //Dbus does not use the real path to the device file
-    //For example, the device "sda" (which would be at /dev/sda):
+    //For example, the device "sda" (which would be at /dev/sda) has the dbus path:
     // /org/freedesktop/UDisks2/block_devices/sda
     //The other function accepts sda1 only because it happens to be the same base name
     //as the corresponding dbus path, but doesn't resolve /dev/sda or anything.
-    //This function is meant to be used with /dev/sda or sda1.
+    //This function is meant to be used with a device path like /dev/sda or sda1.
+    if (device.isEmpty()) return "";
 
     //Check if it's already an internal path, handle that too
     bool is_dbus_path = device.startsWith("/org/freedesktop/UDisks2/block_devices/");
 
-    //Resolve path if it's a symlink
+    //If relative, prepend /dev assuming device is a real block device
     QString path = device;
+    if (!path.contains("/"))
+        path = "/dev/" + path;
+
+    //Resolve path if it's a symlink
     if (QFileInfo(path).isSymLink())
         path = QFileInfo(path).symLinkTarget();
 

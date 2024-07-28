@@ -304,8 +304,8 @@ CapacityTesterGui::showDevSelect()
     btn_menu->setPopupMode(QToolButton::MenuButtonPopup);
     hbox_head->addWidget(btn_menu);
     btn_menu->setIcon(QIcon::fromTheme("view-refresh"));
-    QMenu *mnu = new QMenu;
-    btn_menu->setMenu(mnu);
+    QMenu *mnu = new QMenu(btn_menu);
+    btn_menu->setMenu(mnu); //Ownership of the menu is not transferred to the push button.
     QAction *act_refresh = mnu->addAction(tr("Refresh"));
     connect(btn_menu, SIGNAL(clicked()), SLOT(updateDevSelectTable()));
     connect(act_refresh, SIGNAL(triggered()), SLOT(updateDevSelectTable()));
@@ -319,30 +319,34 @@ CapacityTesterGui::showDevSelect()
     mnu->addSeparator();
     m_act_format = mnu->addAction(tr("Format storage device"));
     m_act_format->setEnabled(false);
-    connect(m_act_format, SIGNAL(triggered()), SLOT(showFormatTool()));
+    //connect(m_act_format, SIGNAL(triggered()), SLOT(showFormatTool())); //need applyDev()
+    connect(m_act_format, &QAction::triggered, this, [=]()
+    {
+        applyDev(m_selected_dev, false, true); //just set header, don't continue
+        showFormatTool(); //load format tool
+    });
 
     //Device selection
-    if (!m_dev_table)
-    {
-        m_dev_table = new QTableWidget;
-        m_dev_table->setStyleSheet("font-weight:bold; font-size:16pt;");
-        m_dev_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-        m_dev_table->setSelectionMode(QAbstractItemView::SingleSelection);
-        m_dev_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        m_dev_table->setAlternatingRowColors(true);
-        //m_dev_table->setCursor(Qt::PointingHandCursor);
-        vbox->addWidget(m_dev_table);
+    //Previous table will be deleted automatically, so it's replaced here
+    //reusing the table might lead to a crash due to delayed deletion (reset above)
+    m_dev_table = new QTableWidget;
+    m_dev_table->setStyleSheet("font-weight:bold; font-size:16pt;");
+    m_dev_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_dev_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_dev_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_dev_table->setAlternatingRowColors(true);
+    //m_dev_table->setCursor(Qt::PointingHandCursor);
+    vbox->addWidget(m_dev_table);
 
-        //Handle double click
-        connect(m_dev_table, &QTableWidget::cellDoubleClicked, this, [=](int row, int column)
-        {
-            Q_UNUSED(column);
-            checkDevSelection(); //update selected device
-            applyDev();
-        });
-        //Store dev path on select
-        connect(m_dev_table, SIGNAL(itemSelectionChanged()), this, SLOT(checkDevSelection()));
-    }
+    //Handle double click
+    connect(m_dev_table, &QTableWidget::cellDoubleClicked, this, [=](int row, int column)
+    {
+        Q_UNUSED(column);
+        checkDevSelection(); //update selected device
+        applyDev();
+    });
+    //Store dev path on select
+    connect(m_dev_table, SIGNAL(itemSelectionChanged()), this, SLOT(checkDevSelection()));
     QTimer::singleShot(0, this, SLOT(updateDevSelectTable())); //load list of devices
 
     //Unload disk tester instance if it exists (after navigating back)
@@ -394,6 +398,9 @@ CapacityTesterGui::showDevSelect()
 void
 CapacityTesterGui::updateDevSelectTable()
 {
+    //Do nothing if called too late
+    if (!m_dev_table) return;
+    //Clear table
     m_dev_table->clearContents();
     m_dev_table->setRowCount(0);
     m_dev_table->setColumnCount(3);
@@ -551,7 +558,7 @@ CapacityTesterGui::applyDev()
 }
 
 void
-CapacityTesterGui::applyDev(const QString &path, bool quick)
+CapacityTesterGui::applyDev(const QString &path, bool quick, bool not_continue)
 {
     if (path.isEmpty())
     {
@@ -589,13 +596,12 @@ CapacityTesterGui::applyDev(const QString &path, bool quick)
     vbox->addLayout(hbox);
     QLabel *lbl_label1 = new QLabel(tr("Device:"));
     lbl_label1->setStyleSheet("font-family:'Prompt', sans-serif; color:black;"); //or VT323
-    lbl_label1->setToolTip(tr("Device path: %1").arg(path));
     hbox->addWidget(lbl_label1);
     QLabel *lbl_size = new QLabel(m_claimed_capacity.formatted(0));
     lbl_size->setStyleSheet("font-family:'Prompt', sans-serif; color:black; font-weight:bold;"); //or VT323
     hbox->addWidget(lbl_size);
     QLineEdit *lbl_name = new QLineEdit(m_dev_title);
-    lbl_name->setStyleSheet("font-weight:bold; font-family:'Prompt', sans-serif; color:black;"); //or VT323
+    lbl_name->setStyleSheet("font-weight:bold; font-family:'Prompt', sans-serif; color:black; background-color:white;"); //or VT323
     lbl_name->setFrame(false);
     lbl_name->setReadOnly(true);
     lbl_name->setCursorPosition(0); //otherwise beginning of text truncated
@@ -605,13 +611,14 @@ CapacityTesterGui::applyDev(const QString &path, bool quick)
     vbox->addWidget(newHLine());
 
     //Show device controls and test selection
+    //or do nothing (not_continue), caller will load new form
     m_step = 2;
     if (!quick)
     {
         m_test_type = 2;
         showDevControls();
     }
-    else
+    else if (!not_continue)
     {
         //start quick test without any more questions
         m_auto = true;
@@ -1525,11 +1532,12 @@ CapacityTesterGui::handleTestFinished(int result)
 void
 CapacityTesterGui::showFormatTool(bool format_now)
 {
-    if (m_dev_path.isEmpty())
+    if (m_selected_dev.isEmpty())
     {
         showDevSelect();
         return;
     }
+    QString dev_path = m_selected_dev;
     //Clear main layout
     QVBoxLayout *vbox = resetMainLayout();
 
@@ -1543,23 +1551,57 @@ CapacityTesterGui::showFormatTool(bool format_now)
     QShortcut *shortcut = new QShortcut(QKeySequence("Escape"), lbl_head);
     connect(shortcut, &QShortcut::activated, this, &CapacityTesterGui::showDevControls); //prevStep()
 
+    //Clear partition table
+    QPushButton *btn_clear = new QPushButton(tr("Clear partition table"));
+    btn_clear->setToolTip(tr("Clear the partition table on this device, removing all partitions. Before you can use the device again, you will need to create a new partition table and format the device. This will erase all data on the device."));
+    form->addRow(tr("Clear device"), btn_clear);
+    connect(btn_clear, &QAbstractButton::clicked, this, [=]()
+    {
+        //Clear partition table //TODO return code, success...?
+        StorageDiskSelection::Device device = StorageDiskSelection().blockDevice(dev_path);
+        if (!device.isValid())
+        {
+            QMessageBox::critical(this, tr("Error"),
+                tr("The device is not valid."));
+            return;
+        }
+        Debug(QS("clearing partition table on device: %s", CSTR(dev_path)));
+        device.makePartitionTable(StorageDiskSelection::PartitionTableType::Unknown); //clear (Linux/UDisks2 only); optional convenience function
+        device.makePartitionTable();
+        QMessageBox::information(this, tr("Partition table cleared"),
+            tr("The partition table on this device has been cleared."));
+        //if (device.makePartitionTable())
+        //{
+        //    QMessageBox::information(this, tr("Partition table cleared"),
+        //        tr("The partition table on this device has been cleared."));
+        //}
+        //else
+        //{
+        //    QMessageBox::critical(this, tr("Error"),
+        //        tr("Failed to clear partition table."));
+        //}
+    });
+
     //Filesystem type
     QComboBox *cmb_fs = new QComboBox;
     cmb_fs->setEditable(false);
     form->addRow(tr("New filesystem"), cmb_fs); //filesystem for new partition
+    //Get available filesystems
     QStringList fs_list_2;
 #ifdef UDISKMANAGER_HPP
     fs_list_2 = UDiskManager().supportedFilesystems();
 #else
-    QLabel *lbl_unsupported = new QLabel(tr("This feature is not available on this platform."));
+    QLabel *lbl_unsupported = new QLabel(tr("This function is not available on this platform."));
     vbox->addWidget(lbl_unsupported);
     lbl_unsupported->setStyleSheet("color: red;");
     lbl_unsupported->setWordWrap(true);
 #endif //UDISKMANAGER_HPP
+    Debug(QS("supported filesystems: %s", CSTR(fs_list_2.join(", "))));
+    //Move exfat and ext4 to the top (default selection should be exfat)
     foreach (QString type, QStringList() << "exfat" << "ext4")
     {
         int i = fs_list_2.indexOf(type);
-        if (i == -1) continue;
+        if (i == -1) continue; //skip if type not available
         cmb_fs->addItem(fs_list_2.takeAt(i));
     }
     cmb_fs->insertSeparator(cmb_fs->count());
@@ -1568,11 +1610,11 @@ CapacityTesterGui::showFormatTool(bool format_now)
     QCheckBox *chk_world_writable = new QCheckBox(tr("Writable for everyone"));
     chk_world_writable->setToolTip(tr("This will allow all users to write to the device."));
     //chk_world_writable->setChecked(true); //always on (why would anyone create a filesystem on a device that's not writable except for root?)
-    chk_world_writable->setEnabled(false); //TODO
+    chk_world_writable->setEnabled(false); //TODO not yet implemented
     form->addRow("", chk_world_writable);
     //Button
     QPushButton *btn_format = new QPushButton(tr("Format"));
-    btn_format->setToolTip(tr("Format this device now, wiping all data on it."));
+    btn_format->setToolTip(tr("Format this device now, wiping all data on it. Afterward, you should be able to mount and use it again."));
     bool can_continue = cmb_fs->count() > 0;
     btn_format->setDisabled(!can_continue);
     form->addRow("", btn_format);
@@ -1585,14 +1627,16 @@ CapacityTesterGui::showFormatTool(bool format_now)
     {
         QString fs_type = cmb_fs->currentText();
         if (fs_type.isEmpty()) return;
+        Debug(QS("formatting device %s with filesystem %s", CSTR(dev_path), CSTR(fs_type)));
 
 #ifdef UDISKMANAGER_HPP
         UDiskManager udisk;
-        QString dev_path = udisk.findDeviceDBusPath(m_dev_path);
+        QString udisk_path = udisk.findDeviceDBusPath(dev_path);
+        Debug(QS("internal udisk device path: %s", CSTR(udisk_path)));
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        udisk.makeDiskLabel(dev_path);
+        udisk.makeDiskLabel(udisk_path);
         QString message;
-        if (!udisk.createPartition(dev_path, fs_type, &message))
+        if (!udisk.createPartition(udisk_path, fs_type, &message))
         {
             QMessageBox::critical(this, tr("Error"),
                 tr("Failed to format device.\n%1").arg(message));
@@ -1603,6 +1647,9 @@ CapacityTesterGui::showFormatTool(bool format_now)
                 tr("The device has been formatted. You should now be able to mount and use it."));
         }
         QApplication::restoreOverrideCursor();
+#else
+        QMessageBox::critical(this, tr("Error"),
+            tr("This function is not available on this platform."));
 #endif //UDISKMANAGER_HPP
     });
     if (format_now)
@@ -2068,19 +2115,19 @@ VolumeTestGui::showDriveWindow()
 }
 
 void
-VolumeTestGui::showFormatDialog(const QString &target)
+VolumeTestGui::showFormatDialog(const QString &target) //TODO obsolete
 {
 #ifdef UDISKMANAGER_HPP
-    //Show format dialog for target which usually is a (block) device
-    //It could also be a mountpoint in which case the device will be determined
-    UDiskFormatDialog *format_dialog = new UDiskFormatDialog(target, this);
-    format_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    format_dialog->open();
+//    //Show format dialog for target which usually is a (block) device
+//    //It could also be a mountpoint in which case the device will be determined
+//    UDiskFormatDialog *format_dialog = new UDiskFormatDialog(target, this);
+//    format_dialog->setAttribute(Qt::WA_DeleteOnClose);
+//    format_dialog->open();
 #endif
 }
 
 void
-VolumeTestGui::showFormatDialog() //TODO
+VolumeTestGui::showFormatDialog() //TODO obsolete
 {
 #ifdef UDISKMANAGER_HPP
     //If mountpoint selected, use it as target and clear selection
@@ -2093,11 +2140,11 @@ VolumeTestGui::showFormatDialog() //TODO
         return;
     }
 
-    //Show device selection dialog
-    UsbDiskSelectionDialog *selection_dialog = new UsbDiskSelectionDialog(this);
-    selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
-    connect(selection_dialog, SIGNAL(deviceSelected(const QString&)), this, SLOT(showFormatDialog(const QString&)));
-    selection_dialog->open();
+//    //Show device selection dialog
+//    UsbDiskSelectionDialog *selection_dialog = new UsbDiskSelectionDialog(this);
+//    selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
+//    connect(selection_dialog, SIGNAL(deviceSelected(const QString&)), this, SLOT(showFormatDialog(const QString&)));
+//    selection_dialog->open();
 #else
 #endif
 }

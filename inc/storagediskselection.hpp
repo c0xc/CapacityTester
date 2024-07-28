@@ -302,13 +302,13 @@ public:
         seek(qint64 offset, qint64 *pos_ptr = 0);
 
         qint64
-        write(const char *bytes, qint64 size);
+        write(const char *bytes, qint64 size); //NOTE danger
 
         qint64
         read(char *bytes, qint64 size);
 
         bool
-        writeBlock(const char *bytes);
+        writeBlock(const char *bytes); //NOTE danger
 
         bool
         readBlock(char *bytes);
@@ -347,15 +347,15 @@ public:
          * @brief Attempts to mount the specified filesystem.
          * 
          * @param filesystem_path like /dev/sda1, refer to the result of filesystems()
-         * @param message_ref 
-         * @return true 
-         * @return false 
          */
         bool
         mount(const QString &dev_path, QString *message_ref = 0);
 
         bool
         unmount(const QString &dev_path, QString *message_ref = 0);
+
+        bool
+        makePartitionTable(PartitionTableType type = PartitionTableType::MBR);
 
     private:
 

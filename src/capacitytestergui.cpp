@@ -571,6 +571,7 @@ CapacityTesterGui::applyDev(const QString &path, bool quick, bool not_continue)
     foreach (QObject *obj, wid_dev_sel->children())
         obj->deleteLater();
     if (wid_dev_sel->layout()) delete wid_dev_sel->layout();
+    //TODO auto-clear dev header when dev object is deleted
 
     //Set selected device
     StorageDiskSelection::Device device = StorageDiskSelection().blockDevice(path);
@@ -1567,19 +1568,16 @@ CapacityTesterGui::showFormatTool(bool format_now)
         }
         Debug(QS("clearing partition table on device: %s", CSTR(dev_path)));
         device.makePartitionTable(StorageDiskSelection::PartitionTableType::Unknown); //clear (Linux/UDisks2 only); optional convenience function
-        device.makePartitionTable();
-        QMessageBox::information(this, tr("Partition table cleared"),
-            tr("The partition table on this device has been cleared."));
-        //if (device.makePartitionTable())
-        //{
-        //    QMessageBox::information(this, tr("Partition table cleared"),
-        //        tr("The partition table on this device has been cleared."));
-        //}
-        //else
-        //{
-        //    QMessageBox::critical(this, tr("Error"),
-        //        tr("Failed to clear partition table."));
-        //}
+        if (device.makePartitionTable())
+        {
+            QMessageBox::information(this, tr("Partition table cleared"),
+                tr("The partition table on this device has been cleared."));
+        }
+        else
+        {
+            QMessageBox::critical(this, tr("Error"),
+                tr("Failed to clear partition table."));
+        }
     });
 
     //Filesystem type
@@ -1628,13 +1626,23 @@ CapacityTesterGui::showFormatTool(bool format_now)
         QString fs_type = cmb_fs->currentText();
         if (fs_type.isEmpty()) return;
         Debug(QS("formatting device %s with filesystem %s", CSTR(dev_path), CSTR(fs_type)));
+        bool reset_mbr = true;
 
 #ifdef UDISKMANAGER_HPP
         UDiskManager udisk;
         QString udisk_path = udisk.findDeviceDBusPath(dev_path);
         Debug(QS("internal udisk device path: %s", CSTR(udisk_path)));
         QApplication::setOverrideCursor(Qt::WaitCursor);
-        udisk.makeDiskLabel(udisk_path);
+        if (reset_mbr)
+        {
+            if (!udisk.makeDiskLabel(udisk_path, "dos", true))
+            {
+                QMessageBox::critical(this, tr("Error"),
+                    tr("Failed to reset the partition table."));
+                QApplication::restoreOverrideCursor();
+                return;
+            }
+        }
         QString message;
         if (!udisk.createPartition(udisk_path, fs_type, &message))
         {

@@ -622,19 +622,31 @@ UDiskManager::umount(const QString &device, QString *message_ref)
     return false;
 }
 
-void
-UDiskManager::makeDiskLabel(const QString &device, const QString &type)
+bool
+UDiskManager::makeDiskLabel(const QString &device, QString type, bool rescan)
 {
     QString block_if = "org.freedesktop.UDisks2.Block"; //interface for block section
     QString path = deviceDbusPath(device);
 
     // If the option erase is used then the underlying device will be erased. Valid values include “zero” to write zeroes over the entire device before formatting, “ata-secure-erase” to perform a secure erase or “ata-secure-erase-enhanced” to perform an enhanced secure erase. 
 
+    //Call Format method
+    if (type.isEmpty()) type = "gpt"; //default if argument explicitly set to ""
     QDBusInterface &iface = dbusInterface(path, block_if);
     QVariantMap options_dict;
     QVariant options(options_dict);
     QDBusMessage msg = iface.call("Format", type, options);
+    bool ok = msg.type() == QDBusMessage::ReplyMessage;
 
+    //Rescan device (optional!)
+    // This is usually not needed since the OS automatically does this when the last process with a writable file descriptor for the device closes it. 
+    if (rescan)
+    {
+        msg = iface.call("Rescan", options);
+        ok = ok && msg.type() == QDBusMessage::ReplyMessage;
+    }
+
+    return ok;
 }
 
 bool

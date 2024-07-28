@@ -1133,10 +1133,9 @@ StorageDiskSelection::Device::makePartitionTable(PartitionTableType type)
     else
     {
         if (udisk_type_str.isEmpty())
-            m_enumerator->m_udisk.makeDiskLabel(udisk_name);
+            success = m_enumerator->m_udisk.makeDiskLabel(udisk_name);
         else
-            m_enumerator->m_udisk.makeDiskLabel(udisk_name, udisk_type_str);
-        success = true; //success not reported by UDisks2
+            success = m_enumerator->m_udisk.makeDiskLabel(udisk_name, udisk_type_str);
     }
 
 #elif defined(Q_OS_WIN)

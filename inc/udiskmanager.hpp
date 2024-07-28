@@ -271,8 +271,8 @@ public slots:
      * YOU WILL NEED RECOVERY TOOLS (OR A BACKUP PLAN WITH SNAPSHOTS).
      * YOU HAVE BEEN WARNED.
      */
-    void
-    makeDiskLabel(const QString &device, const QString &type = "dos");
+    bool
+    makeDiskLabel(const QString &device, QString type = "dos", bool rescan = false);
 
     /**
      * Create new partition on device.

@@ -49,6 +49,8 @@ typedef struct usb_device usb_dev;
 #endif
 
 #include <sys/stat.h>
+//#include <sys/sysmacros.h> //gnu_dev_major, gnu_dev_minor
+#include <sys/types.h>
 #include <regex>
 
 #include <QString>
@@ -87,7 +89,6 @@ public:
         MegaUltraPlusPlusPlus = 320000,
     };
 
-    explicit
     UsbStorageDevice(const QString &path);
 
     ~UsbStorageDevice();
@@ -99,7 +100,7 @@ public:
     toUsbSpeed(int speed);
 
     /**
-     * @brief Returns available api's or 0 (false) if none are available.
+     * @brief Returns available apis or 0 (false) if none are available.
      * 
      * @return int 
      */

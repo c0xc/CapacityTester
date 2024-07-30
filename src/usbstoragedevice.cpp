@@ -54,8 +54,10 @@ UsbStorageDevice::UsbStorageDevice(const QString &path)
 
     //Get major and minor id
     //also available in the udev map: "MAJOR" and "MINOR"
-    m_major_minor.first = major(dev_stat.st_rdev);
-    m_major_minor.second = minor(dev_stat.st_rdev);
+#if !defined(Q_OS_WIN)
+    m_major_minor.first = gnu_dev_major(dev_stat.st_rdev);
+    m_major_minor.second = gnu_dev_minor(dev_stat.st_rdev);
+#endif
 
     Debug(QS("initialized UsbStorageDevice for device %s (major/minor ids: %d/%d)", CSTR(m_path), m_major_minor.first, m_major_minor.second));
 #if defined(HAVE_LIBUSB1)

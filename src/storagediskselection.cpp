@@ -932,7 +932,7 @@ StorageDiskSelection::Device::filesystems()
         if (vol_path.endsWith("\\"))
             vol_path.chop(1); //remove trailing backslash! otherwise the following call fails
         //Filesystem found, but not necessarily on the current partition
-        FilesystemInfo fs_info{}; //zero-initialize because of partition offset member
+        FilesystemInfo fs_info{}; //zero-initialize (because of) partition offset member
         fs_info.path = vol_path;
         fs_info.mountpoint = letter_str;
 
@@ -1104,13 +1104,51 @@ StorageDiskSelection::Device::unmount(const QString &dev_path, QString *message_
 
     //Does Windows even have an umount command?
 
+    QString vol_path = dev_path; //fs.path like \\?\Volume{...}
+    //QString mountpoint_letter = 
+    //vol_path = "\\\\.\\" + mountpoint_letter;
+
+    //Open volume, get info on disk
+    DWORD retnum = 0;
+    HANDLE knob = CreateFileA(
+        vol_path.toUtf8().constData(),
+        GENERIC_READ | GENERIC_WRITE, //access_mode
+        FILE_SHARE_READ | FILE_SHARE_WRITE, //share_mode
+        NULL, //security attributes
+        OPEN_EXISTING,
+        0, //flags and attributes
+        NULL
+    );
+    if (knob != INVALID_HANDLE_VALUE)
+    {
+        bool ok = DeviceIoControl(
+            knob,
+            FSCTL_DISMOUNT_VOLUME,
+            0, 0,
+            0, 0,
+            &retnum, 0
+        );
+        if (ok) success = true;
+        else
+        {
+            QString msg = Access::formatWinError();
+            if (message_ref) *message_ref = QString("Error unmounting %1 %2").arg(vol_path).arg(msg);
+        }
+
+        CloseHandle(knob);
+    }
+    else
+    {
+        //TODO store error using Access::formatWinError()
+    }
+
 #endif
 
     return success;
 }
 
 bool
-StorageDiskSelection::Device::makePartitionTable(PartitionTableType type)
+StorageDiskSelection::Device::makePartitionTable(PartitionTableType type, QString *message_ref)
 {
     bool success = false;
 
@@ -1140,6 +1178,43 @@ StorageDiskSelection::Device::makePartitionTable(PartitionTableType type)
 
 #elif defined(Q_OS_WIN)
 
+    //Open disk device r/w
+    DWORD access_mode = 0;
+    access_mode = GENERIC_READ | GENERIC_WRITE;
+    DWORD share_mode = 0;
+    DWORD flags_attrs = 0;
+    HANDLE handle = CreateFileA(
+        m_int_addr.toLocal8Bit().constData(),
+        access_mode,
+        share_mode,
+        NULL,
+        OPEN_EXISTING,
+        flags_attrs,
+        NULL
+    );
+    if (handle != INVALID_HANDLE_VALUE)
+    {
+        //IOCTL_DISK_CREATE_DISK
+        //HANDLE knob = driveHandle();
+        CREATE_DISK st_create_disk;
+        st_create_disk.PartitionStyle = PARTITION_STYLE_MBR;
+        if (type == PartitionTableType::GPT)
+            st_create_disk.PartitionStyle = PARTITION_STYLE_GPT;
+        else if (type == PartitionTableType::Unknown)
+            st_create_disk.PartitionStyle = PARTITION_STYLE_RAW;
+        DWORD rsize = 0;
+        success = DeviceIoControl(
+            handle,
+            IOCTL_DISK_CREATE_DISK,
+            &st_create_disk, sizeof(st_create_disk), //in buffer
+            0, 0, //out buffer
+            &rsize,
+            NULL
+        );
+        if (message_ref) *message_ref = Access::formatWinError();
+
+        CloseHandle(handle);
+    }
 
 #endif
 

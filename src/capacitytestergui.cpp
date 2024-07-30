@@ -905,6 +905,9 @@ CapacityTesterGui::showDiskTestSelect()
     QLabel *lbl_quick3 = new QLabel(tr("This test will only take a few minutes."));
     lbl_quick3->setWordWrap(true);
     vbox->addWidget(lbl_quick3);
+    QLabel *lbl_quick4 = new QLabel(tr("This test is specifically designed to detect fake USB sticks, which report the wrong capacity. It's not suited for genuine devices experiencing data corruption due to age or other defects."));
+    lbl_quick4->setWordWrap(true);
+    vbox->addWidget(lbl_quick4);
     connect(opt_quick, &QAbstractButton::toggled, this, [=](bool checked)
     {
         m_test_type = 1;
@@ -1492,7 +1495,7 @@ CapacityTesterGui::handleTestFinished(int result)
     else if (result == 0)
     {
         //Bad disk detected
-        m_lbl_phase->setText(tr("FAKE DETECTED"));
+        m_lbl_phase->setText(tr("FAKE DETECTED")); //TODO rephrase, fake only if verify mismatch
         qint64 err_at_m = m_wr_err > -1 ? m_wr_err : m_rd_err; //> -1 M (pos)
         qint64 err_at_g = 0;
         if (err_at_m > -1) //if -1, failed signal with position didn't work
@@ -1621,7 +1624,7 @@ CapacityTesterGui::showFormatTool(bool format_now)
     //Button
     QPushButton *btn_format = new QPushButton(tr("Format"));
     btn_format->setToolTip(tr("Format this device now, wiping all data on it. Afterward, you should be able to mount and use it again."));
-    bool can_continue = cmb_fs->count() > 0;
+    bool can_continue = fs_list_2.count() > 0;
     btn_format->setDisabled(!can_continue);
     form->addRow("", btn_format);
 

@@ -355,7 +355,7 @@ public:
         unmount(const QString &dev_path, QString *message_ref = 0);
 
         bool
-        makePartitionTable(PartitionTableType type = PartitionTableType::MBR);
+        makePartitionTable(PartitionTableType type = PartitionTableType::MBR, QString *message_ref = 0);
 
     private:
 

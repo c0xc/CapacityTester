@@ -325,6 +325,14 @@ CapacityTesterGui::showDevSelect()
         applyDev(m_selected_dev, false, true); //just set header, don't continue
         showFormatTool(); //load format tool
     });
+    QAction *act_select_volume = mnu->addAction(tr("Select custom location to test"));
+    connect(act_select_volume, &QAction::triggered, this, [=]()
+    {
+        SelectionWindow *window = new SelectionWindow(btn_menu);
+        window->setModal(true);
+        window->show();
+        connect(window, SIGNAL(volumeSelected(const QString&)), SLOT(showFilesystemTest(const QString&)));
+    });
 
     //Device selection
     //Previous table will be deleted automatically, so it's replaced here
@@ -2119,42 +2127,6 @@ VolumeTestGui::showDriveWindow()
     window->setModal(true);
     window->show();
     connect(window, SIGNAL(volumeSelected(const QString&)), SLOT(loadVolume(const QString&)));
-
-}
-
-void
-VolumeTestGui::showFormatDialog(const QString &target) //TODO obsolete
-{
-#ifdef UDISKMANAGER_HPP
-//    //Show format dialog for target which usually is a (block) device
-//    //It could also be a mountpoint in which case the device will be determined
-//    UDiskFormatDialog *format_dialog = new UDiskFormatDialog(target, this);
-//    format_dialog->setAttribute(Qt::WA_DeleteOnClose);
-//    format_dialog->open();
-#endif
-}
-
-void
-VolumeTestGui::showFormatDialog() //TODO obsolete
-{
-#ifdef UDISKMANAGER_HPP
-    //If mountpoint selected, use it as target and clear selection
-    //because after formatting it will not be a valid mountpoint anymore
-    if (!selected_mountpoint.isEmpty())
-    {
-        QString mp = selected_mountpoint;
-        unloadVolume();
-        showFormatDialog(mp);
-        return;
-    }
-
-//    //Show device selection dialog
-//    UsbDiskSelectionDialog *selection_dialog = new UsbDiskSelectionDialog(this);
-//    selection_dialog->setAttribute(Qt::WA_DeleteOnClose);
-//    connect(selection_dialog, SIGNAL(deviceSelected(const QString&)), this, SLOT(showFormatDialog(const QString&)));
-//    selection_dialog->open();
-#else
-#endif
 }
 
 void

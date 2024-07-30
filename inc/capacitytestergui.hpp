@@ -57,8 +57,6 @@
 #include "destructivedisktester.hpp"
 #include "destructivedisktesterwrapper.hpp"
 #include "selectionwindow.hpp"
-//#include "udiskformatdialog.hpp" //obsolete
-//#include "usbdiskselectiondialog.hpp" //obsolete
 #include "usbstoragedevice.hpp"
 #include "performancegraph.hpp"
 
@@ -437,12 +435,6 @@ public slots:
 
     void
     showDriveWindow();
-
-    void
-    showFormatDialog(const QString &target);
-
-    void
-    showFormatDialog();
 
     void
     toggleReqRemount(bool checked);

@@ -191,7 +191,7 @@ DestructiveDiskTesterWrapper::checkStatus(const QString &line)
     else if (rx_finished.indexIn(line) != -1)
     {
         bool success = rx_finished.cap(1) == "success";
-        int result = success ? 1 : rx_finished.cap(2).toInt();
+        int result = success ? 0 : rx_finished.cap(2).toInt();
         //finish signal is not forwarded yet because process still running
         //instead we mark it as received, it will be forwarded later
         //see checkStateFinished()

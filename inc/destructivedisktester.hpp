@@ -115,9 +115,27 @@ signals:
     verifyFailed(qint64 start);
 
     void
-    finished(int result = 1);
+    finished(int result = Error::GenericFail);
 
 public:
+
+    struct Error
+    {
+        enum Type
+        {
+            Aborted         = -1,
+            None            = 0,
+            GenericFail     = 1 << 0,
+            Prep            = 1 << 1,
+            Open            = 1 << 2,
+            SeekWrite       = 1 << 3,
+            WriteData       = 1 << 4,
+            SeekRead        = 1 << 5,
+            ReadData        = 1 << 6,
+            ReadEmpty       = 1 << 7,
+            VerifyMismatch  = 1 << 8,
+        };
+    };
 
     static const int
     KB = 1024;
@@ -393,6 +411,12 @@ private:
 
     QElapsedTimer
     m_total_timer;
+
+    bool
+    m_verify_mismatch_detected = false;
+
+    int
+    m_err_result = Error::None;
 
 
 };

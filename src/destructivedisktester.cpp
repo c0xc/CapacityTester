@@ -477,6 +477,7 @@ DestructiveDiskTester::start()
     if (m_fd == -1)
     {
         Debug(QS("failed to open device"));
+        m_err_result |= Error::Open;
         emit startFailed();
         return;
     }
@@ -522,9 +523,9 @@ DestructiveDiskTester::start()
         ok = runFullTest();
 
     Debug(QS("completed, ok = %d", ok));
-    int res = ok ? 1 : 0;
-    if (m_stop_req || !checkParentPid()) res = -1; //make sure to return abort if stop signal received
-    emit finished(res);
+    int rc = ok ? 0 : m_err_result ? m_err_result : Error::GenericFail;
+    if (m_stop_req || !checkParentPid()) rc = Error::Aborted; //make sure to return abort if stop signal received
+    emit finished(rc);
 
     postResetDevice();
 }
@@ -616,12 +617,14 @@ DestructiveDiskTester::runGBSteps(int phase)
             {
                 //seek failed
                 Debug(QS("write seek failed (phase %d) at %llu / %lld GB (errno: %d)", phase, b, g, errno));
+                m_err_result |= Error::SeekWrite;
                 emit writeFailed(m);
                 return false;
             }
             if (writeBlocks(block_pattern) == false)
             {
                 Debug(QS("write failed (phase %d, bs %d) at %llu / %lld GB (errno: %d)", phase, block_pattern.size(), b, g, errno));
+                m_err_result |= Error::WriteData;
                 emit writeFailed(m);
                 return false;
             }
@@ -636,6 +639,7 @@ DestructiveDiskTester::runGBSteps(int phase)
             {
                 //seek failed
                 Debug(QS("read seek failed (phase %d) at %llu / %lld GB (errno: %d)", phase, b, g, errno));
+                m_err_result |= Error::SeekRead;
                 emit verifyFailed(m);
                 return false;
             }
@@ -644,6 +648,7 @@ DestructiveDiskTester::runGBSteps(int phase)
             {
                 //empty read
                 Debug(QS("read failed (phase %d), empty result at %llu / %lld GB (errno: %d)", phase, b, g, errno));
+                m_err_result |= Error::ReadData;
                 emit verifyFailed(m);
                 return false;
             }
@@ -651,6 +656,7 @@ DestructiveDiskTester::runGBSteps(int phase)
             {
                 //pattern on disk differs from test pattern => bad disk detected
                 Debug(QS("pattern mismatch at %llu / %lld GB", b, g));
+                m_err_result |= Error::VerifyMismatch;
                 emit verifyFailed(m);
                 return false;
             }
@@ -696,6 +702,7 @@ DestructiveDiskTester::runFullWrite()
     if (!seekFD(0))
     {
         Debug(QS("write seek failed (errno: %d)", errno));
+        m_err_result |= Error::SeekWrite;
         emit writeFailed(0);
         return false;
     }
@@ -792,6 +799,7 @@ DestructiveDiskTester::runFullWrite()
         if (!wr_ok)
         {
             Debug(QS("write failed at chunk #%lld [%lld MB] (errno: %d)", m, m + 1, errno));
+            m_err_result |= Error::WriteData;
             emit writeFailed(m);
             return false;
         }
@@ -836,6 +844,7 @@ DestructiveDiskTester::runFullRead()
     if (!seekFD(0))
     {
         Debug(QS("read seek failed (errno: %d)", errno));
+        m_err_result |= Error::SeekRead;
         emit verifyFailed(0);
         return false;
     }
@@ -881,6 +890,7 @@ DestructiveDiskTester::runFullRead()
         if (!rd_ok)
         {
             Debug(QS("read failed at chunk #%lld [%lld MB] (errno: %d)", m, m + 1, errno));
+            m_err_result |= Error::ReadData;
             emit verifyFailed(m);
             return false;
         }
@@ -893,6 +903,7 @@ DestructiveDiskTester::runFullRead()
         if (!match)
         {
             Debug(QS("pattern mismatch at chunk #%lld [%lld MB]", m, m + 1));
+            m_err_result |= Error::VerifyMismatch;
             emit verifyFailed(m);
             return false;
         }

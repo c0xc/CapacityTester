@@ -1455,7 +1455,7 @@ void
 CapacityTesterGui::handleTestFinished(int result)
 {
     double size_g = Size(m_claimed_capacity).gb();
-    bool success = result == 1;
+    bool success = result == 0;
     Debug(QS("test finished, success: %d", success));
 
     //Stop counting elapsed, remaining time etc.
@@ -1472,7 +1472,7 @@ CapacityTesterGui::handleTestFinished(int result)
     m_grp_result->show();
     if (success)
     {
-        //No error found
+        //No error found - test finished successfully
         m_lbl_phase->setText(tr("DONE - NO ERRORS"));
 
         //Different summary text depending on test type
@@ -1485,17 +1485,28 @@ CapacityTesterGui::handleTestFinished(int result)
         {
             //Full mode
             //may be used to test a bad drive which does not lie about its capacity
-            m_lbl_result->setText(tr("This storage device appears to be genuine. This storage device has a capacity of %1 GB, all of which is usable.").arg(size_g, 0, 'f', 1));
+            m_lbl_result->setText(tr("This storage device is genuine. This storage device has a capacity of %1 GB, all of which is usable.").arg(size_g, 0, 'f', 1));
         }
 
         //Add option to format device
         m_grp_format->setVisible(true);
 
     }
-    else if (result == 0)
+    else if (result < 0)
     {
-        //Bad disk detected
-        m_lbl_phase->setText(tr("FAKE DETECTED")); //TODO rephrase, fake only if verify mismatch
+        //Test was aborted, either by user or due to an unexpected error
+        m_lbl_phase->setText(tr("TEST ABORTED"));
+
+        m_lbl_result->setText(tr("The disk test was aborted. No results available."));
+    }
+    else
+    {
+        //Bad disk detected - possibly fake or damaged
+        //Most likely a fake if the verification showed a checksum mismatch
+        bool verify_mismatch = result == DestructiveDiskTester::Error::VerifyMismatch;
+        m_lbl_phase->setText(tr("DEFECTIVE STORAGE DEVICE")); //TODO rephrase?
+        if (verify_mismatch)
+            m_lbl_phase->setText(tr("POSSIBLE COUNTERFEIT STORAGE DEVICE"));
         qint64 err_at_m = m_wr_err > -1 ? m_wr_err : m_rd_err; //> -1 M (pos)
         qint64 err_at_g = 0;
         if (err_at_m > -1) //if -1, failed signal with position didn't work
@@ -1507,15 +1518,35 @@ CapacityTesterGui::handleTestFinished(int result)
         //Different summary text depending on test type
         //because fast mode detects fake capacity
         //and full mode detects any damage(d region)
+        QString err_msg;
+        if (verify_mismatch) //VerifyMismatch
+            err_msg = tr("After %1 GB, the device returned data that did not match what was written during the test. This indicates the device is silently corrupting data without reporting any errors.").arg(err_at_g);
+        else if (result == DestructiveDiskTester::Error::Prep)
+            err_msg = tr("This storage device could not be prepared for testing.");
+        else if (result == DestructiveDiskTester::Error::Open)
+            err_msg = tr("This storage device could not be opened.");
+        else if (result == DestructiveDiskTester::Error::SeekWrite)
+            err_msg = tr("Failed to write to device (seek error) after %1 GB.").arg(err_at_g);
+        else if (result == DestructiveDiskTester::Error::SeekRead)
+            err_msg = tr("Failed to read from device (seek error) after %1 GB.").arg(err_at_g);
+        else if (result == DestructiveDiskTester::Error::WriteData)
+            err_msg = tr("This storage device could not be written to after %1 GB.").arg(err_at_g);
+        else if (result == DestructiveDiskTester::Error::ReadData)
+            err_msg = tr("Failed to read from device after %1 GB.").arg(err_at_g);
+        else if (result == DestructiveDiskTester::Error::ReadEmpty)
+            err_msg = tr("This storage device returned empty data after %1 GB.").arg(err_at_g);
+        else //GenericFail
+            err_msg = tr("An error occurred after %1 GB.").arg(err_at_g);
+
         if (m_test_type == 1)
         {
             //Fast mode
-            m_lbl_result->setText(tr("This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.").arg(size_g, 0, 'f', 1).arg(err_at_g));
+            m_lbl_result->setText(err_msg + " " + tr("This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.").arg(size_g, 0, 'f', 1).arg(err_at_g));
         }
         else
         {
             //Full mode
-            m_lbl_result->setText(tr("This storage device returned corrupted data after %1 GB.").arg(err_at_g));
+            m_lbl_result->setText(err_msg);
         }
         //Different message if error at the beginning
         if (err_at_g == 0)
@@ -1524,13 +1555,6 @@ CapacityTesterGui::handleTestFinished(int result)
             m_lbl_result->setText(tr("This storage device returned corrupted data at the beginning or something prevented the test."));
         }
 
-    }
-    else
-    {
-        //Bad disk detected
-        m_lbl_phase->setText(tr("TEST ABORTED"));
-
-        m_lbl_result->setText(tr("The disk test was aborted. No results available."));
     }
 
     //Enable back, next buttons

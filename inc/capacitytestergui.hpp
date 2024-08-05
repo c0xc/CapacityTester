@@ -272,6 +272,9 @@ private:
     QPointer<QLabel>
     m_lbl_phase;
 
+    QPointer<QLabel>
+    m_lbl_icon;
+
     int
     m_ddt_phase;
 

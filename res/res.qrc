@@ -10,5 +10,8 @@
     <file>Inconsolata.ttf</file>
     <file>VT323-Regular.ttf</file>
 
+    <file>check-mark-96.png</file>
+    <file>cross-mark-96.png</file>
+
 </qresource>
 </RCC>

@@ -229,6 +229,9 @@ CapacityTesterGui::showWelcome(bool first_call)
     {
         //QLabel *lbl_root = new QLabel(tr("This program should be run as root."));
         QLabel *lbl_root = new QLabel(tr("Note: This program was started as a regular user. If this user lacks sudo permissions, the test will fail to start. It is recommended to run this program as root."));
+#if defined(Q_OS_WIN)
+        lbl_root->setText(tr("Note: This program was started as a regular user. If this user lacks administrative permissions, the test will fail to start. It is recommended to run this program as an administrator."));
+#endif
         lbl_root->setStyleSheet("color:gray; font-size:8pt;");
         lbl_root->setWordWrap(true);
         vbox->addWidget(lbl_root);
@@ -989,7 +992,13 @@ CapacityTesterGui::startDiskTest()
     h_font = m_lbl_phase->font();
     h_font.setWeight(QFont::Bold);
     m_lbl_phase->setFont(h_font);
-    grid_test_frame->addWidget(m_lbl_phase, 0, 0, 1, 2);
+    m_lbl_icon = new QLabel;
+    QHBoxLayout *hbox_phase_icon = new QHBoxLayout;
+    hbox_phase_icon->addWidget(m_lbl_phase);
+    //hbox_phase_icon->addStretch();
+    hbox_phase_icon->addWidget(m_lbl_icon, 0, Qt::AlignRight);
+    grid_test_frame->addLayout(hbox_phase_icon, 0, 0, 1, 2);
+    //grid_test_frame->addWidget(m_lbl_phase, 0, 0, 1, 2);
     QLabel *lbl_test_time = new QLabel(tr("Time elapsed:"));
     grid_test_frame->addWidget(lbl_test_time, 2, 0);
     m_lbl_time_elapsed = new QLabel;
@@ -1474,6 +1483,10 @@ CapacityTesterGui::handleTestFinished(int result)
     {
         //No error found - test finished successfully
         m_lbl_phase->setText(tr("DONE - NO ERRORS"));
+        m_lbl_icon->setPixmap(QPixmap(":/check-mark-96.png"));
+        m_lbl_icon->setToolTip(tr("Test completed successfully"));
+        //m_lbl_icon->setFixedSize(24, 24);
+        m_lbl_icon->setScaledContents(true);
 
         //Different summary text depending on test type
         if (m_test_type == 1)
@@ -1496,6 +1509,10 @@ CapacityTesterGui::handleTestFinished(int result)
     {
         //Test was aborted, either by user or due to an unexpected error
         m_lbl_phase->setText(tr("TEST ABORTED"));
+        m_lbl_icon->setPixmap(QPixmap(":/cross-mark-96.png"));
+        m_lbl_icon->setToolTip(tr("Test aborted"));
+        //m_lbl_icon->setFixedSize(24, 24);
+        m_lbl_icon->setScaledContents(true);
 
         m_lbl_result->setText(tr("The disk test was aborted. No results available."));
     }
@@ -1507,6 +1524,11 @@ CapacityTesterGui::handleTestFinished(int result)
         m_lbl_phase->setText(tr("DEFECTIVE STORAGE DEVICE")); //TODO rephrase?
         if (verify_mismatch)
             m_lbl_phase->setText(tr("POSSIBLE COUNTERFEIT STORAGE DEVICE"));
+        m_lbl_icon->setPixmap(QPixmap(":/cross-mark-96.png"));
+        m_lbl_icon->setToolTip(tr("Test failed"));
+        //m_lbl_icon->setFixedSize(24, 24);
+        m_lbl_icon->setScaledContents(true);
+        //Error position in MB
         qint64 err_at_m = m_wr_err > -1 ? m_wr_err : m_rd_err; //> -1 M (pos)
         qint64 err_at_g = 0;
         if (err_at_m > -1) //if -1, failed signal with position didn't work

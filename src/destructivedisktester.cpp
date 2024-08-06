@@ -123,6 +123,33 @@ DestructiveDiskTester::amIRoot()
     //geteuid() requires unistd.h
     if (geteuid() == 0) am_i_root = true;
 
+#elif defined(Q_OS_WIN)
+
+    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+    PSID AdministratorsGroup;
+    BOOL b = AllocateAndInitializeSid(
+        &NtAuthority,
+        2,
+        SECURITY_BUILTIN_DOMAIN_RID,
+        DOMAIN_ALIAS_RID_ADMINS,
+        0, 0, 0, 0, 0, 0,
+        &AdministratorsGroup
+    );
+
+    if (b)
+    {
+        if (!CheckTokenMembership(NULL, AdministratorsGroup, &b))
+        {
+            b = FALSE;
+        }
+        FreeSid(AdministratorsGroup);
+    }
+
+    if (b)
+    {
+        am_i_root = true;
+    }
+
 #endif
 
     return am_i_root;

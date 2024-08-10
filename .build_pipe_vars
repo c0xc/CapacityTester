@@ -5,4 +5,5 @@ font_file=res/Roboto-Regular.ttf
 add_library=xcb
 
 INSTALL_DEBIAN=libparted-dev
+YUM_INSTALL=libusb1-devel/libusbx-devel/libusb-devel
 

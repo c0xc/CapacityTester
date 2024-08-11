@@ -8,6 +8,6 @@ add_library=xcb
 
 #INSTALL_DEBIAN=libparted-dev
 # require libusb1, disable libusb0
-INSTALL_FEDORA=libusb1-devel/libusbx-devel/libusb-devel systemd-devel
+INSTALL_FEDORA="libusb1-devel/libusbx-devel/libusb-devel systemd-devel"
 DISABLE_PKGCONFIG=libusb
 

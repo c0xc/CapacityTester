@@ -24,11 +24,12 @@ CONFIG += link_pkgconfig
     LIBS += -ludev
     DEFINES += HAVE_LIBUDEV
 }
-# libusb1, libusb0
+# libusb1, libusb0 (obsolete, but implemented)
 # LIBS += -lusb (or SUBLIBS=-lusb make)
 isEmpty(NO_LIBUSB) {
     !win32 {
-        PKGCONFIG += libusb-1.0 libusb
+        PKGCONFIG += libusb-1.0
+        PKGCONFIG += libusb
 
         #contains(PKGCONFIG, libusb-1.09) {
         contains(PKGCONFIG, libusb-1.0) {

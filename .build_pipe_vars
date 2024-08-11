@@ -4,6 +4,10 @@ font_file=res/Roboto-Regular.ttf
 
 add_library=xcb
 
-INSTALL_DEBIAN=libparted-dev
+# variables for build pipeline - Fedora 33
+
+#INSTALL_DEBIAN=libparted-dev
+# require libusb1, disable libusb0
 INSTALL_FEDORA=libusb1-devel/libusbx-devel/libusb-devel
+DISABLE_PKGCONFIG=libusb
 

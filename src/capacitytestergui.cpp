@@ -228,8 +228,10 @@ CapacityTesterGui::showWelcome(bool first_call)
     if (!is_root)
     {
         //QLabel *lbl_root = new QLabel(tr("This program should be run as root."));
+        //: Warning for Linux/Unix (sudo permissions - a Linux/Unix thing).
         QLabel *lbl_root = new QLabel(tr("Note: This program was started as a regular user. If this user lacks sudo permissions, the test will fail to start. It is recommended to run this program as root."));
 #if defined(Q_OS_WIN)
+        //: Warning for Windows, so almost the same test as above but "Administrator" instead of "root"/sudo.
         lbl_root->setText(tr("Note: This program was started as a regular user. If this user lacks administrative permissions, the test will fail to start. It is recommended to run this program as an administrator."));
 #endif
         lbl_root->setStyleSheet("color:gray; font-size:8pt;");
@@ -888,6 +890,7 @@ CapacityTesterGui::showDiskTestSelect()
     QVBoxLayout *vbox = resetMainLayout();
 
     //Header
+    //: Type of test can be translated as "test method"
     QLabel *lbl_head = new QLabel(tr("Select the type of test to run"));
     lbl_head->setWordWrap(true);
     vbox->addWidget(lbl_head);
@@ -924,6 +927,7 @@ CapacityTesterGui::showDiskTestSelect()
     QLabel *lbl_full1 = new QLabel(tr("This test is more thorough and takes longer. The entire storage medium is filled with data, and then the data is read back to confirm that it matches the original data."));
     lbl_full1->setWordWrap(true);
     vbox->addWidget(lbl_full1);
+    //: "this" refers to this test method (full test) in the following sentence.
     QLabel *lbl_full2 = new QLabel(tr("Use this if your device is not a typical fake but may have some other defects."));
     lbl_full2->setWordWrap(true);
     vbox->addWidget(lbl_full2);
@@ -1189,6 +1193,7 @@ CapacityTesterGui::stopDiskTest()
     //    QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) //no yes until implemented
     //    return;
     else if (QMessageBox::question(this, tr("Stop test process?"),
+        //: "gracefully" may be skipped in the translation or translated as "normally"; "terminate" means "to kill" in this context (to force the process to stop).
         tr("The disk test could not be stopped gracefully. Do you want to terminate the test?"),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
         return;
@@ -1542,20 +1547,24 @@ CapacityTesterGui::handleTestFinished(int result)
         //and full mode detects any damage(d region)
         QString err_msg;
         if (verify_mismatch) //VerifyMismatch
+            //: Translate: "data that did not match..." may be translated as "wrong data" or "incorrect data". "silently corrupting data" means damaging data without notifying the user.
             err_msg = tr("After %1 GB, the device returned data that did not match what was written during the test. This indicates the device is silently corrupting data without reporting any errors.").arg(err_at_g);
         else if (result == DestructiveDiskTester::Error::Prep)
             err_msg = tr("This storage device could not be prepared for testing.");
         else if (result == DestructiveDiskTester::Error::Open)
             err_msg = tr("This storage device could not be opened.");
         else if (result == DestructiveDiskTester::Error::SeekWrite)
+            //: Translator: Do not translate "seek" (technical term)
             err_msg = tr("Failed to write to device (seek error) after %1 GB.").arg(err_at_g);
         else if (result == DestructiveDiskTester::Error::SeekRead)
+            //: Translator: Do not translate "seek" (technical term)
             err_msg = tr("Failed to read from device (seek error) after %1 GB.").arg(err_at_g);
         else if (result == DestructiveDiskTester::Error::WriteData)
             err_msg = tr("This storage device could not be written to after %1 GB.").arg(err_at_g);
         else if (result == DestructiveDiskTester::Error::ReadData)
             err_msg = tr("Failed to read from device after %1 GB.").arg(err_at_g);
         else if (result == DestructiveDiskTester::Error::ReadEmpty)
+            //: Translator: It unexpectedly returned empty/nothing when reading a (non-empty) section of the device
             err_msg = tr("This storage device returned empty data after %1 GB.").arg(err_at_g);
         else //GenericFail
             err_msg = tr("An error occurred after %1 GB.").arg(err_at_g);
@@ -1574,6 +1583,7 @@ CapacityTesterGui::handleTestFinished(int result)
         if (err_at_g == 0)
         {
             m_lbl_phase->setText(tr("TEST FAILED"));
+            //: Translator: Two things may have lead to this error: Either bogus data was returned at the beginning of the test, or something prevented the test from running.
             m_lbl_result->setText(tr("This storage device returned corrupted data at the beginning or something prevented the test."));
         }
 
@@ -1610,6 +1620,7 @@ CapacityTesterGui::showFormatTool(bool format_now)
     connect(shortcut, &QShortcut::activated, this, &CapacityTesterGui::showDevControls); //prevStep()
 
     //Clear partition table
+    //: Translator: "Clear" may be translated as "reset".
     QPushButton *btn_clear = new QPushButton(tr("Clear partition table"));
     btn_clear->setToolTip(tr("Clear the partition table on this device, removing all partitions. Before you can use the device again, you will need to create a new partition table and format the device. This will erase all data on the device."));
     form->addRow(tr("Clear device"), btn_clear);
@@ -1662,6 +1673,7 @@ CapacityTesterGui::showFormatTool(bool format_now)
     cmb_fs->insertSeparator(cmb_fs->count());
     cmb_fs->addItems(fs_list_2);
     //Checkbox to make it world-writable?
+    //: Translator: "Writable for everyone" means that all users, not just root, will be able to write to the device.
     QCheckBox *chk_world_writable = new QCheckBox(tr("Writable for everyone"));
     chk_world_writable->setToolTip(tr("This will allow all users to write to the device."));
     //chk_world_writable->setChecked(true); //always on (why would anyone create a filesystem on a device that's not writable except for root?)

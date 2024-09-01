@@ -8,6 +8,8 @@
 #ifndef PERFORMANCEGRAPH_HPP
 #define PERFORMANCEGRAPH_HPP
 
+#include <cassert>
+
 #include <QDebug>
 #include <QWidget>
 #include <QPointer>

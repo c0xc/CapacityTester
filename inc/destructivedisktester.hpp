@@ -28,6 +28,11 @@
 #include <sys/types.h>
 #include <exception>
 
+#if __GNUC__ < 10
+#include <chrono>
+#include <atomic>
+#endif
+
 #include <QtGlobal> //Q_OS_...
 
 #if !defined(Q_OS_WIN)

@@ -23,6 +23,8 @@
 #if !defined(NO_UDISK) && defined(QT_DBUS_LIB) //!defined(Q_OS_WIN) <QtGlobal>
 #define UDISKMANAGER_HPP
 
+#include <cassert>
+
 #include <QDebug>
 #include <QObject>
 #include <QPointer>

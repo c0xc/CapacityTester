@@ -846,8 +846,10 @@ UsbStorageDevice::getUsb1Device()
     if (!m_usb1_ctx)
     {
 #if LIBUSB_API_VERSION >= 0x0100010A
-        # Since version 1.0.27
-        r = libusb_init_context(&ctx); //libusb_init is deprecated
+        //Since version 1.0.27
+        //libusb_init is deprecated
+        libusb_init_option usb1_opts = {};
+        r = libusb_init_context(&ctx, &usb1_opts, 0);
 #else
         r = libusb_init(&ctx);
 #endif

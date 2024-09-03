@@ -29,7 +29,7 @@ CONFIG += link_pkgconfig
 isEmpty(NO_LIBUSB) {
     !win32 {
         PKGCONFIG += libusb-1.0
-        PKGCONFIG += libusb
+        # libusb0 (libusb) is a dead horse, obsolete, causes nothing but pain
 
         #contains(PKGCONFIG, libusb-1.09) {
         contains(PKGCONFIG, libusb-1.0) {

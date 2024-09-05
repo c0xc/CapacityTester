@@ -1585,7 +1585,7 @@ CapacityTesterGui::handleTestFinished(int result)
         {
             m_lbl_phase->setText(tr("TEST FAILED"));
             //: Translator: Two things may have lead to this error: Either bogus data was returned at the beginning of the test, or something prevented the test from running.
-            m_lbl_result->setText(tr("This storage device returned corrupted data at the beginning or something prevented the test."));
+            m_lbl_result->setText(tr("This storage device returned corrupted data at the beginning or something prevented the test.") + " " + m_lbl_result->text());
         }
 
     }
@@ -1673,7 +1673,7 @@ CapacityTesterGui::showFormatTool(bool format_now)
     }
     cmb_fs->insertSeparator(cmb_fs->count());
     cmb_fs->addItems(fs_list_2);
-    //Checkbox to make it world-writable?
+    //Checkbox to make it world-writable
     //: Translator: "Writable for everyone" means that all users, not just root, will be able to write to the device. This option exists because in some cases, after formatting, accessing the storage device causes permission errors.
     QCheckBox *chk_world_writable = new QCheckBox(tr("Writable for everyone"));
     chk_world_writable->setToolTip(tr("This will allow all users to write to the device."));

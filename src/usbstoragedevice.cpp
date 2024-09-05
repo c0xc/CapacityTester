@@ -636,8 +636,10 @@ UsbStorageDevice::getUsbVendorAndModelId(QString &vendor_id_ref, QString &model_
         QString vendor_id = QString::number(desc.idVendor, 16);
         QString model_id = QString::number(desc.idProduct, 16);
         //zero-pad to 4 characters
-        while (model_id.length() < 4)
+        while (vendor_id.length() < 4)
             vendor_id = "0" + vendor_id;
+        while (model_id.length() < 4)
+            model_id = "0" + model_id;
         vendor_id_ref = vendor_id;
         model_id_ref = model_id;
     }
@@ -650,11 +652,6 @@ UsbStorageDevice::getUsbVendorAndModelId(QString &vendor_id_ref, QString &model_
     {
         QString vendor_id = QString::number(dev->descriptor.idVendor, 16);
         QString model_id = QString::number(dev->descriptor.idProduct, 16);
-        //zero-pad to 4 characters
-        //while (model_id.length() < 4)
-        //{
-        //    vendor_id = "0" + vendor_id;
-        //}
         vendor_id_ref = vendor_id;
         model_id_ref = model_id;
     }

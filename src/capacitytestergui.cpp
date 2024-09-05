@@ -217,7 +217,8 @@ CapacityTesterGui::showWelcome(bool first_call)
     vbox->addWidget(lbl_head);
 
     //Intro(duck)
-    QLabel *lbl_intro = new QLabel(tr("Welcome to the USB Capacity Tester. This program is designed to verify the reported capacity of USB storage devices. It checks if a device is reporting a fake capacity and attempts to determine the actual capacity. Please proceed with caution as this process will wipe all data on the device."));
+    //: Introduction text for the program. Feel free to improve the wording. //Welcome to the USB Capacity Tester...
+    QLabel *lbl_intro = new QLabel(tr("This program is designed to verify the reported capacity of USB storage devices. It checks if a device is reporting a fake capacity and attempts to determine the actual capacity. Please proceed with caution as this process will wipe all data on the device."));
     lbl_intro->setWordWrap(true);
     //format it blue and green to attract attention
     lbl_intro->setStyleSheet("color:blue; background-color:lightgreen; padding:10px; border:1px solid green; border-radius:5px;");
@@ -1673,11 +1674,19 @@ CapacityTesterGui::showFormatTool(bool format_now)
     cmb_fs->insertSeparator(cmb_fs->count());
     cmb_fs->addItems(fs_list_2);
     //Checkbox to make it world-writable?
-    //: Translator: "Writable for everyone" means that all users, not just root, will be able to write to the device.
+    //: Translator: "Writable for everyone" means that all users, not just root, will be able to write to the device. This option exists because in some cases, after formatting, accessing the storage device causes permission errors.
     QCheckBox *chk_world_writable = new QCheckBox(tr("Writable for everyone"));
     chk_world_writable->setToolTip(tr("This will allow all users to write to the device."));
-    //chk_world_writable->setChecked(true); //always on (why would anyone create a filesystem on a device that's not writable except for root?)
+    chk_world_writable->setChecked(true); //always on (why would anyone create a filesystem on a device that's not writable except for root?)
+    bool is_root = DestructiveDiskTester::amIRoot(); // (geteuid() == 0);
+#if !defined(UDISKMANAGER_HPP)
     chk_world_writable->setEnabled(false); //TODO not yet implemented
+#endif
+    if (!is_root)
+    {
+        chk_world_writable->setEnabled(false);
+        chk_world_writable->setToolTip(tr("This option is not available because the program is not running as root."));
+    }
     form->addRow("", chk_world_writable);
     //Button
     QPushButton *btn_format = new QPushButton(tr("Format"));
@@ -1686,9 +1695,6 @@ CapacityTesterGui::showFormatTool(bool format_now)
     btn_format->setDisabled(!can_continue);
     form->addRow("", btn_format);
 
-    //TODO checkbox to make it world-writable?
-    //We will need StorageDiskManipulator for that (not yet available)
-
     //Handler
     connect(btn_format, &QAbstractButton::clicked, this, [=]()
     {
@@ -1696,6 +1702,7 @@ CapacityTesterGui::showFormatTool(bool format_now)
         if (fs_type.isEmpty()) return;
         Debug(QS("formatting device %s with filesystem %s", CSTR(dev_path), CSTR(fs_type)));
         bool reset_mbr = true;
+        bool fix_perms = chk_world_writable->isChecked();
 
 #ifdef UDISKMANAGER_HPP
         UDiskManager udisk;
@@ -1713,7 +1720,16 @@ CapacityTesterGui::showFormatTool(bool format_now)
             }
         }
         QString message;
-        if (!udisk.createPartition(udisk_path, fs_type, &message))
+        bool ok = udisk.createPartition(udisk_path, fs_type, &message);
+        Debug(QS("create partition: %d, message: %s", ok, CSTR(message)));
+        if (ok && fix_perms)
+        {
+            if (!udisk.fixPartitionPermissions(udisk_path))
+            {
+                Debug(QS("failed to fix permissions on device %s", CSTR(dev_path)));
+            }
+        }
+        if (!ok)
         {
             QMessageBox::critical(this, tr("Error"),
                 tr("Failed to format device.\n%1").arg(message));

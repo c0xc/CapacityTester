@@ -23,10 +23,13 @@
 #if !defined(NO_UDISK) && defined(QT_DBUS_LIB) //!defined(Q_OS_WIN) <QtGlobal>
 #define UDISKMANAGER_HPP
 
+#include <sys/stat.h>
+
 #include <cassert>
 
 #include <QDebug>
 #include <QObject>
+#include <QThread>
 #include <QPointer>
 #include <QDir>
 #include <QDBusInterface>
@@ -281,6 +284,14 @@ public slots:
      */
     bool
     createPartition(const QString &device, const QString &type, QString *message_ref = 0);
+
+    /**
+     * After creating a partition and formatting it with a filesystem,
+     * the new filesystem is sometimes not writable for regular users,
+     * only for root. This function fixes the permissions.
+     */
+    bool
+    fixPartitionPermissions(const QString &device);
 
     /**
      * Resolve device path to udisks/dbus path for use with this class.

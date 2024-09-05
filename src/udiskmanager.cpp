@@ -672,6 +672,69 @@ UDiskManager::createPartition(const QString &device, const QString &type, QStrin
     return true;
 }
 
+bool
+UDiskManager::fixPartitionPermissions(const QString &device)
+{
+    QString filesystem_if = "org.freedesktop.UDisks2.Filesystem"; //interface for filesystem section
+    QString path = deviceDbusPath(device);
+    bool ok = false;
+
+    //Mount it to fix permissions
+    //NOTE device (formatted, same arg as fir createPartition) is not a partition path
+    //e.g., createPartition("/dev/sde", "ext4") -> mount("/dev/sde1")
+    QString mountpoint;
+    QString partition;
+    foreach (QString dev, partitionDevices(device))
+        if (partition.isEmpty()) partition = dev;
+        else { partition.clear(); break; }
+    QString message;
+    if (!mount(partition, &message) || message.isEmpty())
+    {
+        qWarning() << "Failed to mount partition" << partition << message;
+        return false;
+    }
+    mountpoint = message;
+    //QList<QDir> mountpoints = this->mountpoints(device);
+    //if (mountpoints.isEmpty())
+    //{
+    //    ok = false;
+    //}
+    //else if (mountpoints.size() == 1)
+    //{
+    //    mountpoint = mountpoints[0].path();
+    //    ok = true;
+    //}
+    if (!QFileInfo(mountpoint).isDir())
+    {
+        qWarning() << "Mountpoint is not a directory" << mountpoint;
+        ok = false;
+    }
+    //Wait for a few seconds before unmounting
+    QThread::sleep(3); //prevent: target is busy
+
+    //chmod 777 mountpoint - must be run as root
+    qInfo() << "Fixing permissions for" << mountpoint;
+    QFile file(mountpoint);
+    ok = ok && file.setPermissions( //not working (but not failing either)
+        QFileDevice::ReadUser | QFileDevice::WriteUser | QFileDevice::ExeUser
+        | QFileDevice::ReadGroup | QFileDevice::WriteGroup | QFileDevice::ExeGroup
+        | QFileDevice::ReadOther | QFileDevice::WriteOther | QFileDevice::ExeOther);
+    if (chmod(mountpoint.toStdString().c_str(), 0777) != 0)
+    {
+        qWarning() << "Failed to change permissions for" << mountpoint;
+        ok = false;
+    }
+
+    //Unmount
+    if (!umount(partition, &message))
+    {
+        qWarning() << "Failed to unmount partition" << partition << message;
+        return false;
+    }
+
+    return ok;
+}
+
 QString
 UDiskManager::findDeviceDBusPath(const QString &device)
 {

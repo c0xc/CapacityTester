@@ -31,7 +31,7 @@
     <message>
         <location filename="../src/capacitytestercli.cpp" line="63"/>
         <source>Set disk test mode to full instead of fast mode.</source>
-        <translation>Disktestmdus auf vollständig statt schnell setzen.</translation>
+        <translation>Disktestmdus auf &quot;vollständig&quot; statt &quot;schnell&quot; setzen.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="65"/>
@@ -127,7 +127,7 @@ Sind Sie wirklich sicher, dass Sie dennoch fortfahren möchten?</translation>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="67"/>
         <source>Path to device to be tested (disk test).</source>
-        <translation>Pfad zum zu testenden Speichergerät (Disktest)</translation>
+        <translation>Pfad zum zu testenden Speichergerät (Disktest).</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="614"/>
@@ -518,7 +518,7 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
         <location filename="../src/capacitytestergui.cpp" line="221"/>
         <source>This program is designed to verify the reported capacity of USB storage devices. It checks if a device is reporting a fake capacity and attempts to determine the actual capacity. Please proceed with caution as this process will wipe all data on the device.</source>
         <extracomment>Introduction text for the program. Feel free to improve the wording. //Welcome to the USB Capacity Tester...</extracomment>
-        <translation type="unfinished">Dieses Programm dient dazu, die Speicherkapazität eines USB-Speichermediums zu verifizieren. Es prüft, ob ein Speichergerät eine falsche, zu hohe Kapazität angibt und versucht, die reale Kapazität zu ermitteln. Lassen Sie Vorsicht walten, denn ein (Disk-)Test wird alle Daten auf Ihrem USB-Speichergerät vernichten.</translation>
+        <translation>Dieses Programm dient dazu, die Speicherkapazität eines USB-Speichermediums zu verifizieren. Es prüft, ob ein Speichergerät eine falsche, zu hohe Kapazität angibt und versucht, die reale Kapazität zu ermitteln. Lassen Sie Vorsicht walten, denn ein (Disk-)Test wird alle Daten auf Ihrem USB-Speichergerät vernichten.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="233"/>
@@ -611,7 +611,7 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
     <message>
         <location filename="../src/capacitytestergui.cpp" line="594"/>
         <source>Invalid device</source>
-        <translation>Ungültige Quelle.</translation>
+        <translation>Ungültige Quelle</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="595"/>
@@ -979,6 +979,7 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1552"/>
         <source>After %1 GB, the device returned data that did not match what was written during the test. This indicates the device is silently corrupting data without reporting any errors.</source>
+        <extracomment>Translate: &quot;data that did not match...&quot; may be translated as &quot;wrong data&quot; or &quot;incorrect data&quot;. &quot;silently corrupting data&quot; means damaging data without notifying the user.</extracomment>
         <translation>Nach %1 GB hat das Speichermedium Daten zurückgegeben, die nicht den ursprünglich geschriebenen Daten entsprechen. Das deutet darauf hin, dass es unbemerkt Daten beschädigt, ohne dabei einen Fehler zu melden.</translation>
     </message>
     <message>
@@ -994,11 +995,13 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1559"/>
         <source>Failed to write to device (seek error) after %1 GB.</source>
+        <extracomment>Translator: Do not translate &quot;seek&quot; (technical term)</extracomment>
         <translation>Fehler beim Schreiben (seek) nach %1 GB.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1562"/>
         <source>Failed to read from device (seek error) after %1 GB.</source>
+        <extracomment>Translator: Do not translate &quot;seek&quot; (technical term)</extracomment>
         <translation>Fehler beim Lesen (seek) nach %1 GB.</translation>
     </message>
     <message>
@@ -1014,6 +1017,7 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1569"/>
         <source>This storage device returned empty data after %1 GB.</source>
+        <extracomment>Translator: It unexpectedly returned empty/nothing when reading a (non-empty) section of the device</extracomment>
         <translation>Das Speichermedium hat nach %1 GB keine Daten geliefert.</translation>
     </message>
     <message>
@@ -1107,7 +1111,7 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1688"/>
         <source>This option is not available because the program is not running as root.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Option ist nicht verfügbar, weil das Programm nicht unter root läuft.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1692"/>
@@ -1159,176 +1163,87 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
     <message>
         <location filename="../src/destructivedisktester.cpp" line="431"/>
         <source>Filesystem is mounted, cannot continue: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateisystem ist eingehängt, Fortsetzung nicht möglich: %1</translation>
     </message>
     <message>
         <location filename="../src/destructivedisktester.cpp" line="438"/>
         <source>Filesystem is mounted, not unmounting automatically because this is not a USB device: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateisystem ist eingehängt, wird nicht automatisch ausgehängt, da dies kein USB-Gerät ist: %1</translation>
     </message>
     <message>
         <location filename="../src/destructivedisktester.cpp" line="448"/>
         <source>Failed to unmount %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Aushängen von %1 fehlgeschlagen: %2</translation>
     </message>
 </context>
 <context>
     <name>DiskTestWidget</name>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="212"/>
-        <source>Which type of test do you want to run? Click OK or hit ENTER to use the recommended one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="218"/>
-        <source>Quick disk test</source>
-        <extracomment>Fast, as in quick - takes only ~minutes.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="222"/>
-        <source>Writes to the disk with certain intervals to quickly determine if the device has less capacity than it claims to have. This type of test works for all common fakes and is very fast. It will not test every byte. Recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="225"/>
-        <source>Full disk test</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="228"/>
-        <source>Fills the whole disk, testing every block. This will take a long time. Use this type of test if you suspect that parts of your disk are faulty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="258"/>
-        <source>Disk test for: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="263"/>
-        <source>TEST2 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="278"/>
-        <source>Do you want to start the test now?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="285"/>
-        <source>This test will overwrite the device, destroying all data on it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="296"/>
-        <source>The following filesystems are mounted on this device: %1. They will be unmounted before the test starts.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="317"/>
         <source>Cannot start test</source>
-        <translation type="unfinished">Test kann nicht starten</translation>
+        <translation type="obsolete">Test kann nicht starten</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="319"/>
         <source>This device is not valid: %1.</source>
         <extracomment>Invalid device selected, device not found.</extracomment>
-        <translation type="unfinished">Das ist kein gültiges Laufwerk: %1.</translation>
+        <translation type="obsolete">Das ist kein gültiges Laufwerk: %1.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="330"/>
-        <location filename="../src/disktestwindow.cpp" line="337"/>
         <source>Disk test</source>
-        <translation type="unfinished">Disk-Test</translation>
+        <translation type="obsolete">Disk-Test</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="332"/>
         <source>This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password.</source>
         <extracomment>This hint is to inform the user that a password prompt will be triggered, usually asking for the sudo password (i.e., the user&apos;s password if s/he has sufficient sudo permissions to run this program as root). sudo does not have to be translated, it&apos;s a detail.</extracomment>
-        <translation type="unfinished">Das Programm läuft mit eingeschränkten Rechten. Es wird nun ein Versuch unternommen, Administratorrechte zu erlangen, damit der Test laufen kann. Sie könnten aufgefordert werden, das (sudo-)Passwort einzugeben.</translation>
+        <translation type="obsolete">Das Programm läuft mit eingeschränkten Rechten. Es wird nun ein Versuch unternommen, Administratorrechte zu erlangen, damit der Test laufen kann. Sie könnten aufgefordert werden, das (sudo-)Passwort einzugeben.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="339"/>
         <source>This program is running with limited privileges. Try restarting the program as administrator.</source>
         <extracomment>This warning is shown on Windows, so the term administrator is used. Alternative: Please start this program with elevated privileges.</extracomment>
-        <translation type="unfinished">Das Programm läuft mit eingeschränkten Rechten. Versuchen Sie, es als Administrator zu starten.</translation>
+        <translation type="obsolete">Das Programm läuft mit eingeschränkten Rechten. Versuchen Sie, es als Administrator zu starten.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="417"/>
-        <source>Test Progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="427"/>
         <source>Time elapsed:</source>
-        <translation type="unfinished">Verstrichene Zeit:</translation>
+        <translation type="obsolete">Verstrichene Zeit:</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="431"/>
         <source>Estimated time remaining:</source>
-        <translation type="unfinished">Geschätzte Restzeit:</translation>
+        <translation type="obsolete">Geschätzte Restzeit:</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="439"/>
-        <source>TEST IN PROGRESS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="442"/>
         <source>Write Speed</source>
-        <translation type="unfinished">Schreibgeschwindigkeit</translation>
+        <translation type="obsolete">Schreibgeschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="450"/>
         <source>Read Speed</source>
-        <translation type="unfinished">Lesegeschwindigkeit</translation>
+        <translation type="obsolete">Lesegeschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="515"/>
         <source>WRITING</source>
-        <translation type="unfinished">SCHREIBEN</translation>
+        <translation type="obsolete">SCHREIBEN</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="521"/>
         <source>VERIFYING</source>
-        <translation type="unfinished">VERIFIZIEREN</translation>
+        <translation type="obsolete">VERIFIZIEREN</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="528"/>
         <source>TEST SUCCEEDED</source>
-        <translation type="unfinished">TEST ERFOLGREICH ABGESCHLOSSEN</translation>
+        <translation type="obsolete">TEST ERFOLGREICH ABGESCHLOSSEN</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="532"/>
         <source>TEST FAILED</source>
-        <translation type="unfinished">TEST FEHLGESCHLAGEN</translation>
+        <translation type="obsolete">TEST FEHLGESCHLAGEN</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="583"/>
         <source>DONE - NO ERRORS</source>
-        <translation type="unfinished">FERTIG - KEINE FEHLER</translation>
+        <translation type="obsolete">FERTIG - KEINE FEHLER</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="589"/>
-        <location filename="../src/disktestwindow.cpp" line="595"/>
         <source>This storage device appears to be genuine. This storage device has a capacity of %1 GB, all of which is usable.</source>
-        <translation type="unfinished">Dieses Speichermedium scheint echt zu sein. Es hat eine Kapazität von %1 GB, die vollständig nutzbar ist.</translation>
+        <translation type="obsolete">Dieses Speichermedium scheint echt zu sein. Es hat eine Kapazität von %1 GB, die vollständig nutzbar ist.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="601"/>
-        <source>FAKE DETECTED</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="615"/>
         <source>This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.</source>
-        <translation type="unfinished">Das Speichermedium gibt eine Kapazität von %1 GB an, aber nur die ersten %2 GB sind nutzbar.</translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="620"/>
-        <source>This storage device returned corrupted data after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Das Speichermedium gibt eine Kapazität von %1 GB an, aber nur die ersten %2 GB sind nutzbar.</translation>
     </message>
 </context>
 <context>
@@ -1707,7 +1622,7 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
         <location filename="../src/capacitytestergui.cpp" line="1919"/>
         <source>Volume</source>
         <extracomment>Volume refers to a (mounted) filesystem throughout this application, so the word volume may be translated as filesystem.</extracomment>
-        <translation>Dateisystem</translation>
+        <translation>Laufwerk</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1925"/>
@@ -1979,7 +1894,7 @@ Falls Sie noch irgendwelche wertvollen Daten auf dem Laufwerk gespeichert haben,
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2732"/>
         <source>Test failed. </source>
-        <translation>Test fehlgeschlagen.</translation>
+        <translation>Test fehlgeschlagen. </translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2840"/>

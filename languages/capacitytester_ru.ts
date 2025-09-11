@@ -31,7 +31,7 @@
     <message>
         <location filename="../src/capacitytestercli.cpp" line="63"/>
         <source>Set disk test mode to full instead of fast mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить режим тестирования диска на полный вместо быстрого.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="65"/>
@@ -134,7 +134,7 @@ Are you really sure you want to continue?</source>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="67"/>
         <source>Path to device to be tested (disk test).</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь к устройству для тестирования (тест диска).</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="614"/>
@@ -508,334 +508,334 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="67"/>
         <source>&amp;Next</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Далее</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="69"/>
         <source>&amp;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Назад</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="215"/>
         <source>Hello</source>
-        <translation type="unfinished"></translation>
+        <translation>Здравствуйте</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="221"/>
         <source>This program is designed to verify the reported capacity of USB storage devices. It checks if a device is reporting a fake capacity and attempts to determine the actual capacity. Please proceed with caution as this process will wipe all data on the device.</source>
         <extracomment>Introduction text for the program. Feel free to improve the wording. //Welcome to the USB Capacity Tester...</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Эта программа предназначена для проверки заявленной ёмкости USB-накопителей. Она проверяет, не сообщает ли устройство фальшивую ёмкость, и пытается определить реальную ёмкость. Пожалуйста, будьте осторожны: в ходе этого процесса все данные на устройстве будут удалены.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="233"/>
         <source>Note: This program was started as a regular user. If this user lacks sudo permissions, the test will fail to start. It is recommended to run this program as root.</source>
         <extracomment>Warning for Linux/Unix (sudo permissions - a Linux/Unix thing).</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Примечание: Эта программа была запущена от обычного пользователя. Если у этого пользователя нет прав sudo, тест не сможет запуститься. Рекомендуется запускать программу от имени root.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="236"/>
         <source>Note: This program was started as a regular user. If this user lacks administrative permissions, the test will fail to start. It is recommended to run this program as an administrator.</source>
         <extracomment>Warning for Windows, so almost the same test as above but &quot;Administrator&quot; instead of &quot;root&quot;/sudo.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Примечание: Эта программа была запущена от обычного пользователя. Если у этого пользователя нет административных прав, тест не сможет запуститься. Рекомендуется запускать программу от имени администратора.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="303"/>
         <source>Select the USB storage device to test</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите USB-накопитель для тестирования</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="315"/>
         <source>Refresh</source>
-        <translation type="unfinished">Обновить</translation>
+        <translation>Обновить</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="318"/>
         <source>USB devices only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только USB-устройства</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="326"/>
         <source>Format storage device</source>
-        <translation type="unfinished"></translation>
+        <translation>Отформатировать запоминающее устройство</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="334"/>
         <source>Select custom location to test</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите пользовательское расположение для тестирования</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="378"/>
         <location filename="../src/capacitytestergui.cpp" line="901"/>
         <source>Quick test</source>
         <extracomment>Quick test [method] means a quick test of the storage device.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Быстрый тест</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="382"/>
         <source>This test is usually sufficient to detect fake devices. It will only take a few minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот тест обычно достаточен для обнаружения поддельных устройств. Он займет всего несколько минут.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="386"/>
         <source>Quick start</source>
-        <translation type="unfinished"></translation>
+        <translation>Быстрый запуск</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="400"/>
         <source>Continue to select the type of test to run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Продолжайте, чтобы выбрать тип теста для запуска.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="421"/>
         <source>Name</source>
-        <translation type="unfinished">Название</translation>
+        <translation>Название</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="474"/>
         <source>Serial</source>
         <extracomment>Serial number of storage device.</extracomment>
-        <translation type="unfinished">Номер серии</translation>
+        <translation>Номер серии</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="486"/>
         <source>Mounted at: %1</source>
         <extracomment>Mountpoint of the device.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Смонтировано в: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="566"/>
         <location filename="../src/capacitytestergui.cpp" line="579"/>
         <source>No device selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство не выбрано</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="567"/>
         <location filename="../src/capacitytestergui.cpp" line="580"/>
         <source>Please select a device to test.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, выберите устройство для тестирования.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="594"/>
         <source>Invalid device</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимое устройство</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="595"/>
         <source>The selected device is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранное устройство недопустимо.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="612"/>
         <source>Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство:</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="624"/>
         <source>Device path: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь к устройству: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="655"/>
         <source>Device information</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация об устройстве</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="664"/>
         <source>Device name: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Название устройства: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="676"/>
         <source>Device serial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Серийный номер: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="688"/>
         <source>Device speed: %1 (%2 Mbps)</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость устройства: %1 (%2 Мбит/с)</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="693"/>
         <source>Device speed could not be determined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость устройства не удалось определить.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="699"/>
         <source>Possible permission problem trying to determine device speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Возможная проблема с правами доступа при определении скорости устройства.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="708"/>
         <location filename="../src/capacitytestergui.cpp" line="716"/>
         <source>USB device id: %1:%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификатор USB-устройства: %1:%2</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="724"/>
         <source>USB device information not available on this system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация о USB-устройстве недоступна на этой системе.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="732"/>
         <source>Filesystems</source>
-        <translation type="unfinished"></translation>
+        <translation>Файловые системы</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="741"/>
         <source>Number of partitions: %1</source>
         <extracomment>This device has %1 partitions.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Количество разделов: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="758"/>
         <source>Partition</source>
-        <translation type="unfinished"></translation>
+        <translation>Раздел</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="767"/>
         <source>Size</source>
-        <translation type="unfinished">Ёмкость</translation>
+        <translation>Ёмкость</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="773"/>
         <source>Mountpoint</source>
-        <translation type="unfinished">Точка монтирования</translation>
+        <translation>Точка монтирования</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="788"/>
         <source>Unmount</source>
-        <translation type="unfinished">Извлечь</translation>
+        <translation>Извлечь</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="796"/>
         <source>Filesystem test</source>
         <extracomment>Filesystem test (old test method; not disk test, which is more thorough and recommended).</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Тест файловой системы</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="802"/>
         <source>Test the filesystem on this partition. A filesystem test will take hours! A disk test is recommended instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверьте файловую систему на этом разделе. Тест файловой системы займет несколько часов! Вместо этого рекомендуется выполнить тест диска.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="807"/>
         <source>Mount</source>
-        <translation type="unfinished">Подключить</translation>
+        <translation>Подключить</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="820"/>
         <source>Continue to select a test type.</source>
-        <translation type="unfinished"></translation>
+        <translation>Продолжайте, чтобы выбрать тип теста.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="836"/>
         <source>Mount filesystem?</source>
-        <translation type="unfinished"></translation>
+        <translation>Смонтировать файловую систему?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="837"/>
         <source>Do you want to mount the selected filesystem?</source>
-        <translation type="unfinished"></translation>
+        <translation>Хотите смонтировать выбранную файловую систему?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="845"/>
         <location filename="../src/capacitytestergui.cpp" line="853"/>
         <source>Mount filesystem</source>
-        <translation type="unfinished"></translation>
+        <translation>Смонтировать файловую систему</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="846"/>
         <source>The selected filesystem has been mounted here: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранная файловая система была смонтирована здесь: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="854"/>
         <source>The selected filesystem could not be mounted. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось смонтировать выбранную файловую систему. %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="865"/>
         <source>Unmount filesystem?</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмонтировать файловую систему?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="866"/>
         <source>Do you want to unmount the selected filesystem?</source>
-        <translation type="unfinished"></translation>
+        <translation>Хотите отмонтировать выбранную файловую систему?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="874"/>
         <location filename="../src/capacitytestergui.cpp" line="881"/>
         <source>Unmount filesystem</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмонтировать файловую систему</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="875"/>
         <source>The selected filesystem has been unmounted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбранная файловая система была отмонтирована.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="882"/>
         <source>The selected filesystem could not be unmounted. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось отмонтировать выбранную файловую систему. %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="895"/>
         <source>Select the type of test to run</source>
         <extracomment>Type of test can be translated as &quot;test method&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Выберите тип теста</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="903"/>
         <source>This test is usually sufficient to detect fake devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот тест обычно достаточен для обнаружения поддельных устройств.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="908"/>
         <source>The Quick Test specifically checks whether the storage medium is reporting a false capacity and attempts to determine the real capacity. USB sticks that claim too large a capacity can be quickly identified with this, hence this is the recommended test type.</source>
-        <translation type="unfinished"></translation>
+        <translation>Быстрый тест специально проверяет, сообщает ли носитель данных ложную ёмкость, и пытается определить реальную ёмкость. USB-накопители, которые заявляют слишком большую ёмкость, можно быстро выявить с помощью этого теста, поэтому он рекомендуется.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="910"/>
         <source>If fake sticks, which claim more capacity than they actually have, are written beyond their real capacity, the written data is lost and the file system on the stick can even be damaged in some cases. Instead of completely filling the storage medium, it writes specifically at certain positions to determine whether the data can be read back.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если поддельные флешки, которые заявляют большую ёмкость, чем имеют на самом деле, записываются сверх их реальной ёмкости, записанные данные теряются, а файловая система на флешке в некоторых случаях может быть повреждена. Вместо полного заполнения носителя запись производится в определённых местах, чтобы определить, можно ли считать данные обратно.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="912"/>
         <source>This test will only take a few minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот тест займет всего несколько минут.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="915"/>
         <source>This test is specifically designed to detect fake USB sticks, which report the wrong capacity. It&apos;s not suited for genuine devices experiencing data corruption due to age or other defects.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот тест специально предназначен для обнаружения поддельных USB-накопителей, которые сообщают неверную ёмкость. Он не подходит для настоящих устройств, у которых возникают ошибки данных из-за возраста или других дефектов.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="926"/>
         <source>Full test</source>
         <extracomment>Full test [method] means a full test of the storage device.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Полный тест</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="928"/>
         <source>This test is more thorough and takes longer. The entire storage medium is filled with data, and then the data is read back to confirm that it matches the original data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот тест более тщательный и занимает больше времени. Всё запоминающее устройство заполняется данными, после чего данные считываются обратно для проверки их соответствия исходным данным.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="932"/>
         <source>Use this if your device is not a typical fake but may have some other defects.</source>
         <extracomment>&quot;this&quot; refers to this test method (full test) in the following sentence.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Используйте это, если ваше устройство не является типовой подделкой, но может иметь другие дефекты.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="953"/>
         <source>Start the disk test now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Начать тест диска сейчас?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="961"/>
         <source>The disk test will overwrite all data on the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Тест диска перезапишет все данные на устройстве.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="995"/>
@@ -847,85 +847,85 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1007"/>
         <source>Time elapsed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Прошедшее время:</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1011"/>
         <source>Estimated time remaining:</source>
-        <translation type="unfinished"></translation>
+        <translation>Примерное оставшееся время:</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1016"/>
         <source>Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость:</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1033"/>
         <source>Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость записи</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1041"/>
         <source>Read Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость чтения</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1053"/>
         <source>Test results</source>
-        <translation type="unfinished"></translation>
+        <translation>Результаты теста</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1076"/>
         <source>You should format the device to make it usable again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вам следует отформатировать устройство, чтобы оно снова стало пригодным для использования.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1079"/>
         <source>Format device</source>
-        <translation type="unfinished"></translation>
+        <translation>Отформатировать диск</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1187"/>
         <location filename="../src/capacitytestergui.cpp" line="1196"/>
         <source>Stop test process?</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить процесс тестирования?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1188"/>
         <source>Do you want to stop the disk test?</source>
-        <translation type="unfinished"></translation>
+        <translation>Хотите остановить тест диска?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1198"/>
         <source>The disk test could not be stopped gracefully. Do you want to terminate the test?</source>
         <extracomment>&quot;gracefully&quot; may be skipped in the translation or translated as &quot;normally&quot;; &quot;terminate&quot; means &quot;to kill&quot; in this context (to force the process to stop).</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Тест диска не удалось корректно остановить. Хотите принудительно завершить тест?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1245"/>
         <location filename="../src/capacitytestergui.cpp" line="1246"/>
         <source>Initializing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Инициализация...</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1283"/>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1297"/>
         <source>FAILED TO START</source>
-        <translation type="unfinished"></translation>
+        <translation>НЕ УДАЛОСЬ ЗАПУСТИТЬ</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1300"/>
         <source>Failed to start disk test</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось запустить тест диска</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1301"/>
         <source>The disk test could not be started: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось запустить тест диска: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1352"/>
@@ -940,124 +940,128 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1491"/>
         <source>DONE - NO ERRORS</source>
-        <translation type="unfinished"></translation>
+        <translation>ГОТОВО – ОШИБОК НЕТ</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1493"/>
         <source>Test completed successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Тест успешно завершён</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1501"/>
         <source>This storage device appears to be genuine. This storage device has a capacity of %1 GB, all of which is usable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это запоминающее устройство, по-видимому, является подлинным. Его ёмкость составляет %1 ГБ, и всё пространство доступно для использования.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1507"/>
         <source>This storage device is genuine. This storage device has a capacity of %1 GB, all of which is usable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это запоминающее устройство является подлинным. Его ёмкость составляет %1 ГБ, и всё пространство доступно для использования.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1517"/>
         <source>TEST ABORTED</source>
-        <translation type="unfinished"></translation>
+        <translation>ТЕСТ ПРЕРВАН</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1519"/>
         <source>Test aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Тест прерван</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1523"/>
         <source>The disk test was aborted. No results available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Тест диска был прерван. Результаты отсутствуют.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1530"/>
         <source>DEFECTIVE STORAGE DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>НЕИСПРАВНОЕ ЗАПОМИНАЮЩЕЕ УСТРОЙСТВО</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1532"/>
         <source>POSSIBLE COUNTERFEIT STORAGE DEVICE</source>
-        <translation type="unfinished"></translation>
+        <translation>ВОЗМОЖНО ПОДДЕЛЬНОЕ ЗАПОМИНАЮЩЕЕ УСТРОЙСТВО</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1552"/>
         <source>After %1 GB, the device returned data that did not match what was written during the test. This indicates the device is silently corrupting data without reporting any errors.</source>
-        <translation type="unfinished"></translation>
+        <extracomment>Translate: &quot;data that did not match...&quot; may be translated as &quot;wrong data&quot; or &quot;incorrect data&quot;. &quot;silently corrupting data&quot; means damaging data without notifying the user.</extracomment>
+        <translation>После %1 ГБ устройство вернуло данные, которые не совпадали с записанными во время теста. Это указывает на то, что устройство незаметно повреждает данные, не сообщая об ошибках.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1554"/>
         <source>This storage device could not be prepared for testing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось подготовить это запоминающее устройство для тестирования.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1556"/>
         <source>This storage device could not be opened.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось открыть это запоминающее устройство.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1559"/>
         <source>Failed to write to device (seek error) after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <extracomment>Translator: Do not translate &quot;seek&quot; (technical term)</extracomment>
+        <translation>Не удалось записать на устройство (ошибка позиционирования) после %1 ГБ.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1562"/>
         <source>Failed to read from device (seek error) after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <extracomment>Translator: Do not translate &quot;seek&quot; (technical term)</extracomment>
+        <translation>Не удалось прочитать с устройства (ошибка позиционирования) после %1 ГБ.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1564"/>
         <source>This storage device could not be written to after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <translation>На это запоминающее устройство не удалось записать после %1 ГБ.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1566"/>
         <source>Failed to read from device after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось прочитать с устройства после %1 ГБ.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1569"/>
         <source>This storage device returned empty data after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <extracomment>Translator: It unexpectedly returned empty/nothing when reading a (non-empty) section of the device</extracomment>
+        <translation>Это запоминающее устройство вернуло пустые данные после %1 ГБ.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1571"/>
         <source>An error occurred after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <translation>После %1 ГБ произошла ошибка.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1576"/>
         <source>This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это запоминающее устройство заявляет о ёмкости %1 ГБ, но только первые %2 ГБ доступны для использования.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1588"/>
         <source>This storage device returned corrupted data at the beginning or something prevented the test.</source>
         <extracomment>Translator: Two things may have lead to this error: Either bogus data was returned at the beginning of the test, or something prevented the test from running.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Это запоминающее устройство вернуло повреждённые данные в начале теста или что-то помешало проведению теста.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1614"/>
         <source>Select a filesystem type and confirm to format the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите тип файловой системы и подтвердите форматирование устройства.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1625"/>
         <source>Clear partition table</source>
         <extracomment>Translator: &quot;Clear&quot; may be translated as &quot;reset&quot;.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Очистить таблицу разделов</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1626"/>
         <source>Clear the partition table on this device, removing all partitions. Before you can use the device again, you will need to create a new partition table and format the device. This will erase all data on the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистьте таблицу разделов на этом устройстве, удалив все разделы. Прежде чем вы сможете снова использовать устройство, потребуется создать новую таблицу разделов и отформатировать устройство. Это приведёт к удалению всех данных на устройстве.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1627"/>
         <source>Clear device</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить устройство</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1634"/>
@@ -1066,85 +1070,86 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <location filename="../src/capacitytestergui.cpp" line="1734"/>
         <location filename="../src/capacitytestergui.cpp" line="1744"/>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1635"/>
         <source>The device is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство недопустимо.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1642"/>
         <source>Partition table cleared</source>
-        <translation type="unfinished"></translation>
+        <translation>Таблица разделов очищена</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1643"/>
         <source>The partition table on this device has been cleared.</source>
-        <translation type="unfinished"></translation>
+        <translation>Таблица разделов на этом устройстве была очищена.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1648"/>
         <source>Failed to clear partition table.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось очистить таблицу разделов.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1655"/>
         <source>New filesystem</source>
-        <translation type="unfinished">Новая файловая система</translation>
+        <translation>Новая файловая система</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1661"/>
         <location filename="../src/capacitytestergui.cpp" line="1745"/>
         <source>This function is not available on this platform.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта функция недоступна на данной платформе.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1678"/>
         <source>Writable for everyone</source>
         <extracomment>Translator: &quot;Writable for everyone&quot; means that all users, not just root, will be able to write to the device. This option exists because in some cases, after formatting, accessing the storage device causes permission errors.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Доступно для записи всем</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1679"/>
         <source>This will allow all users to write to the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это позволит всем пользователям записывать на устройство.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1688"/>
         <source>This option is not available because the program is not running as root.</source>
-        <translation type="unfinished"></translation>
+        <translation>Эта опция недоступна, потому что программа запущена не от имени root.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1692"/>
         <source>Format</source>
-        <translation type="unfinished">Форматировать</translation>
+        <translation>Форматировать</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1693"/>
         <source>Format this device now, wiping all data on it. Afterward, you should be able to mount and use it again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Отформатируйте это устройство сейчас, удалив все данные на нём. После этого вы сможете снова смонтировать и использовать его.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1717"/>
         <source>Failed to reset the partition table.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось сбросить таблицу разделов.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1735"/>
         <source>Failed to format device.
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось отформатировать устройство.
+%1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1739"/>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Успех</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1740"/>
         <source>The device has been formatted. You should now be able to mount and use it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство было отформатировано. Теперь вы должны смочь его смонтировать и использовать.</translation>
     </message>
     <message>
         <source>ACCESS ERROR!</source>
@@ -1164,176 +1169,59 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
     <message>
         <location filename="../src/destructivedisktester.cpp" line="431"/>
         <source>Filesystem is mounted, cannot continue: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Файловая система смонтирована, продолжение невозможно: %1</translation>
     </message>
     <message>
         <location filename="../src/destructivedisktester.cpp" line="438"/>
         <source>Filesystem is mounted, not unmounting automatically because this is not a USB device: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Файловая система смонтирована, автоматическое размонтирование не выполняется, так как это не USB-устройство: %1</translation>
     </message>
     <message>
         <location filename="../src/destructivedisktester.cpp" line="448"/>
         <source>Failed to unmount %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось отмонтировать %1: %2</translation>
     </message>
 </context>
 <context>
     <name>DiskTestWidget</name>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="212"/>
-        <source>Which type of test do you want to run? Click OK or hit ENTER to use the recommended one.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="218"/>
-        <source>Quick disk test</source>
-        <extracomment>Fast, as in quick - takes only ~minutes.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="222"/>
-        <source>Writes to the disk with certain intervals to quickly determine if the device has less capacity than it claims to have. This type of test works for all common fakes and is very fast. It will not test every byte. Recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="225"/>
-        <source>Full disk test</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="228"/>
-        <source>Fills the whole disk, testing every block. This will take a long time. Use this type of test if you suspect that parts of your disk are faulty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="258"/>
-        <source>Disk test for: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="263"/>
-        <source>TEST2 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="278"/>
-        <source>Do you want to start the test now?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="285"/>
-        <source>This test will overwrite the device, destroying all data on it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="296"/>
-        <source>The following filesystems are mounted on this device: %1. They will be unmounted before the test starts.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="317"/>
         <source>Cannot start test</source>
-        <translation type="unfinished">Проверка не может быть начата</translation>
+        <translation type="obsolete">Проверка не может быть начата</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="319"/>
         <source>This device is not valid: %1.</source>
         <extracomment>Invalid device selected, device not found.</extracomment>
-        <translation type="unfinished">Это устройство недействительно: %1.</translation>
+        <translation type="obsolete">Это устройство недействительно: %1.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="330"/>
-        <location filename="../src/disktestwindow.cpp" line="337"/>
         <source>Disk test</source>
-        <translation type="unfinished">Проверка диска</translation>
+        <translation type="obsolete">Проверка диска</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="332"/>
         <source>This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password.</source>
         <extracomment>This hint is to inform the user that a password prompt will be triggered, usually asking for the sudo password (i.e., the user&apos;s password if s/he has sufficient sudo permissions to run this program as root). sudo does not have to be translated, it&apos;s a detail.</extracomment>
-        <translation type="unfinished">Данная программа работает с ограниченными правами. Сейчас будет произведена попытка получить расширенные права, может быть запрошен пароль.</translation>
+        <translation type="obsolete">Данная программа работает с ограниченными правами. Сейчас будет произведена попытка получить расширенные права, может быть запрошен пароль.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="339"/>
         <source>This program is running with limited privileges. Try restarting the program as administrator.</source>
         <extracomment>This warning is shown on Windows, so the term administrator is used. Alternative: Please start this program with elevated privileges.</extracomment>
-        <translation type="unfinished">Данная программа работает с ограниченными правами. Пожалуйста, перезапустите программу как администратор.</translation>
+        <translation type="obsolete">Данная программа работает с ограниченными правами. Пожалуйста, перезапустите программу как администратор.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="417"/>
-        <source>Test Progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="427"/>
-        <source>Time elapsed:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="431"/>
-        <source>Estimated time remaining:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="439"/>
-        <source>TEST IN PROGRESS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="442"/>
-        <source>Write Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="450"/>
-        <source>Read Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="515"/>
         <source>WRITING</source>
-        <translation type="unfinished">ЗАПИСЬ</translation>
+        <translation type="obsolete">ЗАПИСЬ</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="521"/>
         <source>VERIFYING</source>
-        <translation type="unfinished">ВЕРИФИКАЦИЯ</translation>
+        <translation type="obsolete">ВЕРИФИКАЦИЯ</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="528"/>
         <source>TEST SUCCEEDED</source>
-        <translation type="unfinished">ПРОВЕРКА ЗАВЕРШЕНА</translation>
+        <translation type="obsolete">ПРОВЕРКА ЗАВЕРШЕНА</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="532"/>
         <source>TEST FAILED</source>
-        <translation type="unfinished">ПРОВЕРКА НЕ ПОЛУЧИЛАСЬ</translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="583"/>
-        <source>DONE - NO ERRORS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="589"/>
-        <location filename="../src/disktestwindow.cpp" line="595"/>
-        <source>This storage device appears to be genuine. This storage device has a capacity of %1 GB, all of which is usable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="601"/>
-        <source>FAKE DETECTED</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="615"/>
-        <source>This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/disktestwindow.cpp" line="620"/>
-        <source>This storage device returned corrupted data after %1 GB.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">ПРОВЕРКА НЕ ПОЛУЧИЛАСЬ</translation>
     </message>
 </context>
 <context>
@@ -1667,40 +1555,40 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <location filename="../src/usbdiskselectiondialog.cpp" line="35"/>
         <source>Select a storage device</source>
         <extracomment>Storage device (selection list) / usb thumb drive / disk</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Выберите USB-накопитель</translation>
     </message>
     <message>
         <location filename="../src/usbdiskselectiondialog.cpp" line="54"/>
         <source>USB devices only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только USB-устройства</translation>
     </message>
     <message>
         <location filename="../src/usbdiskselectiondialog.cpp" line="69"/>
         <source>Address</source>
         <extracomment>Internal device address, path to device file.</extracomment>
-        <translation type="unfinished">Путь</translation>
+        <translation>Адрес</translation>
     </message>
     <message>
         <location filename="../src/usbdiskselectiondialog.cpp" line="74"/>
         <source>Name</source>
         <extracomment>Name of storage device, i.e.: [model] name (e.g., of USB stick; not user-defined)</extracomment>
-        <translation type="unfinished">Название</translation>
+        <translation>Название</translation>
     </message>
     <message>
         <location filename="../src/usbdiskselectiondialog.cpp" line="78"/>
         <source>Vendor</source>
-        <translation type="unfinished">Производитель</translation>
+        <translation>Производитель</translation>
     </message>
     <message>
         <location filename="../src/usbdiskselectiondialog.cpp" line="82"/>
         <source>Size</source>
-        <translation type="unfinished">Ёмкость</translation>
+        <translation>Ёмкость</translation>
     </message>
     <message>
         <location filename="../src/usbdiskselectiondialog.cpp" line="177"/>
         <source>Serial</source>
         <extracomment>Serial number of storage device.</extracomment>
-        <translation type="unfinished">Номер серии</translation>
+        <translation>Номер серии</translation>
     </message>
 </context>
 <context>
@@ -1709,153 +1597,153 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <location filename="../src/capacitytestergui.cpp" line="1919"/>
         <source>Volume</source>
         <extracomment>Volume refers to a (mounted) filesystem throughout this application, so the word volume may be translated as filesystem.</extracomment>
-        <translation type="unfinished">Файловая система</translation>
+        <translation>Диск</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1925"/>
         <source>Filesystem</source>
         <extracomment>Volume, filesystem.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Файловая система</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1926"/>
         <source>Mounted volume to be tested</source>
-        <translation type="unfinished">Файловая система для проверки</translation>
+        <translation>Файловая система для проверки</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1932"/>
         <source>Select &amp;drive...</source>
         <extracomment>Button action: Select volume/filesystem on a USB flash drive, the dialog lists drives but the user needs to select a volume, a mounted filesystem, so the word filesystem can be used here as well.</extracomment>
-        <translation type="unfinished">&amp;Выбрать файловую систему...</translation>
+        <translation>&amp;Выбрать файловую систему...</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1952"/>
         <source>Capacity</source>
-        <translation type="unfinished">Ёмкость</translation>
+        <translation>Ёмкость</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1959"/>
         <source>Used</source>
         <extracomment>Label: Used storage (of capacity).</extracomment>
-        <translation type="unfinished">Использовано</translation>
+        <translation>Использовано</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1966"/>
         <source>Available</source>
         <extracomment>Label: Unused storage (of capacity).</extracomment>
-        <translation type="unfinished">Свободно</translation>
+        <translation>Свободно</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2019"/>
         <source>Initializing</source>
         <extracomment>Label for status of this phase - the init phase of the test.</extracomment>
-        <translation type="unfinished">Подготовка</translation>
+        <translation>Подготовка</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2022"/>
         <source>Writing</source>
         <extracomment>Label for status of this test phase.</extracomment>
-        <translation type="unfinished">Запись</translation>
+        <translation>Запись</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2025"/>
         <source>Verifying</source>
         <extracomment>Label for status of this test phase.</extracomment>
-        <translation type="unfinished">Верификация</translation>
+        <translation>Верификация</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2031"/>
         <source>Write speed</source>
-        <translation type="unfinished">Скорость записи</translation>
+        <translation>Скорость записи</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2037"/>
         <source>Read speed</source>
-        <translation type="unfinished">Скорость чтения</translation>
+        <translation>Скорость чтения</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2049"/>
         <source>Time</source>
-        <translation type="unfinished">Время</translation>
+        <translation>Время</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2055"/>
         <source>Result</source>
-        <translation type="unfinished">Результат</translation>
+        <translation>Результат</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2067"/>
         <source>&amp;Start</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Запуск</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2071"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Стоп</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2075"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">Завер&amp;шить</translation>
+        <translation>Завер&amp;шить</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2081"/>
         <source>&amp;Advanced...</source>
         <extracomment>Menu button (hence ...): Advanced functions, more functions...</extracomment>
-        <translation type="unfinished">&amp;Дополнительно...</translation>
+        <translation>&amp;Дополнительно...</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2086"/>
         <source>Run pre-check during initialization</source>
         <extracomment>On/off switch: Pre-check means quick test before the real test, to detect a fake earlier, can be translated as superficial check.</extracomment>
-        <translation type="unfinished">Выполнить предпроверку во время начальной фазы</translation>
+        <translation>Выполнить предпроверку во время начальной фазы</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2094"/>
         <source>Unmount and remount during test</source>
         <extracomment>On/off switch: Try to remount between write and read phases. (This only affects the volume test, not the disk test.)</extracomment>
-        <translation type="unfinished">Извлечь и переподключить во время проверки</translation>
+        <translation>Извлечь и переподключить во время проверки</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2173"/>
         <source>Abort test?</source>
-        <translation type="unfinished">Прервать проверку?</translation>
+        <translation>Прервать проверку?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2174"/>
         <source>Do you want to abort the running test?</source>
-        <translation type="unfinished">Вы уверены, что хотите прервать текущую проверку?</translation>
+        <translation>Вы уверены, что хотите прервать текущую проверку?</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2218"/>
         <source>Information</source>
-        <translation type="unfinished">Информация</translation>
+        <translation>Информация</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2219"/>
         <source>You have requested the volume to be remounted during the test. Normally, this should not be necessary. You might be asked for a password.</source>
-        <translation type="unfinished">Вы выбрали переподключение файловой системы во время проверки. Обычно это не требуется. Может быть запрошен пароль.</translation>
+        <translation>Вы выбрали переподключение файловой системы во время проверки. Обычно это не требуется. Может быть запрошен пароль.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2319"/>
         <location filename="../src/capacitytestergui.cpp" line="2431"/>
         <source>Volume invalid</source>
-        <translation type="unfinished">Файловая система недействительна</translation>
+        <translation>Файловая система недействительна</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2320"/>
         <source>The selected volume is not valid.</source>
-        <translation type="unfinished">Выбранная файловая система недействительна.</translation>
+        <translation>Выбранная файловая система недействительна.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2356"/>
         <source>Old test files found</source>
-        <translation type="unfinished">Обнаружены старые тестовые файлы</translation>
+        <translation>Обнаружены старые тестовые файлы</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="2358"/>
         <source>%n old test file(s) have been found! Cannot test with these files present, please delete them! The volume should be completely empty.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Обнаружен %n старый тестовый файл. Он мешает дальнейшей проверке. Пожалуйста, удалите его! Файловая система должна быть абсолютно пустой.</numerusform>
             <numerusform>Обнаружены %n старых тестовых файла. Они мешают дальнейшей проверке. Пожалуйста, удалите их! Файловая система должна быть абсолютно пустой.</numerusform>
             <numerusform>Обнаружены %n старых тестовых файлов. Они мешают дальнейшей проверке. Пожалуйста, удалите их! Файловая система должна быть абсолютно пустой.</numerusform>
@@ -1866,17 +1754,17 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
         <location filename="../src/capacitytestergui.cpp" line="2396"/>
         <location filename="../src/capacitytestergui.cpp" line="2458"/>
         <source>Volume not empty</source>
-        <translation type="unfinished">Файловая система не пуста</translation>
+        <translation>Файловая система не пуста</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2375"/>
         <source>This volume is %1% full. The volume should be completely empty.</source>
-        <translation type="unfinished">Данная файловая система занята на %1%. Она должна быть полностью пустая.</translation>
+        <translation>Данная файловая система занята на %1%. Она должна быть полностью пустая.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="2398"/>
         <source>%n file(s) have been found. The volume should be completely empty.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Обнаружен %n файл. Файловая система должна быть абсолютно пустой.</numerusform>
             <numerusform>Обнаружены %n файла. Файловая система должна быть абсолютно пустой.</numerusform>
             <numerusform>Обнаружены %n файлов. Файловая система должна быть абсолютно пустой.</numerusform>
@@ -1885,22 +1773,22 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2432"/>
         <source>The selected volume is not valid anymore.</source>
-        <translation type="unfinished">Выбранная файловая система больше недействительна.</translation>
+        <translation>Выбранная файловая система больше недействительна.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2445"/>
         <source>Volume full</source>
-        <translation type="unfinished">Файловая система заполнена</translation>
+        <translation>Файловая система заполнена</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2446"/>
         <source>The selected volume is full.</source>
-        <translation type="unfinished">Выбранная файловая система заполнена.</translation>
+        <translation>Выбранная файловая система заполнена.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/capacitytestergui.cpp" line="2460"/>
         <source>The volume is not empty: %n file(s) have been found. You should cancel, delete all those files and try again. Are you really sure you want to continue?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Файловая система не пуста. Обнаружен %n файл. Удалите этот файл и попробуйте ещё раз. Вы уверены, что хотите продолжить?</numerusform>
             <numerusform>Файловая система не пуста. Обнаружены %n файла. Удалите все эти файлы и попробуйте ещё раз. Вы уверены, что хотите продолжить?</numerusform>
             <numerusform>Файловая система не пуста. Обнаружены %n файлов. Удалите все эти файлы и попробуйте ещё раз. Вы уверены, что хотите продолжить?</numerusform>
@@ -1909,112 +1797,112 @@ If you have any valuable files on this device, cancel NOW (press ESC).</source>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2632"/>
         <source>STARTING</source>
-        <translation type="unfinished">ЗАПУСК</translation>
+        <translation>ЗАПУСК</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2650"/>
         <source>STOPPING</source>
-        <translation type="unfinished">ОСТАНОВКА</translation>
+        <translation>ОСТАНОВКА</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2667"/>
         <source>TEST SUCCEEDED</source>
-        <translation type="unfinished">ПРОВЕРКА ЗАВЕРШЕНА</translation>
+        <translation>ПРОВЕРКА ЗАВЕРШЕНА</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2670"/>
         <source>TEST COMPLETED SUCCESSFULLY, NO ERRORS FOUND.</source>
-        <translation type="unfinished">ПРОВЕРКА УСПЕШНО ЗАВЕРШЕНА. ОШИБОК НЕ НАЙДЕНО.</translation>
+        <translation>ПРОВЕРКА УСПЕШНО ЗАВЕРШЕНА. ОШИБОК НЕ НАЙДЕНО.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2686"/>
         <source>Test succeeded</source>
-        <translation type="unfinished">Проверка завершена</translation>
+        <translation>Проверка завершена</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2687"/>
         <source>Test completed successfully, no errors found.</source>
-        <translation type="unfinished">Проверка успешно завершена. Ошибок не найдено.</translation>
+        <translation>Проверка успешно завершена. Ошибок не найдено.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2697"/>
         <source>TEST FAILED</source>
-        <translation type="unfinished">ПРОВЕРКА НЕ ПОЛУЧИЛАСЬ</translation>
+        <translation>ПРОВЕРКА НЕ ПОЛУЧИЛАСЬ</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2718"/>
         <source>The volume might be bad.</source>
-        <translation type="unfinished">Файловая система повреждена.</translation>
+        <translation>Файловая система повреждена.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2719"/>
         <source>An error has occurred.</source>
-        <translation type="unfinished">Возникла ошибка.</translation>
+        <translation>Возникла ошибка.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2721"/>
         <source>Error creating test file.</source>
-        <translation type="unfinished">Возникла ошибка при создании тестового файла.</translation>
+        <translation>Возникла ошибка при создании тестового файла.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2723"/>
         <source>Permission denied.</source>
-        <translation type="unfinished">Отказано в доступе.</translation>
+        <translation>Отказано в доступе.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2725"/>
         <source>Resizing test file failed.</source>
-        <translation type="unfinished">Увеличение тестового файла не получилось.</translation>
+        <translation>Увеличение тестового файла не получилось.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2727"/>
         <source>Write failed.</source>
-        <translation type="unfinished">Запись не получилась.</translation>
+        <translation>Запись не получилась.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2729"/>
         <source>Verification failed.</source>
-        <translation type="unfinished">Верификация не получилась.</translation>
+        <translation>Верификация не получилась.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2731"/>
         <source>Test failed</source>
-        <translation type="unfinished">Проверка не получилась</translation>
+        <translation>Проверка не получилась</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2732"/>
         <source>Test failed. </source>
-        <translation type="unfinished">Проверка не получилась.</translation>
+        <translation>Проверка не получилась. </translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2840"/>
         <source>INITIALIZING</source>
-        <translation type="unfinished">ПОДГОТОВКА</translation>
+        <translation>ПОДГОТОВКА</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2859"/>
         <source>WRITING</source>
-        <translation type="unfinished">ЗАПИСЬ</translation>
+        <translation>ЗАПИСЬ</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2869"/>
         <source>VERIFYING</source>
-        <translation type="unfinished">ВЕРИФИКАЦИЯ</translation>
+        <translation>ВЕРИФИКАЦИЯ</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2882"/>
         <source>ACCESS ERROR!</source>
-        <translation type="unfinished">ОШИБКА ДОСТУПА!</translation>
+        <translation>ОШИБКА ДОСТУПА!</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2894"/>
         <source>WRITE ERROR AFTER %1 MB!</source>
-        <translation type="unfinished">ОШИБКА ЗАПИСИ ПОСЛЕ %1 MB!</translation>
+        <translation>ОШИБКА ЗАПИСИ ПОСЛЕ %1 MB!</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="2906"/>
         <source>READ ERROR AFTER %1 MB!</source>
-        <translation type="unfinished">ОШИБКА ЧТЕНИЯ ПОСЛЕ %1 MB!</translation>
+        <translation>ОШИБКА ЧТЕНИЯ ПОСЛЕ %1 MB!</translation>
     </message>
 </context>
 </TS>

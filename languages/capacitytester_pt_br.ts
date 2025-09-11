@@ -681,6 +681,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1552"/>
         <source>After %1 GB, the device returned data that did not match what was written during the test. This indicates the device is silently corrupting data without reporting any errors.</source>
+        <extracomment>Translate: &quot;data that did not match...&quot; may be translated as &quot;wrong data&quot; or &quot;incorrect data&quot;. &quot;silently corrupting data&quot; means damaging data without notifying the user.</extracomment>
         <translation>Depois de %1 GB, o dispositivo retornou dados que não correspondiam com os que foram gravados durante o teste. Isso indica que o dispositivo está corrompendo dados silenciosamente sem relatar erros.</translation>
     </message>
     <message>
@@ -696,11 +697,13 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1559"/>
         <source>Failed to write to device (seek error) after %1 GB.</source>
+        <extracomment>Translator: Do not translate &quot;seek&quot; (technical term)</extracomment>
         <translation>Falha ao gravar no dispositivo (seek error) depois de %1 GB.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1562"/>
         <source>Failed to read from device (seek error) after %1 GB.</source>
+        <extracomment>Translator: Do not translate &quot;seek&quot; (technical term)</extracomment>
         <translation>Falha ao ler do dispositivo (seek error) depois de %1 GB.</translation>
     </message>
     <message>
@@ -716,6 +719,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1569"/>
         <source>This storage device returned empty data after %1 GB.</source>
+        <extracomment>Translator: It unexpectedly returned empty/nothing when reading a (non-empty) section of the device</extracomment>
         <translation>O dispositivo de armazenamento retornou dados vazios depois de %1 GB.</translation>
     </message>
     <message>
@@ -864,160 +868,128 @@ Você tem certeza que deseja continuar?</numerusform>
 <context>
     <name>DiskTestWidget</name>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="212"/>
         <source>Which type of test do you want to run? Click OK or hit ENTER to use the recommended one.</source>
-        <translation>Qual tipo de teste que você deseja executar? Clique em OK ou tecle ENTER para usar o teste recomendado.</translation>
+        <translation type="vanished">Qual tipo de teste que você deseja executar? Clique em OK ou tecle ENTER para usar o teste recomendado.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="218"/>
         <source>Quick disk test</source>
         <extracomment>Fast, as in quick - takes only ~minutes.</extracomment>
-        <translation>Teste rápido de disco</translation>
+        <translation type="vanished">Teste rápido de disco</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="222"/>
         <source>Writes to the disk with certain intervals to quickly determine if the device has less capacity than it claims to have. This type of test works for all common fakes and is very fast. It will not test every byte. Recommended.</source>
-        <translation>Grava no disco com certos intervalos para determinar rapidamente se o dispositivo tem menos capacidade do que diz. Este tipo de teste funciona com todos os falsos comuns e é bem rápido. Ele não teste todos os bytes. Recomendado.</translation>
+        <translation type="vanished">Grava no disco com certos intervalos para determinar rapidamente se o dispositivo tem menos capacidade do que diz. Este tipo de teste funciona com todos os falsos comuns e é bem rápido. Ele não teste todos os bytes. Recomendado.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="225"/>
         <source>Full disk test</source>
-        <translation>Testo completo de disco</translation>
+        <translation type="vanished">Testo completo de disco</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="228"/>
         <source>Fills the whole disk, testing every block. This will take a long time. Use this type of test if you suspect that parts of your disk are faulty.</source>
-        <translation>Enche o disco inteiro, testando todos os blocos. Isto leva um bom tempo. Use este tipo de teste somente se você suspeita que partes do seu disco estão defeituosas.</translation>
+        <translation type="vanished">Enche o disco inteiro, testando todos os blocos. Isto leva um bom tempo. Use este tipo de teste somente se você suspeita que partes do seu disco estão defeituosas.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="258"/>
         <source>Disk test for: %1</source>
-        <translation>Teste de disco para: %1</translation>
+        <translation type="vanished">Teste de disco para: %1</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="263"/>
         <source>TEST2 </source>
-        <translation>TESTE2 </translation>
+        <translation type="vanished">TESTE2 </translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="278"/>
         <source>Do you want to start the test now?</source>
-        <translation>Você quer iniciar o teste agora?</translation>
+        <translation type="vanished">Você quer iniciar o teste agora?</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="285"/>
         <source>This test will overwrite the device, destroying all data on it.</source>
-        <translation>Este teste gravará em cima do dispositivo, destruindo todos os dados nele.</translation>
+        <translation type="vanished">Este teste gravará em cima do dispositivo, destruindo todos os dados nele.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="296"/>
         <source>The following filesystems are mounted on this device: %1. They will be unmounted before the test starts.</source>
-        <translation>Os seguintes sistemas de arquivos estão montados neste dispositivo: %1. Eles serão desmontados antes do teste começar.</translation>
+        <translation type="vanished">Os seguintes sistemas de arquivos estão montados neste dispositivo: %1. Eles serão desmontados antes do teste começar.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="317"/>
         <source>Cannot start test</source>
-        <translation>Não é possível iniciar o teste</translation>
+        <translation type="vanished">Não é possível iniciar o teste</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="319"/>
         <source>This device is not valid: %1.</source>
         <extracomment>Invalid device selected, device not found.</extracomment>
-        <translation>Este dispositivo não é válido: %1</translation>
+        <translation type="vanished">Este dispositivo não é válido: %1</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="330"/>
-        <location filename="../src/disktestwindow.cpp" line="337"/>
         <source>Disk test</source>
-        <translation>Teste de disco</translation>
+        <translation type="vanished">Teste de disco</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="332"/>
         <source>This program is running with limited privileges. An attempt will now be made to gain root privileges for this test, you may be asked for your sudo password.</source>
         <extracomment>This hint is to inform the user that a password prompt will be triggered, usually asking for the sudo password (i.e., the user&apos;s password if s/he has sufficient sudo permissions to run this program as root). sudo does not have to be translated, it&apos;s a detail.</extracomment>
-        <translation>Este programa está sendo executado com privilégios limitados. Uma tentativa será feita agora para receber privilégios de root para este teste, você pode ser solicitado pela sua senha de sudo.</translation>
+        <translation type="vanished">Este programa está sendo executado com privilégios limitados. Uma tentativa será feita agora para receber privilégios de root para este teste, você pode ser solicitado pela sua senha de sudo.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="339"/>
         <source>This program is running with limited privileges. Try restarting the program as administrator.</source>
         <extracomment>This warning is shown on Windows, so the term administrator is used. Alternative: Please start this program with elevated privileges.</extracomment>
-        <translation>Este programa está sendo executado com privilégios limitados. Tente reiniciar o programa como administrador.</translation>
+        <translation type="vanished">Este programa está sendo executado com privilégios limitados. Tente reiniciar o programa como administrador.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="417"/>
         <source>Test Progress</source>
-        <translation>Progresso do Teste</translation>
+        <translation type="vanished">Progresso do Teste</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="427"/>
         <source>Time elapsed:</source>
-        <translation>Tempo decorrido</translation>
+        <translation type="vanished">Tempo decorrido</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="431"/>
         <source>Estimated time remaining:</source>
-        <translation>Estimativa de tempo restante</translation>
+        <translation type="vanished">Estimativa de tempo restante</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="439"/>
         <source>TEST IN PROGRESS</source>
-        <translation>TESTE EM PROGRESSO</translation>
+        <translation type="vanished">TESTE EM PROGRESSO</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="442"/>
         <source>Write Speed</source>
-        <translation>Velocidade de Gravação</translation>
+        <translation type="vanished">Velocidade de Gravação</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="450"/>
         <source>Read Speed</source>
-        <translation>Velocidade de Leitura</translation>
+        <translation type="vanished">Velocidade de Leitura</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="515"/>
         <source>WRITING</source>
-        <translation>GRAVAÇÃO</translation>
+        <translation type="vanished">GRAVAÇÃO</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="521"/>
         <source>VERIFYING</source>
-        <translation>VERIFICAÇÃO</translation>
+        <translation type="vanished">VERIFICAÇÃO</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="528"/>
         <source>TEST SUCCEEDED</source>
-        <translation>TESTE BEM SUCEDIDO</translation>
+        <translation type="vanished">TESTE BEM SUCEDIDO</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="532"/>
         <source>TEST FAILED</source>
-        <translation>TESTE FALHOU</translation>
+        <translation type="vanished">TESTE FALHOU</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="583"/>
         <source>DONE - NO ERRORS</source>
-        <translation>CONCLUÍDO - NENHUM ERRO</translation>
+        <translation type="vanished">CONCLUÍDO - NENHUM ERRO</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="589"/>
-        <location filename="../src/disktestwindow.cpp" line="595"/>
         <source>This storage device appears to be genuine. This storage device has a capacity of %1 GB, all of which is usable.</source>
-        <translation>Este dispositivo de armazenamento parece ser real. Este dispositivo de armazenamento tem uma capacidade de %1 GB, e tudo é utilizável.</translation>
+        <translation type="vanished">Este dispositivo de armazenamento parece ser real. Este dispositivo de armazenamento tem uma capacidade de %1 GB, e tudo é utilizável.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="601"/>
         <source>FAKE DETECTED</source>
-        <translation>FALSIFICAÇÃO DETECTADA</translation>
+        <translation type="vanished">FALSIFICAÇÃO DETECTADA</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="615"/>
         <source>This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.</source>
-        <translation>Este dispositivo de armazenamento alega ter uma capacidade de %1 GB, mas somente os primeiros %1 GB são utilizáveis.</translation>
+        <translation type="vanished">Este dispositivo de armazenamento alega ter uma capacidade de %1 GB, mas somente os primeiros %1 GB são utilizáveis.</translation>
     </message>
     <message>
-        <location filename="../src/disktestwindow.cpp" line="620"/>
         <source>This storage device returned corrupted data after %1 GB.</source>
-        <translation>Este dispositivo de armazenamento retornou dados corrompidos depois de %1 GB.</translation>
+        <translation type="vanished">Este dispositivo de armazenamento retornou dados corrompidos depois de %1 GB.</translation>
     </message>
 </context>
 <context>

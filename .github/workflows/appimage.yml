@@ -2,7 +2,7 @@
 name: Build AppImage executable
 
 on:
-  - push
+  push:
 
 jobs:
   build-appimage:
@@ -16,10 +16,10 @@ jobs:
         with:
           recipe: .build_pipe_vars
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: executable
           path: |
             build.tar
+            *.AppImage
             #bin/*
-            #*.AppImage

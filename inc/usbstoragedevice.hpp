@@ -89,6 +89,9 @@ public:
         MegaUltraPlusPlusPlus = 320000,
     };
 
+    static bool
+    isDevicePath(const QString &path);
+
     UsbStorageDevice(const QString &path);
 
     ~UsbStorageDevice();

@@ -76,7 +76,9 @@
 #include <initguid.h>
 #include <ntddstor.h>
 // GUID_DEVINTERFACE_DISK = {53F56307-B6BF-11D0-94F2-00A0C91EFB8B}
+#if !defined(_MSC_VER) //avoid redefinition error with MSVC
 DEFINE_GUID(GUID_DEVINTERFACE_DISK, 0x53F56307, 0xB6BF, 0x11D0, 0x94, 0xf2, 0x0, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b);
+#endif
 #else
 //extern...
 #endif

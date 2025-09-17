@@ -24,8 +24,11 @@
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
-#include <unistd.h>
 #include <fcntl.h>
+
+#if !defined(_MSC_VER)
+#include <unistd.h>
+#endif
 
 #if defined(_WIN32)
 #include <io.h> /* _get_osfhandle */

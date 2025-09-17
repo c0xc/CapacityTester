@@ -88,7 +88,7 @@ StorageDiskSelection::Access::sometimesWideCharToString(LPCTSTR str_tchar)
 #ifdef UNICODE
     text = QString::fromWCharArray(str_tchar);
 #else
-    text = QString::fromLocal8Bit(str_tchar)
+    text = QString::fromLocal8Bit(str_tchar);
 #endif
 
     return text;

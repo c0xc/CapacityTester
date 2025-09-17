@@ -21,40 +21,48 @@
 
 #include "usbstoragedevice.hpp"
 
+bool
+UsbStorageDevice::isDevicePath(const QString &path)
+{
+    bool is_device = false;
+
+#if !defined(Q_OS_WIN)
+    struct stat dev_stat;
+    if (stat(path.toUtf8().constData(), &dev_stat) == 0)
+    {
+        is_device = S_ISBLK(dev_stat.st_mode);
+    }
+#elif defined(Q_OS_WIN)
+    // On Windows, you may want to check for device path prefix, e.g. "\\\\.\\"
+    is_device = path.startsWith("\\\\.\\");
+#endif
+
+    return is_device;
+}
+
 UsbStorageDevice::UsbStorageDevice(const QString &path)
                 : m_path(path),
                   m_init_ok(false),
                   m_err_flag(0)
 {
     //Check if the path is a block device
-    struct stat dev_stat;
-    if (stat(m_path.toUtf8().constData(), &dev_stat) == 0)
+    if (!isDevicePath(m_path))
     {
-        if (S_ISBLK(dev_stat.st_mode))
-        {
-            //path is a block device
-            //like /dev/sda
-            QFileInfo fi(m_path);
-            m_int_name = fi.fileName();
-            m_init_ok = true;
-        }
-        else
-        {
-            //not a block device
-            m_err_flag = 1;
-            return;
-        }
-    }
-    else
-    {
-        //Error getting device status
-        m_err_flag = -1;
+        m_err_flag = 1;
         return;
     }
+
+    //path is a block device
+    //like /dev/sda
+    QFileInfo fi(m_path);
+    m_int_name = fi.fileName();
+    m_init_ok = true;
 
     //Get major and minor id
     //also available in the udev map: "MAJOR" and "MINOR"
 #if !defined(Q_OS_WIN)
+    struct stat dev_stat;
+    stat(m_path.toUtf8().constData(), &dev_stat);
     m_major_minor.first = gnu_dev_major(dev_stat.st_rdev);
     m_major_minor.second = gnu_dev_minor(dev_stat.st_rdev);
 #endif

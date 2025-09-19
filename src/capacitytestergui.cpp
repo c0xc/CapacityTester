@@ -754,7 +754,7 @@ CapacityTesterGui::showDevControls()
         int row = 0;
 
         //Partition number
-        int part_num = device.partitionNumberOfFilesystem(fs.path);
+        int part_num = device.partitionNumberOfFilesystem(fs);
         QLabel *lbl_part_num = new QLabel(tr("Partition"));
         grid_fs->addWidget(lbl_part_num, row, 0);
         QLabel *txt_part_num = new QLabel(QString("%1").arg(part_num));

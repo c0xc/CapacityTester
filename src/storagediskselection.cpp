@@ -817,37 +817,45 @@ StorageDiskSelection::Device::partitions()
 #elif defined(Q_OS_WIN)
 
     //IOCTL_DISK_GET_DRIVE_LAYOUT_EX
+    //Prepare buffer large enough to hold all partitions
     HANDLE knob = driveHandle();
-    DRIVE_LAYOUT_INFORMATION_EX_FIXED st_parts_layout;
+    DRIVE_LAYOUT_INFORMATION_EX_FIXED st_parts_layout; //unreliable
+    const int max_partitions = 128;
+    DWORD layout_size = sizeof(DRIVE_LAYOUT_INFORMATION_EX) +
+                        sizeof(PARTITION_INFORMATION_EX) * (max_partitions - 1);
+    std::vector<char> layout_bytes(layout_size, 0); //zero-initialized
+    DRIVE_LAYOUT_INFORMATION_EX *layout =
+        reinterpret_cast<DRIVE_LAYOUT_INFORMATION_EX*>(layout_bytes.data());
+    //IOCTL_DISK_GET_DRIVE_LAYOUT_EX
     DWORD rsize = 0;
-    DeviceIoControl(
+    BOOL ok = DeviceIoControl(
         knob,
         IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
-        0, 0,
-        &st_parts_layout, sizeof(st_parts_layout),
+        nullptr, 0,
+        layout, layout_size,
         &rsize,
-        NULL
+        nullptr
     );
-    if (!rsize)
+    if (!ok || !rsize)
     {
         //error //TODO formatWinError
         return partitions;
     }
 
-    int parts_count_max = st_parts_layout.PartitionCount; //MBR: 4
+    int parts_count_max = layout->PartitionCount; //MBR: 4
     for (int j = 0; j < parts_count_max; j++)
     {
         PartitionGeometry part{};
 
-        if (st_parts_layout.PartitionStyle == PARTITION_STYLE_MBR)
+        if (layout->PartitionStyle == PARTITION_STYLE_MBR)
         {
-            if (st_parts_layout.PartitionEntry[j].Mbr.PartitionType == PARTITION_ENTRY_UNUSED)
-                continue;
+            if (layout->PartitionEntry[j].Mbr.PartitionType == PARTITION_ENTRY_UNUSED)
+                continue; //otherwise number of partitions is always 4
         }
 
-        part.start = st_parts_layout.PartitionEntry[j].StartingOffset.QuadPart;
-        part.size = st_parts_layout.PartitionEntry[j].PartitionLength.QuadPart;
-        part.number = st_parts_layout.PartitionEntry[j].PartitionNumber;
+        part.start = layout->PartitionEntry[j].StartingOffset.QuadPart;
+        part.size = layout->PartitionEntry[j].PartitionLength.QuadPart;
+        part.number = layout->PartitionEntry[j].PartitionNumber;
         partitions << part;
     }
 
@@ -1013,6 +1021,23 @@ StorageDiskSelection::Device::partitionNumberOfFilesystem(const QString &filesys
     foreach (PartitionGeometry part, partitions())
     {
         if (fs_info._part_start == part.start)
+        {
+            number = part.number;
+            break;
+        }
+    }
+
+    return number;
+}
+
+int
+StorageDiskSelection::Device::partitionNumberOfFilesystem(const FilesystemInfo &filesystem_info)
+{
+    int number = -1;
+
+    foreach (PartitionGeometry part, partitions())
+    {
+        if (filesystem_info._part_start == part.start)
         {
             number = part.number;
             break;

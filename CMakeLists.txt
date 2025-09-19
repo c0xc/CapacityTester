@@ -1,19 +1,19 @@
+# CMake version and project language
 cmake_minimum_required(VERSION 3.16)
 project(CapacityTester LANGUAGES CXX)
-
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Define PROGRAM macro as a C string literal
 add_compile_definitions(PROGRAM="CapacityTester")
 
-# Prefer Qt6, fallback to Qt5 if available
+# Qt components
 if(WIN32)
     set(QT_COMPONENTS Widgets Concurrent LinguistTools)
 else()
     set(QT_COMPONENTS Widgets Concurrent DBus LinguistTools)
 endif()
-
+# Find and configure Qt6 or fallback to Qt5
 find_package(Qt6 COMPONENTS ${QT_COMPONENTS} QUIET)
 if(Qt6_FOUND)
     set(QT_VERSION_MAJOR 6)
@@ -31,16 +31,19 @@ set(CMAKE_AUTORCC ON)
 # Source and header files
 file(GLOB SOURCES src/*.cpp)
 file(GLOB HEADERS inc/*.hpp inc/*.h)
-
-add_executable(capacity-tester ${SOURCES} ${HEADERS})
-
+add_executable(capacity-tester ${SOURCES} ${HEADERS}add_executable(capacity-tester ${SOURCES} ${HEADERS})
 target_include_directories(capacity-tester PRIVATE inc)
 
+# Set Windows GUI subsystem to hide console window
+if (WIN32)
+    set_target_properties(capacity-tester PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
+# Link Qt libraries to the executable
 target_link_libraries(capacity-tester
     ${QT_PACKAGE_PREFIX}::Widgets
     ${QT_PACKAGE_PREFIX}::Concurrent
 )
-
 if(UNIX AND NOT WIN32)
     target_link_libraries(capacity-tester ${QT_PACKAGE_PREFIX}::DBus udev)
     target_compile_definitions(capacity-tester PRIVATE HAVE_LIBUDEV)
@@ -106,4 +109,5 @@ if (MSVC)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
+# Install the built executable to the bin directory
 install(TARGETS capacity-tester DESTINATION bin)

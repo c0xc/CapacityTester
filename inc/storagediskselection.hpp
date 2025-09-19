@@ -110,7 +110,7 @@ DEFINE_DEVPROPKEY(DEVPKEY_Device_SecuritySDS,            0xa45c254e, 0xdf1c, 0x4
 #include <QSharedPointer>
 #include <QRegExp>
 
-//#include "classlogger.hpp"
+#include "classlogger.hpp"
 
 /*! \class StorageDiskSelection
  *
@@ -329,6 +329,9 @@ public:
 
         int
         partitionNumberOfFilesystem(const QString &filesystem_path);
+
+        int
+        partitionNumberOfFilesystem(const FilesystemInfo &filesystem_info);
 
         /**
          * @brief Attempts to determine the first mountpoint of the first filesystem on the device.

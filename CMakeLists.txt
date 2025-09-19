@@ -31,7 +31,7 @@ set(CMAKE_AUTORCC ON)
 # Source and header files
 file(GLOB SOURCES src/*.cpp)
 file(GLOB HEADERS inc/*.hpp inc/*.h)
-add_executable(capacity-tester ${SOURCES} ${HEADERS}add_executable(capacity-tester ${SOURCES} ${HEADERS})
+add_executable(capacity-tester ${SOURCES} ${HEADERS})
 target_include_directories(capacity-tester PRIVATE inc)
 
 # Set Windows GUI subsystem to hide console window

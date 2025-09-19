@@ -220,7 +220,7 @@ Você tem certeza que deseja continuar?</numerusform>
         <location filename="../src/capacitytestergui.cpp" line="221"/>
         <source>This program is designed to verify the reported capacity of USB storage devices. It checks if a device is reporting a fake capacity and attempts to determine the actual capacity. Please proceed with caution as this process will wipe all data on the device.</source>
         <extracomment>Introduction text for the program. Feel free to improve the wording. //Welcome to the USB Capacity Tester...</extracomment>
-        <translation>Este programa é feito para verificar a capacidade relatada por dispositivos USB de armazenamento. Ele verifica se o dispositivo está relatando uma capacidade falsa e tente determinar a capacidade real. Por favor prossiga com cuidado, já que este processo apagará todos os dados no dispositivo.</translation>
+        <translation>Esse programa foi feito para verificar a capacidade relatada por dispositivos USB de armazenamento. Ele verifica se o dispositivo está relatando uma capacidade falsa e tenta determinar a capacidade real. Por favor prossiga com cuidado, já que este processo apagará todos os dados no dispositivo.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="233"/>
@@ -257,7 +257,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="334"/>
         <source>Select custom location to test</source>
-        <translation>Selecione um local personalizado para testar</translation>
+        <translation>Selecionar local personalizado</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="378"/>
@@ -279,7 +279,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="400"/>
         <source>Continue to select the type of test to run.</source>
-        <translation>Continue para selecionar o tipo de teste para executar.</translation>
+        <translation>Continue para selecionar o tipo de teste.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="421"/>
@@ -374,7 +374,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="732"/>
         <source>Filesystems</source>
-        <translation>Sistemas de arquivo</translation>
+        <translation>Sistemas de arquivos</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="741"/>
@@ -442,7 +442,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="846"/>
         <source>The selected filesystem has been mounted here: %1</source>
-        <translation>O sistema de arquivos selecionado foi montado aqui: %s</translation>
+        <translation>O sistema de arquivos selecionado foi montado aqui: %1</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="854"/>
@@ -489,7 +489,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="908"/>
         <source>The Quick Test specifically checks whether the storage medium is reporting a false capacity and attempts to determine the real capacity. USB sticks that claim too large a capacity can be quickly identified with this, hence this is the recommended test type.</source>
-        <translation>O teste rápido verifica especificamente se o meio de armazenamento está relatando uma capacidade falsa e tenta determina a capacidade real. Pendrives que informam uma capacidade muito grande podem ser identificados rapidamente com isso, portanto é o tipo de teste recomendado.</translation>
+        <translation>O teste rápido verifica especificamente se o meio de armazenamento está relatando uma capacidade falsa e tenta determinar a capacidade real. Pendrives que informam uma capacidade muito grande podem ser identificados rapidamente com isso, portanto é o tipo de teste recomendado.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="910"/>
@@ -862,7 +862,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/destructivedisktester.cpp" line="448"/>
         <source>Failed to unmount %1: %2</source>
-        <translation>Falha ao desmontar %1: %s</translation>
+        <translation>Falha ao desmontar %1: %2</translation>
     </message>
 </context>
 <context>

@@ -6,17 +6,17 @@
     <message>
         <location filename="../src/capacitytestercli.cpp" line="53"/>
         <source>Lists available volumes.</source>
-        <translation>Перечисляет доступные файловые системы.</translation>
+        <translation>Перечисляет доступные тома.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="55"/>
         <source>Shows volume information.</source>
-        <translation>Показывает информацию о файловых системах.</translation>
+        <translation>Показывает информацию о томах.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="57"/>
         <source>Starts volume test.</source>
-        <translation>Начинает проверку файловых систем.</translation>
+        <translation>Запускает тест тома.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="59"/>
@@ -26,7 +26,7 @@
     <message>
         <location filename="../src/capacitytestercli.cpp" line="61"/>
         <source>Run destructive test (+ -device).</source>
-        <translation>Начать проверку диска (+ -device).</translation>
+        <translation>Запустить разрушительный тест (+ -device).</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="63"/>
@@ -36,11 +36,11 @@
     <message>
         <location filename="../src/capacitytestercli.cpp" line="65"/>
         <source>Changes the size of the safety buffer zone.</source>
-        <translation>Изменяет размер свободной буферной зоны.</translation>
+        <translation>Изменяет размер зоны безопасного буфера.</translation>
     </message>
     <message>
         <source>Path to device to be tested (destructive test).</source>
-        <translation type="vanished">Адрес диска для проверки.</translation>
+        <translation type="vanished">Путь к устройству для тестирования (разрушительный тест).</translation>
     </message>
     <message>
         <location filename="../src/capacitytestercli.cpp" line="71"/>

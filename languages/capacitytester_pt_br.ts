@@ -730,7 +730,7 @@ Você tem certeza que deseja continuar?</numerusform>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1576"/>
         <source>This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.</source>
-        <translation>Este dispositivo de armazenamento alega ter uma capacidade de %1 GB, mas somente os primeiros %1 GB são utilizáveis.</translation>
+        <translation>Este dispositivo de armazenamento alega ter uma capacidade de %1 GB, mas somente os primeiros %2 GB são utilizáveis.</translation>
     </message>
     <message>
         <location filename="../src/capacitytestergui.cpp" line="1588"/>
@@ -985,7 +985,7 @@ Você tem certeza que deseja continuar?</numerusform>
     </message>
     <message>
         <source>This storage device claims to have a capacity of %1 GB, but only the first %2 GB are usable.</source>
-        <translation type="vanished">Este dispositivo de armazenamento alega ter uma capacidade de %1 GB, mas somente os primeiros %1 GB são utilizáveis.</translation>
+        <translation type="vanished">Este dispositivo de armazenamento alega ter uma capacidade de %1 GB, mas somente os primeiros %2 GB são utilizáveis.</translation>
     </message>
     <message>
         <source>This storage device returned corrupted data after %1 GB.</source>
